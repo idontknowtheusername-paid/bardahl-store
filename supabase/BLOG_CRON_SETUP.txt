@@ -1,0 +1,64 @@
+CONFIGURATION DU CRON JOB POUR LA GÉNÉRATION AUTOMATIQUE DE BLOG
+=================================================================
+
+Pour activer la génération automatique hebdomadaire d'articles de blog :
+
+OPTION 1 : Via Supabase Dashboard (Recommandé)
+-----------------------------------------------
+1. Allez dans votre projet Supabase Dashboard
+2. Naviguez vers "Database" > "Cron Jobs" (ou "Extensions" > "pg_cron")
+3. Créez un nouveau cron job avec :
+   - Name: weekly-blog-generation
+   - Schedule: 0 9 * * 1 (Chaque lundi à 9h00)
+   - Command: SELECT net.http_post(
+       url:='https://YOUR_PROJECT_REF.supabase.co/functions/v1/blog-auto-publish',
+       headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb
+     );
+
+OPTION 2 : Via SQL
+------------------
+Exécutez cette commande SQL dans votre base de données :
+
+SELECT cron.schedule(
+  'weekly-blog-generation',
+  '0 9 * * 1',
+  $$
+  SELECT net.http_post(
+    url:='https://YOUR_PROJECT_REF.supabase.co/functions/v1/blog-auto-publish',
+    headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb
+  );
+  $$
+);
+
+OPTION 3 : Via GitHub Actions (Alternative)
+--------------------------------------------
+Créez un fichier .github/workflows/weekly-blog.yml avec :
+
+name: Weekly Blog Generation
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9 AM
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  generate-blog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Supabase Function
+        run: |
+          curl -X POST \
+            https://YOUR_PROJECT_REF.supabase.co/functions/v1/blog-auto-publish \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json"
+
+NOTES IMPORTANTES :
+-------------------
+- Remplacez YOUR_PROJECT_REF par votre référence de projet Supabase
+- Remplacez YOUR_SERVICE_ROLE_KEY par votre clé service_role (gardez-la secrète!)
+- Le cron '0 9 * * 1' signifie : minute 0, heure 9, tous les jours du mois, tous les mois, le lundi
+- Vous pouvez ajuster l'horaire selon vos besoins
+
+GÉNÉRATION MANUELLE :
+---------------------
+Pour générer un article manuellement, utilisez le bouton "Générer un article" 
+dans l'interface admin à /blog

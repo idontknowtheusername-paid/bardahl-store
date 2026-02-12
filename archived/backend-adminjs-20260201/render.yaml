@@ -1,0 +1,52 @@
+services:
+  # Backend API + AdminJS
+  - type: web
+    name: cannesh-backend-adminjs
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: npm install && npm run db:generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cannesh-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: Cannesh Lingerie <noreply@cannesh.com>
+      - key: LYGOS_API_KEY
+        sync: false
+      - key: LYGOS_SECRET_KEY
+        sync: false
+      - key: LYGOS_BASE_URL
+        value: https://api.lygos.com
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+databases:
+  - name: cannesh-db
+    databaseName: cannesh
+    user: cannesh_user
+    region: frankfurt
+    plan: starter
+    postgresMajorVersion: 15
