@@ -19,7 +19,7 @@ export default function Unsubscribe() {
       }
 
       try {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('blog_subscribers')
           .update({ is_active: false })
           .eq('unsubscribe_token', token);

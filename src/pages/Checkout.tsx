@@ -176,7 +176,7 @@ export default function Checkout() {
       if (subscribeToBlog && shippingInfo.email) {
         try {
           const { supabase } = await import('@/integrations/supabase/client');
-          await supabase
+          await (supabase as any)
             .from('blog_subscribers')
             .upsert({
               email: shippingInfo.email,
