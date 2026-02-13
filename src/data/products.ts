@@ -1,160 +1,114 @@
 // Static data fallback for products and categories
 import type { Product, Collection } from '@/types/product';
 
-// Static categories fallback (synchronized with database)
+// Static categories — Bardahl automotive
 export const categories: Collection[] = [
   {
-    id: 'ensembles',
-    slug: 'ensembles',
-    name: 'Ensembles & Combinaison',
-    description: 'Ensembles de lingerie coordonnés et combinaisons',
-    image: 'https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=800&q=80',
+    id: 'huiles-moteur',
+    slug: 'huiles-moteur',
+    name: 'Huiles Moteur',
+    description: 'Huiles moteur haute performance avec technologie Polar Plus®',
+    image: 'https://images.unsplash.com/photo-1635784553857-4a87fb285e44?w=800&q=80',
     productCount: 0,
   },
   {
-    id: 'soutiens-gorge',
-    slug: 'soutiens-gorge',
-    name: 'Soutiens-gorge',
-    description: 'Soutiens-gorge confortables et élégants',
-    image: 'https://images.unsplash.com/photo-1600721391689-2564bb8055de?w=800&q=80',
+    id: 'additifs',
+    slug: 'additifs',
+    name: 'Additifs & Traitements',
+    description: 'Additifs moteur, carburant et traitements spécialisés',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80',
     productCount: 0,
   },
   {
-    id: 'culottes',
-    slug: 'culottes',
-    name: 'Culottes & Strings',
-    description: 'Culottes, strings et bas de lingerie',
-    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80',
+    id: 'entretien',
+    slug: 'entretien',
+    name: 'Entretien & Nettoyage',
+    description: 'Produits d\'entretien et de nettoyage automobile',
+    image: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&q=80',
     productCount: 0,
   },
   {
-    id: 'nuisettes',
-    slug: 'nuisettes',
-    name: 'Nuisettes & Pyjamas',
-    description: 'Nuisettes, pyjamas et vêtements de nuit',
-    image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
+    id: 'graisses',
+    slug: 'graisses',
+    name: 'Graisses & Lubrifiants',
+    description: 'Graisses et lubrifiants spécialisés pour tous types de mécanismes',
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=80',
     productCount: 0,
   },
   {
-    id: 'pyjamas',
-    slug: 'pyjamas',
-    name: 'Crop-top & Bodysuits',
-    description: 'Crop-tops, bodysuits et hauts tendance',
-    image: 'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?w=800&q=80',
+    id: 'liquides',
+    slug: 'liquides',
+    name: 'Liquides de refroidissement',
+    description: 'Liquides de refroidissement et antigel haute performance',
+    image: 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&q=80',
     productCount: 0,
   },
   {
-    id: 'accessoires',
-    slug: 'accessoires',
-    name: 'Accessoires & Cosmétique',
-    description: 'Accessoires de lingerie et cosmétiques beauté',
-    image: 'https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=800&q=80',
-    productCount: 0,
-  },
-  {
-    id: 'shorts-boxers',
-    slug: 'shorts-boxers',
-    name: 'Shorts & Collants',
-    description: 'Shorts, collants et bas de contention',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80',
-    productCount: 0,
-  },
-  {
-    id: 'autres',
-    slug: 'autres',
-    name: 'Autres',
-    description: 'Autres articles et produits divers',
-    image: 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80',
+    id: 'transmission',
+    slug: 'transmission',
+    name: 'Transmission & Freinage',
+    description: 'Huiles de transmission, liquides de frein et direction assistée',
+    image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
     productCount: 0,
   },
 ];
 
-// Sample static products
+// Sample static products — Bardahl automotive
 export const products: Product[] = [
   {
-    id: 'prod-1',
-    slug: 'ensemble-dentelle-rose',
-    name: 'Ensemble Dentelle Rose',
-    price: 15000,
-    originalPrice: 18000,
-    images: [
-      'https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=800&q=80',
-      'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
-    ],
-    category: 'ensembles',
-    collection: 'saint-valentin',
-    colors: [
-      { name: 'Rose', hex: '#D4A5A5' },
-      { name: 'Noir', hex: '#1a1a1a' },
-    ],
-    sizes: [
-      { size: 'S', available: true },
-      { size: 'M', available: true },
-      { size: 'L', available: true },
-      { size: 'XL', available: false },
-    ],
-    description: 'Un ensemble de lingerie en dentelle fine, parfait pour les occasions spéciales.',
-    composition: '90% Polyamide, 10% Elasthanne',
-    care: 'Lavage à la main recommandé. Ne pas sécher au sèche-linge.',
-    style: 'Sexy',
+    id: 'bardahl-xtc-5w30',
+    slug: 'bardahl-xtc-c60-5w30',
+    name: 'Bardahl XTC C60 5W-30',
+    price: 25000,
+    originalPrice: 28000,
+    images: ['https://images.unsplash.com/photo-1635784553857-4a87fb285e44?w=800&q=80'],
+    category: 'huiles-moteur',
+    collection: 'xtc-c60',
+    colors: [{ name: '1L', hex: '#FFD000' }, { name: '5L', hex: '#1a1a1a' }],
+    sizes: [{ size: '1L', available: true }, { size: '5L', available: true }],
+    description: 'Huile moteur 100% synthèse avec technologie Polar Plus® et Fullerène C60. Norme ACEA C2/C3, API SN/CF. Protection maximale du moteur.',
+    composition: 'Base synthétique PAO + Fullerène C60 + Polar Plus®',
+    care: 'Viscosité: 5W-30 | Normes: ACEA C2/C3, API SN/CF',
+    style: 'Synthèse',
     isNew: true,
     isBestseller: true,
-    stock: { S: 5, M: 10, L: 8, XL: 0 },
+    stock: { global: 100 },
   },
   {
-    id: 'prod-2',
-    slug: 'nuisette-satin-noir',
-    name: 'Nuisette Satin Noir',
-    price: 12000,
-    images: [
-      'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&q=80',
-    ],
-    category: 'nuisettes',
-    collection: 'essentiels',
-    colors: [
-      { name: 'Noir', hex: '#1a1a1a' },
-      { name: 'Ivoire', hex: '#FFFFF0' },
-    ],
-    sizes: [
-      { size: 'S', available: true },
-      { size: 'M', available: true },
-      { size: 'L', available: true },
-    ],
-    description: 'Nuisette en satin doux avec finitions en dentelle.',
-    composition: '95% Polyester, 5% Elasthanne',
-    care: 'Lavage délicat 30°C',
-    style: 'Classique',
+    id: 'bardahl-xtc-5w40',
+    slug: 'bardahl-xtc-c60-5w40',
+    name: 'Bardahl XTC C60 5W-40',
+    price: 22000,
+    images: ['https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80'],
+    category: 'huiles-moteur',
+    collection: 'xtc-c60',
+    colors: [{ name: '1L', hex: '#FFD000' }, { name: '5L', hex: '#1a1a1a' }],
+    sizes: [{ size: '1L', available: true }, { size: '5L', available: true }],
+    description: 'Huile moteur 100% synthèse polyvalente. Technologie Polar Plus® pour une lubrification optimale.',
+    composition: 'Base synthétique + Fullerène C60',
+    care: 'Viscosité: 5W-40 | Normes: ACEA A3/B4, API SN/CF',
+    style: 'Synthèse',
+    isNew: false,
+    isBestseller: true,
+    stock: { global: 80 },
+  },
+  {
+    id: 'bardahl-10w40',
+    slug: 'bardahl-xtc-10w40',
+    name: 'Bardahl XTC 10W-40',
+    price: 15000,
+    images: ['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=80'],
+    category: 'huiles-moteur',
+    collection: 'xtc',
+    colors: [{ name: '1L', hex: '#FFD000' }],
+    sizes: [{ size: '1L', available: true }, { size: '4L', available: true }, { size: '5L', available: true }],
+    description: 'Huile moteur semi-synthèse pour moteurs essence et diesel. Excellent rapport qualité-prix.',
+    composition: 'Base semi-synthétique + additifs Polar Plus®',
+    care: 'Viscosité: 10W-40 | Normes: ACEA A3/B4',
+    style: 'Semi-synthèse',
     isNew: false,
     isBestseller: false,
-    stock: { S: 3, M: 7, L: 5 },
-  },
-  {
-    id: 'prod-3',
-    slug: 'soutien-gorge-push-up',
-    name: 'Soutien-gorge Push-up',
-    price: 8500,
-    images: [
-      'https://images.unsplash.com/photo-1600721391689-2564bb8055de?w=800&q=80',
-    ],
-    category: 'soutiens-gorge',
-    collection: 'essentiels',
-    colors: [
-      { name: 'Noir', hex: '#1a1a1a' },
-      { name: 'Nude', hex: '#E8C4A4' },
-    ],
-    sizes: [
-      { size: 'S', available: true },
-      { size: 'M', available: true },
-      { size: 'L', available: true },
-    ],
-    cupSizes: ['A', 'B', 'C', 'D'],
-    description: 'Soutien-gorge push-up avec rembourrage léger.',
-    composition: '80% Polyamide, 20% Elasthanne',
-    care: 'Lavage à la main',
-    style: 'Classique',
-    isNew: true,
-    isBestseller: false,
-    stock: { S: 12, M: 15, L: 8 },
+    stock: { global: 120 },
   },
 ];
 
@@ -168,9 +122,7 @@ export function getProductBySlug(slug: string): Product | undefined {
 }
 
 export function getRelatedProducts(product: Product): Product[] {
-  return products
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+  return products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
 }
 
 export function getNewProducts(): Product[] {
@@ -186,10 +138,9 @@ export function searchProducts(query: string): Product[] {
   return products.filter(p =>
     p.name.toLowerCase().includes(lowerQuery) ||
     p.category.toLowerCase().includes(lowerQuery) ||
-    p.colors.some(c => c.name.toLowerCase().includes(lowerQuery))
+    p.description.toLowerCase().includes(lowerQuery)
   );
 }
 
-// Static categories alias
 export const staticCategories = categories;
 export const staticProducts = products;
