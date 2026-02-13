@@ -1,21 +1,18 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Linkedin } from 'lucide-react';
 
 const footerLinks = {
-  boutique: [
-    { label: 'Soutiens-gorge', href: '/collections/soutiens-gorge' },
-    { label: 'Culottes', href: '/collections/culottes' },
-    { label: 'Ensembles', href: '/collections/ensembles' },
-    { label: 'Nuisettes', href: '/collections/nuisettes' },
-    { label: 'Pyjamas', href: '/collections/pyjamas' },
-    { label: 'Accessoires', href: '/collections/accessoires' },
+  produits: [
+    { label: 'Huiles Moteur', href: '/collections/huiles-moteur' },
+    { label: 'Additifs', href: '/collections/additifs' },
+    { label: 'Entretien', href: '/collections/entretien' },
+    { label: 'Tous les produits', href: '/collections' },
   ],
   informations: [
-    { label: 'À propos', href: '/a-propos' },
-    { label: 'Blog', href: '/blog' },
+    { label: 'À propos de Bardahl', href: '/a-propos' },
+    { label: 'Nos technologies', href: '/blog' },
     { label: 'Contact', href: '/contact' },
     { label: 'Livraison & Retours', href: '/livraison-retours' },
-    { label: 'Guide des tailles', href: '/guide-tailles' },
   ],
   legal: [
     { label: 'Mentions légales', href: '/mentions-legales' },
@@ -25,38 +22,35 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: Youtube, href: 'https://youtube.com', label: 'YouTube' },
+  { icon: Facebook, href: 'https://facebook.com/bardahl', label: 'Facebook' },
+  { icon: Instagram, href: 'https://instagram.com/bardahl', label: 'Instagram' },
+  { icon: Youtube, href: 'https://youtube.com/bardahl', label: 'YouTube' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/bardahl', label: 'LinkedIn' },
 ];
 
 export function Footer() {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="container py-10 md:py-12">
-        {/* Brand Section */}
-        <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-2xl font-medium">
-            Cannesh <span className="text-rose">Lingerie</span>
-          </Link>
-          <p className="mt-3 text-background/70 text-sm max-w-md mx-auto">
-            Lingerie de qualité premium pour sublimer votre féminité au quotidien.
-          </p>
-        </div>
+    <footer className="bg-secondary text-secondary-foreground">
+      <div className="container py-12 md:py-16">
+        {/* Top Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="inline-block mb-4">
+              <span className="text-primary font-extrabold text-2xl tracking-tight">BARDAHL</span>
+            </Link>
+            <p className="text-secondary-foreground/60 text-sm leading-relaxed">
+              Depuis 1939, la technologie Polar Plus et le Fullerène C60 au service de la performance de votre moteur.
+            </p>
+          </div>
 
-        {/* Links Grid - 3 columns on mobile */}
-        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-8">
-          {/* Boutique */}
+          {/* Products */}
           <div>
-            <h3 className="font-serif text-sm md:text-base font-medium mb-3">Boutique</h3>
-            <ul className="space-y-2">
-              {footerLinks.boutique.map(link => (
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">Produits</h3>
+            <ul className="space-y-2.5">
+              {footerLinks.produits.map(link => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="text-xs md:text-sm text-background/70 hover:text-rose transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -66,14 +60,11 @@ export function Footer() {
 
           {/* Informations */}
           <div>
-            <h3 className="font-serif text-sm md:text-base font-medium mb-3">Infos</h3>
-            <ul className="space-y-2">
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">Infos</h3>
+            <ul className="space-y-2.5">
               {footerLinks.informations.map(link => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="text-xs md:text-sm text-background/70 hover:text-rose transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -83,14 +74,11 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="font-serif text-sm md:text-base font-medium mb-3">Légal</h3>
-            <ul className="space-y-2">
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">Légal</h3>
+            <ul className="space-y-2.5">
               {footerLinks.legal.map(link => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="text-xs md:text-sm text-background/70 hover:text-rose transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -99,29 +87,24 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Social Links */}
-        <div className="text-center mb-6">
-          <p className="text-sm text-background/70 mb-3">Suivez-nous</p>
-          <div className="flex items-center justify-center gap-4">
+        {/* Social */}
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-secondary-foreground/10">
+          <div className="flex items-center gap-4 mb-4 md:mb-0">
             {socialLinks.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center text-background/70 hover:bg-rose hover:text-white transition-all duration-300"
+                className="w-10 h-10 rounded-full bg-secondary-foreground/10 flex items-center justify-center text-secondary-foreground/60 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                 aria-label={label}
               >
                 <Icon className="h-4 w-4" />
               </a>
             ))}
           </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="text-center pt-6 border-t border-background/10">
-          <p className="text-xs text-background/50">
-            © 2025 Cannesh Lingerie. Tous droits réservés.
+          <p className="text-xs text-secondary-foreground/40">
+            © {new Date().getFullYear()} Bardahl. Tous droits réservés.
           </p>
         </div>
       </div>

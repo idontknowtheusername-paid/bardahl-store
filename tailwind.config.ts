@@ -18,8 +18,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ["Playfair Display", "Georgia", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Karla", "system-ui", "sans-serif"],
+        body: ["Karla", "system-ui", "sans-serif"],
+        sans: ["Karla", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,17 +56,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        rose: {
-          DEFAULT: "hsl(var(--rose))",
-          light: "hsl(var(--rose-light))",
-          dark: "hsl(var(--rose-dark))",
+        bardahl: {
+          yellow: "hsl(var(--bardahl-yellow))",
+          "yellow-light": "hsl(var(--bardahl-yellow-light))",
+          "yellow-dark": "hsl(var(--bardahl-yellow-dark))",
+          black: "hsl(var(--bardahl-black))",
+          gray: "hsl(var(--bardahl-gray))",
+          light: "hsl(var(--bardahl-light))",
         },
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          light: "hsl(var(--gold-light))",
-        },
-        noir: "hsl(var(--noir))",
-        cream: "hsl(var(--cream))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -122,6 +120,10 @@ export default {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.2)" },
         },
+        "marquee": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -131,6 +133,7 @@ export default {
         "slide-down": "slide-down 0.3s ease-out forwards",
         "scale-in": "scale-in 0.2s ease-out forwards",
         "cart-bounce": "cart-bounce 0.3s ease-in-out",
+        "marquee": "marquee 30s linear infinite",
       },
     },
   },

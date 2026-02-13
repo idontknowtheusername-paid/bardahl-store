@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Shield, Zap, Award } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCarouselSkeleton } from '@/components/product/ProductCardSkeleton';
 import { useFeaturedProducts } from '@/hooks/use-supabase-api';
@@ -16,70 +16,86 @@ import {
 export function HeroSection() {
   const { data: apiProducts, isLoading } = useFeaturedProducts();
   
-  // Use API data if available, fallback to static bestsellers
   const featuredProducts = apiProducts && apiProducts.length > 0
     ? apiProducts
     : staticProducts.filter(p => p.isBestseller || p.isNew).slice(0, 8);
 
   return (
     <>
-      {/* Hero Compact - 60vh */}
-      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="/CBEEF825-5683-4ADE-9480-376346E815F2.jpeg"
-            alt="Lingerie élégante Cannesh - Collection Bénin"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-foreground/60" />
+      {/* Hero */}
+      <section className="relative min-h-[75vh] flex items-center overflow-hidden bg-secondary">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/95 to-secondary/60" />
+        <div className="absolute right-0 top-0 w-1/2 h-full opacity-20">
+          <div className="absolute inset-0 bg-gradient-to-l from-primary/30 to-transparent" />
         </div>
 
-        {/* Content - Centré */}
-        <div className="container relative z-10 px-4">
-          <div className="max-w-2xl mx-auto text-center animate-slide-up">
-            <span className="inline-block text-gold text-sm font-medium tracking-widest uppercase mb-3">
-              Cannesh Lingerie • Bénin
-            </span>
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-medium text-background leading-tight mb-4">
-              Sublimez votre féminité avec élégance
+        <div className="container relative z-10 py-16 md:py-24">
+          <div className="max-w-2xl animate-slide-up">
+            <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-6">
+              <Zap className="h-4 w-4" />
+              Technologie Polar Plus®
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-secondary-foreground leading-tight mb-6">
+              La performance
+              <span className="text-primary block">au service de votre moteur</span>
             </h1>
-            <p className="text-background/90 text-base md:text-lg mb-6 leading-relaxed max-w-xl mx-auto">
-              Découvrez notre collection exclusive de lingerie raffinée. Livraison partout au Bénin.
+            <p className="text-secondary-foreground/70 text-lg md:text-xl mb-8 leading-relaxed max-w-xl">
+              Depuis 1939, Bardahl développe des lubrifiants et additifs de haute technologie 
+              enrichis au Fullerène C60 pour une protection maximale.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                variant="hero"
                 size="lg"
-                className="group bg-background text-foreground hover:bg-background/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base px-8 group"
                 asChild
               >
                 <Link to="/collections">
-                  Voir la Collection
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  Découvrir nos produits
+                  <ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button
-                variant="elegant"
+                variant="outline"
                 size="lg"
-                className="border-background text-background hover:bg-background hover:text-foreground"
+                className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10 font-bold text-base"
                 asChild
               >
-                <Link to="/nouveautes">Nouveautés</Link>
+                <Link to="/a-propos">Notre technologie</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products Strip */}
-      <section className="py-8 bg-muted/30 border-b border-border/50">
+      {/* USP Strip */}
+      <section className="bg-primary py-4">
         <div className="container">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-serif text-xl md:text-2xl font-medium text-foreground">
-              Nos Vedettes
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+            <div className="flex items-center justify-center gap-3 text-primary-foreground">
+              <Shield className="h-6 w-6 shrink-0" />
+              <span className="font-bold text-sm">Technologie Polar Plus® exclusive</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 text-primary-foreground">
+              <Zap className="h-6 w-6 shrink-0" />
+              <span className="font-bold text-sm">Enrichi au Fullerène C60</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 text-primary-foreground">
+              <Award className="h-6 w-6 shrink-0" />
+              <span className="font-bold text-sm">Depuis 1939 — 85 ans d'expertise</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Products */}
+      <section className="py-10 md:py-16 bg-background">
+        <div className="container">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">
+              Produits populaires
             </h2>
-            <Button variant="link" className="p-0 text-primary shrink-0 ml-4" asChild>
+            <Button variant="link" className="p-0 text-primary font-semibold shrink-0 ml-4" asChild>
               <Link to="/collections">Tout voir</Link>
             </Button>
           </div>
@@ -88,10 +104,7 @@ export function HeroSection() {
             <ProductCarouselSkeleton count={4} />
           ) : (
             <Carousel
-              opts={{
-                align: 'start',
-                loop: true,
-              }}
+              opts={{ align: 'start', loop: true }}
               className="w-full"
             >
               <CarouselContent className="-ml-4">
