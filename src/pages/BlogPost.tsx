@@ -7,25 +7,36 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ReactMarkdown from 'react-markdown'
-import type { Tables } from '@/integrations/supabase/types'
 
-type BlogPostType = Tables<'blog_posts'>
+const db = supabase as any;
+
+interface BlogPostData {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  featured_image: string | null;
+  author: string | null;
+  tags: string[] | null;
+  read_time: number | null;
+  views: number | null;
+  published_at: string | null;
+}
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
-  const [post, setPost] = useState<BlogPostType | null>(null)
+  const [post, setPost] = useState<BlogPostData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([])
+  const [relatedPosts, setRelatedPosts] = useState<BlogPostData[]>([])
 
   useEffect(() => {
-    if (slug) {
-      fetchPost()
-    }
+    if (slug) fetchPost()
   }, [slug])
 
   const fetchPost = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
@@ -33,19 +44,16 @@ export default function BlogPost() {
         .single()
 
       if (error) throw error
-      
       setPost(data)
 
-      // Increment views
       if (data) {
-        await supabase
+        await db
           .from('blog_posts')
           .update({ views: (data.views || 0) + 1 })
           .eq('id', data.id)
 
-        // Fetch related posts
         if (data.tags && data.tags.length > 0) {
-          const { data: related } = await supabase
+          const { data: related } = await db
             .from('blog_posts')
             .select('*')
             .eq('status', 'published')
@@ -120,9 +128,8 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-gradient-to-b from-pink-50 to-white py-8">
+    <div className="min-h-screen bg-background">
+      <div className="bg-muted/30 py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <Link to="/blog">
@@ -132,8 +139,7 @@ export default function BlogPost() {
               </Button>
             </Link>
 
-            {/* Meta Info */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(post.published_at)}
@@ -147,19 +153,16 @@ export default function BlogPost() {
               {post.author && <span>Par {post.author}</span>}
             </div>
 
-            {/* Title */}
             <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
               {post.title}
             </h1>
 
-            {/* Excerpt */}
             {post.excerpt && (
-              <p className="text-xl text-gray-600 mb-6">
+              <p className="text-xl text-muted-foreground mb-6">
                 {post.excerpt}
               </p>
             )}
 
-            {/* Tags & Share */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
               <div className="flex flex-wrap gap-2">
                 {post.tags?.map(tag => (
@@ -177,7 +180,6 @@ export default function BlogPost() {
         </div>
       </div>
 
-      {/* Featured Image */}
       {post.featured_image && (
         <div className="container mx-auto px-4 mb-12">
           <div className="max-w-4xl mx-auto">
@@ -190,29 +192,27 @@ export default function BlogPost() {
         </div>
       )}
 
-      {/* Content */}
       <div className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto">
-          <article className="prose prose-lg prose-pink max-w-none">
+          <article className="prose prose-lg max-w-none">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </article>
         </div>
       </div>
 
-      {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <div className="bg-gray-50 py-12">
+        <div className="bg-muted/30 py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <h2 className="text-3xl font-bold mb-8">Articles similaires</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 {relatedPosts.map(related => (
                   <Link key={related.id} to={`/blog/${related.slug}`}>
-                    <div className="bg-white rounded-lg p-6 hover:shadow-lg transition-shadow">
-                      <h3 className="font-semibold mb-2 hover:text-pink-600 transition-colors">
+                    <div className="bg-background rounded-lg p-6 hover:shadow-lg transition-shadow">
+                      <h3 className="font-semibold mb-2 hover:text-primary transition-colors">
                         {related.title}
                       </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
                         {related.excerpt}
                       </p>
                     </div>
