@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-type DbPromoCode = Database['public']['Tables']['promo_codes']['Row'];
+const db = supabase as any;
 
 export type PromoCodeType = 'percentage' | 'fixed_amount' | 'free_shipping' | 'buy_x_get_y';
 
@@ -44,7 +43,7 @@ export function usePromoCode() {
     setError(null);
 
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await db
         .from('promo_codes')
         .select('*')
         .eq('code', code.toUpperCase())
@@ -57,9 +56,8 @@ export function usePromoCode() {
         return false;
       }
 
-      const promoData = data as DbPromoCode;
+      const promoData = data as any;
 
-      // Check validity dates
       const now = new Date();
       const validFrom = new Date(promoData.valid_from);
       const validUntil = promoData.valid_until ? new Date(promoData.valid_until) : null;
@@ -76,14 +74,12 @@ export function usePromoCode() {
         return false;
       }
 
-      // Check max uses
       if (promoData.max_uses && promoData.uses_count >= promoData.max_uses) {
         setError('Ce code promo a atteint sa limite d\'utilisation');
         setPromoCode(null);
         return false;
       }
 
-      // Map to our interface
       const mappedPromo: PromoCode = {
         id: promoData.id,
         code: promoData.code,
@@ -118,7 +114,6 @@ export function usePromoCode() {
   ): PromoCodeDiscount | null => {
     if (!promoCode) return null;
 
-    // Check minimum order amount
     if (promoCode.min_order_amount && subtotal < promoCode.min_order_amount) {
       return null;
     }
@@ -133,16 +128,13 @@ export function usePromoCode() {
           discountAmount = promoCode.max_discount_amount;
         }
         break;
-
       case 'fixed_amount':
         discountAmount = Math.min(promoCode.discount_value, subtotal);
         break;
-
       case 'free_shipping':
         freeShipping = true;
         discountAmount = 0;
         break;
-
       case 'buy_x_get_y':
         discountAmount = 0;
         break;

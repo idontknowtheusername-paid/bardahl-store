@@ -1,10 +1,8 @@
-// API Client pour Supabase - Cannesh Lingerie
+// API Client pour Supabase - Bardahl Store
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-type Product = Database['public']['Tables']['products']['Row'];
-type Category = Database['public']['Tables']['categories']['Row'];
-type ProductCollection = Database['public']['Tables']['product_collections']['Row'];
+// Use any-cast until types are regenerated after migration
+const db = supabase as any;
 
 // =====================================================
 // PRODUCTS
@@ -18,9 +16,8 @@ export async function getProducts(params?: {
   featured?: boolean;
   isNew?: boolean;
 }) {
-  // If filtering by category, use a JOIN to filter at query level
   if (params?.categorySlug) {
-    let query = supabase
+    let query = db
       .from('products')
       .select(`
         *,
@@ -43,8 +40,7 @@ export async function getProducts(params?: {
     return data;
   }
 
-  // Otherwise, fetch all products and attach categories
-  let query = supabase
+  let query = db
     .from('products')
     .select(`
       *,
@@ -61,15 +57,13 @@ export async function getProducts(params?: {
   const { data, error } = await query;
   if (error) throw error;
 
-  // Fetch categories for each product
   if (data && data.length > 0) {
-    const productIds = data.map(p => p.id);
-    const { data: categoriesData } = await supabase
+    const productIds = data.map((p: any) => p.id);
+    const { data: categoriesData } = await db
       .from('product_categories')
       .select('product_id, categories (id, title, slug)')
       .in('product_id', productIds);
 
-    // Attach categories to products
     data.forEach((product: any) => {
       product.product_categories = categoriesData?.filter(
         (pc: any) => pc.product_id === product.id
@@ -81,7 +75,7 @@ export async function getProducts(params?: {
 }
 
 export async function getProductBySlug(slug: string) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('products')
     .select(`
       *,
@@ -93,9 +87,8 @@ export async function getProductBySlug(slug: string) {
 
   if (error) throw error;
 
-  // Fetch categories separately
   if (data) {
-    const { data: categories } = await supabase
+    const { data: categories } = await db
       .from('product_categories')
       .select('categories (id, title, slug)')
       .eq('product_id', data.id);
@@ -111,7 +104,7 @@ export async function getProductBySlug(slug: string) {
 // =====================================================
 
 export async function getCategories() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('categories')
     .select('*')
     .eq('is_active', true)
@@ -122,7 +115,7 @@ export async function getCategories() {
 }
 
 export async function getCategoryBySlug(slug: string) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('categories')
     .select('*')
     .eq('slug', slug)
@@ -138,7 +131,7 @@ export async function getCategoryBySlug(slug: string) {
 // =====================================================
 
 export async function getCollections() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('product_collections')
     .select('*')
     .eq('is_active', true)
@@ -149,7 +142,7 @@ export async function getCollections() {
 }
 
 export async function getCollectionBySlug(slug: string) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('product_collections')
     .select(`
       *,
@@ -173,7 +166,7 @@ export async function getCollectionBySlug(slug: string) {
 // =====================================================
 
 export async function subscribeNewsletter(email: string, name?: string) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('newsletter_subscribers')
     .insert({ email, name, status: 'active', source: 'website' })
     .select()
@@ -193,7 +186,7 @@ export async function submitContactMessage(message: {
   subject: string;
   message: string;
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('contact_messages')
     .insert(message)
     .select()
