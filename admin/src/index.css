@@ -4,34 +4,35 @@
 
 @layer base {
   :root {
-    --background: 270 40% 9%;
-    --foreground: 40 20% 95%;
-    --card: 270 35% 12%;
-    --card-foreground: 40 20% 95%;
-    --popover: 270 35% 12%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 30 45% 65%;
-    --primary-foreground: 270 40% 9%;
-    --secondary: 270 25% 50%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 270 30% 18%;
-    --muted-foreground: 270 15% 65%;
-    --accent: 30 45% 65%;
-    --accent-foreground: 270 40% 9%;
-    --destructive: 0 70% 60%;
-    --destructive-foreground: 40 20% 95%;
-    --border: 270 25% 22%;
-    --input: 270 25% 22%;
-    --ring: 30 45% 65%;
+    /* Dark Bardahl Theme */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 49 100% 50%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 49 100% 50%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 49 100% 50%;
     --radius: 0.5rem;
-    --sidebar-background: 270 40% 9%;
-    --sidebar-foreground: 40 20% 95%;
-    --sidebar-primary: 30 45% 65%;
-    --sidebar-primary-foreground: 270 40% 9%;
-    --sidebar-accent: 270 30% 18%;
-    --sidebar-accent-foreground: 40 20% 95%;
-    --sidebar-border: 270 25% 22%;
-    --sidebar-ring: 30 45% 65%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 49 100% 50%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 49 100% 50%;
   }
 }
 

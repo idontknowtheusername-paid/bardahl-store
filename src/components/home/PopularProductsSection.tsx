@@ -22,7 +22,7 @@ export function PopularProductsSection() {
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestsellers || 'POPULAIRES'}</span>
+              <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestseller || 'POPULAIRES'}</span>
               <h2 className="text-2xl md:text-3xl font-bold mt-1">{t.popularProducts || 'Produits Populaires'}</h2>
             </div>
           </div>
@@ -39,7 +39,7 @@ export function PopularProductsSection() {
       <div className="container">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestsellers || 'POPULAIRES'}</span>
+            <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestseller || 'POPULAIRES'}</span>
             <h2 className="text-2xl md:text-3xl font-bold mt-1">{t.popularProducts || 'Produits Populaires'}</h2>
           </div>
           <Button variant="link" className="p-0 text-primary font-semibold shrink-0 ml-4" asChild>
