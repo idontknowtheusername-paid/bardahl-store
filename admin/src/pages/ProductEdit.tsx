@@ -12,12 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Loader2, Save, Upload, X, GripVertical, Eye, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Upload, X, GripVertical } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -53,9 +47,10 @@ const productSchema = z.object({
   description: z.string().optional(),
   sku: z.string().optional(),
   stock: z.number().min(0).optional(),
-  composition: z.string().optional(),
-  care_instructions: z.string().optional(),
-  style: z.string().optional(),
+  viscosity: z.string().optional(),
+  api_norm: z.string().optional(),
+  acea_norm: z.string().optional(),
+  capacity: z.string().optional(),
   is_active: z.boolean(),
   is_new: z.boolean(),
   is_featured: z.boolean(),
@@ -63,32 +58,17 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-const COLORS = [
-  { name: 'Noir', code: '#000000' },
-  { name: 'Blanc', code: '#FFFFFF' },
-  { name: 'Rouge', code: '#DC2626' },
-  { name: 'Rose', code: '#EC4899' },
-  { name: 'Bleu', code: '#3B82F6' },
-  { name: 'Vert', code: '#10B981' },
-  { name: 'Beige', code: '#D4A574' },
-  { name: 'Gris', code: '#6B7280' },
-];
-
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-const CUP_SIZES = ['A', 'B', 'C', 'D', 'E', 'F'];
-
-const COMPOSITIONS = [
-  '95% Coton, 5% Élasthanne',
-  '85% Polyamide, 15% Élasthanne',
-  '90% Polyester, 10% Élasthanne',
-  '80% Nylon, 20% Spandex',
-];
-
-const CARE_INSTRUCTIONS = [
-  'Lavage à la main uniquement à 30°C',
-  'Lavage machine délicat à 30°C',
-  'Lavage machine à 40°C, pas de sèche-linge',
-  'Lavage à froid, séchage à plat',
+const VISCOSITIES = ['0W-20', '0W-30', '5W-30', '5W-40', '10W-40', '10W-60', '15W-40', '20W-50', '75W-80', '75W-90', '80W-90'];
+const API_NORMS = ['API SN', 'API SN Plus', 'API SP', 'API CJ-4', 'API CK-4', 'API GL-4', 'API GL-5'];
+const ACEA_NORMS = ['ACEA A3/B4', 'ACEA A5/B5', 'ACEA C2', 'ACEA C3', 'ACEA C4', 'ACEA C5', 'ACEA E6', 'ACEA E9'];
+const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '20L', '60L', '200L'];
+const PRODUCT_TYPES = [
+  { value: 'huile-moteur', label: 'Huile Moteur' },
+  { value: 'additif', label: 'Additif' },
+  { value: 'graisse', label: 'Graisse' },
+  { value: 'entretien', label: 'Produit d\'Entretien' },
+  { value: 'liquide-refroidissement', label: 'Liquide de Refroidissement' },
+  { value: 'huile-transmission', label: 'Huile de Transmission' },
 ];
 
 // Sortable Image Component
@@ -112,7 +92,7 @@ function SortableImage({ url, index, onRemove }: { url: string; index: number; o
     <div
       ref={setNodeRef}
       style={style}
-      className="relative group aspect-square rounded-lg overflow-hidden border bg-muted"
+      className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted"
     >
       <img src={url} alt="" className="w-full h-full object-cover" />
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -122,7 +102,7 @@ function SortableImage({ url, index, onRemove }: { url: string; index: number; o
           {...listeners}
           className="p-2 bg-white/90 rounded-md hover:bg-white transition-colors cursor-grab active:cursor-grabbing"
         >
-          <GripVertical className="h-4 w-4" />
+          <GripVertical className="h-4 w-4 text-foreground" />
         </button>
         <Button
           type="button"
@@ -135,7 +115,7 @@ function SortableImage({ url, index, onRemove }: { url: string; index: number; o
         </Button>
       </div>
       {index === 0 && (
-        <div className="absolute top-2 left-2 bg-rose-600 text-white text-xs px-2 py-1 rounded">
+        <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
           Principal
         </div>
       )}
@@ -143,18 +123,14 @@ function SortableImage({ url, index, onRemove }: { url: string; index: number; o
   );
 }
 
-// Chunked upload helper to avoid stack overflow
+// Chunked upload helper
 async function uploadFileChunked(
   file: File,
   bucket: string,
   fileName: string,
-  onProgress?: (progress: number) => void
 ): Promise<string> {
-  // Read file as ArrayBuffer
   const arrayBuffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
-  
-  // Convert to Blob for upload (more efficient than base64)
   const blob = new Blob([uint8Array], { type: file.type });
   
   const { error: uploadError } = await supabase.storage
@@ -165,15 +141,13 @@ async function uploadFileChunked(
       contentType: file.type,
     });
 
-  if (uploadError) {
-    throw uploadError;
-  }
+  if (uploadError) throw uploadError;
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
   return data.publicUrl;
 }
 
-// Compress image client-side
+// Compress image
 async function compressImage(file: File, maxSizeMB = 1, maxDimension = 1920): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -182,8 +156,6 @@ async function compressImage(file: File, maxSizeMB = 1, maxDimension = 1920): Pr
     
     img.onload = () => {
       let { width, height } = img;
-      
-      // Scale down if needed
       if (width > maxDimension || height > maxDimension) {
         if (width > height) {
           height = (height / width) * maxDimension;
@@ -193,34 +165,24 @@ async function compressImage(file: File, maxSizeMB = 1, maxDimension = 1920): Pr
           height = maxDimension;
         }
       }
-      
       canvas.width = width;
       canvas.height = height;
-      
       if (ctx) {
         ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convert to blob with compression
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), {
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), {
                 type: 'image/webp',
                 lastModified: Date.now(),
-              });
-              resolve(compressedFile);
-            } else {
-              reject(new Error('Failed to compress image'));
-            }
+              }));
+            } else reject(new Error('Failed to compress image'));
           },
           'image/webp',
           0.85
         );
-      } else {
-        reject(new Error('Canvas context not available'));
-      }
+      } else reject(new Error('Canvas context not available'));
     };
-    
     img.onerror = () => reject(new Error('Failed to load image'));
     img.src = URL.createObjectURL(file);
   });
@@ -232,7 +194,6 @@ export default function ProductEdit() {
   const queryClient = useQueryClient();
   const isNew = !id || id === 'new';
   
-  // Use refs to prevent race conditions
   const isSavingRef = useRef(false);
   const uploadingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -243,37 +204,23 @@ export default function ProductEdit() {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
+  const [productType, setProductType] = useState('huile-moteur');
 
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedCupSizes, setSelectedCupSizes] = useState<string[]>([]);
-  const [selectedComposition, setSelectedComposition] = useState<string>('');
-  const [selectedCareInstructions, setSelectedCareInstructions] = useState<string>('');
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      if (abortControllerRef.current) abortControllerRef.current.abort();
     };
   }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('title');
+      const { data, error } = await supabase.from('categories').select('*').eq('is_active', true).order('title');
       if (error) throw error;
       return data;
     },
@@ -282,11 +229,7 @@ export default function ProductEdit() {
   const { data: collections } = useQuery({
     queryKey: ['collections'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('product_collections')
-        .select('*')
-        .eq('is_active', true)
-        .order('title');
+      const { data, error } = await supabase.from('product_collections').select('*').eq('is_active', true).order('title');
       if (error) throw error;
       return data;
     },
@@ -309,71 +252,27 @@ export default function ProductEdit() {
 
   useEffect(() => {
     if (!product) return;
-
     if (product.product_images && product.product_images.length > 0) {
       const imageUrls = product.product_images
         .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
         .map((img: any) => img.image_url);
       setImages(imageUrls);
     }
-
-    if (product.available_colors) {
-      try {
-        const colors = typeof product.available_colors === 'string'
-          ? JSON.parse(product.available_colors)
-          : product.available_colors;
-        if (Array.isArray(colors)) {
-          setSelectedColors(colors.map((c: any) => c.name));
-        }
-      } catch (e) {
-        console.error('Error parsing available_colors:', e);
-      }
-    }
-
-    if (product.available_sizes && Array.isArray(product.available_sizes)) {
-      setSelectedSizes(product.available_sizes);
-    }
-
-    if (product.available_cup_sizes && Array.isArray(product.available_cup_sizes)) {
-      setSelectedCupSizes(product.available_cup_sizes);
-    }
-
     if (product.product_categories && product.product_categories.length > 0) {
-      const categoryIds = product.product_categories.map((pc: any) => pc.category_id);
-      setSelectedCategories(categoryIds);
+      setSelectedCategories(product.product_categories.map((pc: any) => pc.category_id));
     }
-
     if (product.product_collection_items && product.product_collection_items.length > 0) {
-      const collectionIds = product.product_collection_items.map((pci: any) => pci.collection_id);
-      setSelectedCollections(collectionIds);
-    }
-
-    if (product.composition) {
-      setSelectedComposition(product.composition);
-    }
-
-    if (product.care_instructions) {
-      setSelectedCareInstructions(product.care_instructions);
+      setSelectedCollections(product.product_collection_items.map((pci: any) => pci.collection_id));
     }
   }, [product]);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      title: '',
-      slug: '',
-      price: 0,
-      compare_at_price: null,
-      short_description: '',
-      description: '',
-      sku: '',
-      stock: 100,
-      composition: '',
-      care_instructions: '',
-      style: 'classique',
-      is_active: true,
-      is_new: false,
-      is_featured: false,
+      title: '', slug: '', price: 0, compare_at_price: null,
+      short_description: '', description: '', sku: '', stock: 100,
+      viscosity: '', api_norm: '', acea_norm: '', capacity: '',
+      is_active: true, is_new: false, is_featured: false,
     },
     values: product ? {
       title: product.title,
@@ -381,85 +280,54 @@ export default function ProductEdit() {
       price: product.price,
       compare_at_price: product.compare_at_price,
       short_description: product.short_description || '',
-      description: typeof product.description === 'object' && product.description 
-        ? (product.description as any).text || '' 
-        : '',
+      description: typeof product.description === 'object' && product.description
+        ? (product.description as any).text || ''
+        : (product.description || ''),
       sku: product.sku || '',
       stock: product.stock || 0,
-      composition: product.composition || '',
-      care_instructions: product.care_instructions || '',
-      style: product.style || 'classique',
+      viscosity: product.viscosity || '',
+      api_norm: product.api_norm || '',
+      acea_norm: product.acea_norm || '',
+      capacity: product.capacity || '',
       is_active: product.is_active ?? true,
       is_new: product.is_new ?? false,
       is_featured: product.is_featured ?? false,
     } : undefined,
   });
 
-  // Optimized image upload with timeout and abort support
   const handleImageUpload = useCallback(async (files: FileList | File[]) => {
-    if (uploadingRef.current) {
-      toast.warning('Upload en cours, veuillez patienter');
-      return;
-    }
-
+    if (uploadingRef.current) { toast.warning('Upload en cours'); return; }
     const fileArray = Array.from(files).filter(file => file.type.startsWith('image/'));
-    if (fileArray.length === 0) {
-      toast.error('Aucune image valide détectée');
-      return;
-    }
+    if (fileArray.length === 0) { toast.error('Aucune image valide'); return; }
 
     uploadingRef.current = true;
     setUploading(true);
     setUploadProgress({ current: 0, total: fileArray.length });
-
-    // Create abort controller for timeout
     abortControllerRef.current = new AbortController();
     
     const uploadedUrls: string[] = [];
     let completed = 0;
 
     try {
-      // Upload sequentially to avoid overwhelming the server
       for (const file of fileArray) {
-        // Check for abort
-        if (abortControllerRef.current.signal.aborted) {
-          throw new Error('Upload annulé');
-        }
-
+        if (abortControllerRef.current.signal.aborted) throw new Error('Upload annulé');
         try {
-          // Compress image first
-          console.log(`Compressing ${file.name}...`);
           const compressedFile = await compressImage(file, 1, 1920);
-          console.log(`Compressed: ${(compressedFile.size / 1024).toFixed(0)}KB`);
-
-          // Generate unique filename
-          const fileExt = 'webp';
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-
-          // Upload with timeout (30 seconds per file)
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
           const uploadPromise = uploadFileChunked(compressedFile, 'products', fileName);
-          const timeoutPromise = new Promise<never>((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 30000)
-          );
-
+          const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 30000));
           const publicUrl = await Promise.race([uploadPromise, timeoutPromise]);
           uploadedUrls.push(publicUrl);
-          
           completed++;
           setUploadProgress({ current: completed, total: fileArray.length });
-          console.log(`Uploaded ${completed}/${fileArray.length}`);
         } catch (fileError) {
           console.error(`Failed to upload ${file.name}:`, fileError);
-          // Continue with other files
         }
       }
-
       if (uploadedUrls.length > 0) {
         setImages(prev => [...prev, ...uploadedUrls]);
         toast.success(`${uploadedUrls.length} image(s) uploadée(s)`);
-      } else {
-        toast.error('Aucune image n\'a pu être uploadée');
-      }
+      } else toast.error('Aucune image n\'a pu être uploadée');
     } catch (error) {
       console.error('Upload error:', error);
       toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'upload');
@@ -481,25 +349,11 @@ export default function ProductEdit() {
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDraggingOver(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleImageUpload(e.dataTransfer.files);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDraggingOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDraggingOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) handleImageUpload(e.dataTransfer.files);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (over && active.id !== over.id) {
       setImages((items) => {
         const oldIndex = items.indexOf(active.id as string);
@@ -509,174 +363,90 @@ export default function ProductEdit() {
     }
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  const removeImage = (index: number) => setImages(images.filter((_, i) => i !== index));
 
   const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    return title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   };
 
   const generateSKU = (title: string) => {
-    const prefix = title
-      .split(' ')
-      .slice(0, 2)
-      .map(word => word.substring(0, 3).toUpperCase())
-      .join('-');
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `${prefix}-${timestamp}-${random}`;
+    const prefix = title.split(' ').slice(0, 2).map(word => word.substring(0, 3).toUpperCase()).join('-');
+    return `${prefix}-${Date.now().toString(36).toUpperCase()}`;
   };
 
   const saveMutation = useMutation({
     mutationFn: async (data: ProductFormData) => {
-      // Prevent double submission
-      if (isSavingRef.current) {
-        throw new Error('Sauvegarde déjà en cours');
-      }
+      if (isSavingRef.current) throw new Error('Sauvegarde déjà en cours');
       isSavingRef.current = true;
 
       try {
-        // Build available_colors JSONB
-        const availableColors = selectedColors.map(name => ({
-          name,
-          hex: COLORS.find(c => c.name === name)?.code || '#000000'
-        }));
-
         const productData = {
           title: data.title,
           slug: data.slug,
           price: data.price,
           compare_at_price: data.compare_at_price || null,
           short_description: data.short_description || null,
-          description: data.description ? { text: data.description } : null,
+          description: data.description || null,
           sku: data.sku?.trim() || generateSKU(data.title),
           stock: data.stock || 0,
-          composition: selectedComposition || null,
-          care_instructions: selectedCareInstructions || null,
-          style: data.style || 'classique',
+          viscosity: data.viscosity || null,
+          api_norm: data.api_norm || null,
+          acea_norm: data.acea_norm || null,
+          capacity: data.capacity || null,
+          style: productType,
           is_active: data.is_active,
           is_new: data.is_new,
           is_featured: data.is_featured,
-          available_colors: availableColors,
-          available_sizes: selectedSizes.length > 0 ? selectedSizes : null,
-          available_cup_sizes: selectedCupSizes.length > 0 ? selectedCupSizes : null,
+          available_colors: [],
+          available_sizes: null,
+          available_cup_sizes: null,
+          composition: null,
+          care_instructions: null,
         };
 
         let productId = id;
 
         if (isNew) {
-          // Check for duplicate slug first
-          const { data: existingSlug } = await supabase
-            .from('products')
-            .select('id')
-            .eq('slug', data.slug)
-            .maybeSingle();
+          const { data: existingSlug } = await supabase.from('products').select('id').eq('slug', data.slug).maybeSingle();
+          if (existingSlug) productData.slug = `${data.slug}-${Date.now().toString(36)}`;
 
-          if (existingSlug) {
-            // Append timestamp to make unique
-            productData.slug = `${data.slug}-${Date.now().toString(36)}`;
-          }
-
-          const { data: newProduct, error } = await supabase
-            .from('products')
-            .insert(productData)
-            .select('id')
-            .single();
-          
+          const { data: newProduct, error } = await supabase.from('products').insert(productData).select('id').single();
           if (error) throw error;
           productId = newProduct.id;
         } else {
-          const { error } = await supabase
-            .from('products')
-            .update(productData)
-            .eq('id', id);
-          
+          const { error } = await supabase.from('products').update(productData).eq('id', id);
           if (error) throw error;
         }
 
         if (!productId) throw new Error('Product ID not found');
 
-        // Handle images - delete existing first, then insert new
-        if (!isNew) {
-          await supabase
-            .from('product_images')
-            .delete()
-            .eq('product_id', productId);
-        }
-
+        // Images
+        if (!isNew) await supabase.from('product_images').delete().eq('product_id', productId);
         if (images.length > 0) {
-          const imageRecords = images.map((url, index) => ({
-            product_id: productId,
-            image_url: url,
-            display_order: index,
-            alt_text: data.title,
-          }));
-
-          const { error: imageError } = await supabase
-            .from('product_images')
-            .insert(imageRecords);
-
-          if (imageError) {
-            console.error('Image insert error:', imageError);
-          }
+          await supabase.from('product_images').insert(
+            images.map((url, index) => ({ product_id: productId, image_url: url, display_order: index, alt_text: data.title }))
+          );
         }
 
-        // Handle categories
-        if (!isNew) {
-          await supabase
-            .from('product_categories')
-            .delete()
-            .eq('product_id', productId);
-        }
-
+        // Categories
+        if (!isNew) await supabase.from('product_categories').delete().eq('product_id', productId);
         if (selectedCategories.length > 0) {
-          const categoryRecords = selectedCategories.map(categoryId => ({
-            product_id: productId,
-            category_id: categoryId,
-          }));
-
-          const { error: categoryError } = await supabase
-            .from('product_categories')
-            .insert(categoryRecords);
-
-          if (categoryError) {
-            console.error('Category insert error:', categoryError);
-          }
+          await supabase.from('product_categories').insert(
+            selectedCategories.map(categoryId => ({ product_id: productId, category_id: categoryId }))
+          );
         }
 
-        // Handle collections
-        if (!isNew) {
-          await supabase
-            .from('product_collection_items')
-            .delete()
-            .eq('product_id', productId);
-        }
-
+        // Collections
+        if (!isNew) await supabase.from('product_collection_items').delete().eq('product_id', productId);
         if (selectedCollections.length > 0) {
-          const collectionRecords = selectedCollections.map(collectionId => ({
-            product_id: productId,
-            collection_id: collectionId,
-          }));
-
-          const { error: collectionError } = await supabase
-            .from('product_collection_items')
-            .insert(collectionRecords);
-
-          if (collectionError) {
-            console.error('Collection insert error:', collectionError);
-          }
+          await supabase.from('product_collection_items').insert(
+            selectedCollections.map(collectionId => ({ product_id: productId, collection_id: collectionId }))
+          );
         }
 
         return productId;
-      } finally {
-        isSavingRef.current = false;
-      }
+      } finally { isSavingRef.current = false; }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -690,23 +460,15 @@ export default function ProductEdit() {
   });
 
   const onSubmit = (data: ProductFormData) => {
-    if (selectedCategories.length === 0) {
-      toast.error('Veuillez sélectionner au moins une catégorie');
-      return;
-    }
-    
-    if (saveMutation.isPending || isSavingRef.current) {
-      toast.warning('Sauvegarde en cours...');
-      return;
-    }
-    
+    if (selectedCategories.length === 0) { toast.error('Veuillez sélectionner au moins une catégorie'); return; }
+    if (saveMutation.isPending || isSavingRef.current) { toast.warning('Sauvegarde en cours...'); return; }
     saveMutation.mutate(data);
   };
 
   if (!isNew && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -735,60 +497,35 @@ export default function ProductEdit() {
             <CardContent className="space-y-4">
               <div
                 onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
+                onDragOver={(e) => { e.preventDefault(); setIsDraggingOver(true); }}
+                onDragLeave={(e) => { e.preventDefault(); setIsDraggingOver(false); }}
                 className={`grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg border-2 border-dashed transition-colors ${
-                  isDraggingOver ? 'border-rose-500 bg-rose-50' : 'border-border'
+                  isDraggingOver ? 'border-primary bg-primary/5' : 'border-border'
                 }`}
               >
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                   <SortableContext items={images} strategy={rectSortingStrategy}>
                     {images.map((url, index) => (
-                      <SortableImage
-                        key={url}
-                        url={url}
-                        index={index}
-                        onRemove={() => removeImage(index)}
-                      />
+                      <SortableImage key={url} url={url} index={index} onRemove={() => removeImage(index)} />
                     ))}
                   </SortableContext>
                 </DndContext>
 
-                <label className="aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors">
+                <label className="aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors">
                   {uploading ? (
                     <div className="flex flex-col items-center gap-2">
-                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">
-                        {uploadProgress.current}/{uploadProgress.total}
-                      </span>
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <span className="text-xs text-muted-foreground">{uploadProgress.current}/{uploadProgress.total}</span>
                     </div>
                   ) : (
                     <>
                       <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground text-center px-2">
-                        Cliquez ou glissez
-                      </span>
+                      <span className="text-sm text-muted-foreground text-center px-2">Cliquez ou glissez</span>
                     </>
                   )}
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileInputChange}
-                    className="hidden"
-                    disabled={uploading}
-                  />
+                  <input type="file" multiple accept="image/*" onChange={handleFileInputChange} className="hidden" disabled={uploading} />
                 </label>
               </div>
-              {images.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center">
-                  Aucune image. Glissez-déposez des images ou cliquez pour uploader.
-                </p>
-              )}
             </CardContent>
           </Card>
 
@@ -800,15 +537,13 @@ export default function ProductEdit() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Titre *</Label>
+                  <Label htmlFor="title">Nom du produit *</Label>
                   <Input
                     id="title"
                     {...form.register('title')}
                     onChange={(e) => {
                       form.setValue('title', e.target.value);
-                      if (isNew) {
-                        form.setValue('slug', generateSlug(e.target.value));
-                      }
+                      if (isNew) form.setValue('slug', generateSlug(e.target.value));
                     }}
                   />
                   {form.formState.errors.title && (
@@ -822,21 +557,95 @@ export default function ProductEdit() {
               </div>
 
               <div className="space-y-2">
+                <Label>Type de produit</Label>
+                <Select value={productType} onValueChange={setProductType}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRODUCT_TYPES.map(type => (
+                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="short_description">Description courte</Label>
-                <Textarea
-                  id="short_description"
-                  rows={2}
-                  {...form.register('short_description')}
-                />
+                <Textarea id="short_description" rows={2} {...form.register('short_description')} />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description détaillée</Label>
-                <Textarea
-                  id="description"
-                  rows={5}
-                  {...form.register('description')}
-                />
+                <Textarea id="description" rows={5} {...form.register('description')} />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Technical Specs */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Spécifications techniques</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Viscosité</Label>
+                  <Select value={form.watch('viscosity') || ''} onValueChange={(v) => form.setValue('viscosity', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucune</SelectItem>
+                      {VISCOSITIES.map(v => (
+                        <SelectItem key={v} value={v}>{v}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Contenance</Label>
+                  <Select value={form.watch('capacity') || ''} onValueChange={(v) => form.setValue('capacity', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CAPACITIES.map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Norme API</Label>
+                  <Select value={form.watch('api_norm') || ''} onValueChange={(v) => form.setValue('api_norm', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucune</SelectItem>
+                      {API_NORMS.map(n => (
+                        <SelectItem key={n} value={n}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Norme ACEA</Label>
+                  <Select value={form.watch('acea_norm') || ''} onValueChange={(v) => form.setValue('acea_norm', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Aucune</SelectItem>
+                      {ACEA_NORMS.map(n => (
+                        <SelectItem key={n} value={n}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -849,68 +658,26 @@ export default function ProductEdit() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Prix (FCFA) *</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="1"
-                    placeholder="Ex: 15000"
-                    {...form.register('price', { valueAsNumber: true })}
-                  />
+                  <Label htmlFor="price">Prix (€) *</Label>
+                  <Input id="price" type="number" step="0.01" placeholder="Ex: 29.90" {...form.register('price', { valueAsNumber: true })} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="compare_at_price">Ancien prix (barré)</Label>
                   <Input
-                    id="compare_at_price"
-                    type="number"
-                    step="1"
-                    placeholder="Optionnel"
+                    id="compare_at_price" type="number" step="0.01" placeholder="Optionnel"
                     {...form.register('compare_at_price', {
-                      setValueAs: v => {
-                        if (v === '' || v === null || v === undefined) return null;
-                        const parsed = parseFloat(v);
-                        return isNaN(parsed) ? null : parsed;
-                      }
+                      setValueAs: v => { if (v === '' || v === null || v === undefined) return null; const p = parseFloat(v); return isNaN(p) ? null : p; }
                     })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="stock">Stock</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    placeholder="Ex: 50"
-                    {...form.register('stock', { valueAsNumber: true })}
-                  />
+                  <Input id="stock" type="number" placeholder="Ex: 50" {...form.register('stock', { valueAsNumber: true })} />
                 </div>
               </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="sku">SKU</Label>
-                  <Input
-                    id="sku"
-                    {...form.register('sku')}
-                    placeholder="Auto-généré si vide"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="style">Style</Label>
-                  <Select
-                    value={form.watch('style')}
-                    onValueChange={(value) => form.setValue('style', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="classique">Classique</SelectItem>
-                      <SelectItem value="sexy">Sexy</SelectItem>
-                      <SelectItem value="sport">Sport</SelectItem>
-                      <SelectItem value="confort">Confort</SelectItem>
-                      <SelectItem value="elegant">Élégant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="sku">SKU / Référence</Label>
+                <Input id="sku" {...form.register('sku')} placeholder="Auto-généré si vide" />
               </div>
             </CardContent>
           </Card>
@@ -929,19 +696,16 @@ export default function ProductEdit() {
                       key={category.id}
                       className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${
                         selectedCategories.includes(category.id)
-                        ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
+                        ? 'bg-primary/20 border-primary text-primary'
+                        : 'border-border hover:bg-muted'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedCategories.includes(category.id)}
                         onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedCategories([...selectedCategories, category.id]);
-                          } else {
-                            setSelectedCategories(selectedCategories.filter(id => id !== category.id));
-                          }
+                          if (e.target.checked) setSelectedCategories([...selectedCategories, category.id]);
+                          else setSelectedCategories(selectedCategories.filter(cid => cid !== category.id));
                         }}
                         className="sr-only"
                       />
@@ -962,19 +726,16 @@ export default function ProductEdit() {
                       key={collection.id}
                       className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${
                         selectedCollections.includes(collection.id)
-                        ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
+                        ? 'bg-primary/20 border-primary text-primary'
+                        : 'border-border hover:bg-muted'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedCollections.includes(collection.id)}
                         onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedCollections([...selectedCollections, collection.id]);
-                          } else {
-                            setSelectedCollections(selectedCollections.filter(id => id !== collection.id));
-                          }
+                          if (e.target.checked) setSelectedCollections([...selectedCollections, collection.id]);
+                          else setSelectedCollections(selectedCollections.filter(cid => cid !== collection.id));
                         }}
                         className="sr-only"
                       />
@@ -982,190 +743,6 @@ export default function ProductEdit() {
                     </label>
                   ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Options */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Options disponibles</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Couleurs</Label>
-                <div className="flex flex-wrap gap-2">
-                  {COLORS.map(color => (
-                    <label
-                      key={color.name}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${
-                        selectedColors.includes(color.name)
-                        ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
-                      }`}
-                    >
-                      <div
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: color.code }}
-                      />
-                      <input
-                        type="checkbox"
-                        checked={selectedColors.includes(color.name)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedColors([...selectedColors, color.name]);
-                          } else {
-                            setSelectedColors(selectedColors.filter(n => n !== color.name));
-                          }
-                        }}
-                        className="sr-only"
-                      />
-                      <span className="text-sm">{color.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Tailles</Label>
-                <div className="flex flex-wrap gap-2">
-                  {SIZES.map(size => (
-                    <label
-                      key={size}
-                      className={`px-4 py-2 border rounded-md cursor-pointer transition-colors ${
-                        selectedSizes.includes(size)
-                        ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSizes.includes(size)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedSizes([...selectedSizes, size]);
-                          } else {
-                            setSelectedSizes(selectedSizes.filter(s => s !== size));
-                          }
-                        }}
-                        className="sr-only"
-                      />
-                      <span className="text-sm font-medium">{size}</span>
-                    </label>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (selectedSizes.length === SIZES.length) {
-                        setSelectedSizes([]);
-                      } else {
-                        setSelectedSizes([...SIZES]);
-                      }
-                    }}
-                    className="px-4 py-2 border-2 border-dashed rounded-md hover:bg-muted transition-colors text-sm font-medium text-muted-foreground"
-                  >
-                    {selectedSizes.length === SIZES.length ? 'Tout désélectionner' : 'Tout sélectionner'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Bonnets (optionnel)</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CUP_SIZES.map(cup => (
-                    <label
-                      key={cup}
-                      className={`px-4 py-2 border rounded-md cursor-pointer transition-colors ${
-                        selectedCupSizes.includes(cup)
-                        ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCupSizes.includes(cup)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedCupSizes([...selectedCupSizes, cup]);
-                          } else {
-                            setSelectedCupSizes(selectedCupSizes.filter(c => c !== cup));
-                          }
-                        }}
-                        className="sr-only"
-                      />
-                      <span className="text-sm font-medium">{cup}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Détails supplémentaires</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Composition</Label>
-                <div className="flex flex-wrap gap-2">
-                  {COMPOSITIONS.map(comp => (
-                    <label
-                      key={comp}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${selectedComposition === comp
-                          ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="composition"
-                        checked={selectedComposition === comp}
-                        onChange={() => setSelectedComposition(comp)}
-                        className="sr-only"
-                      />
-                      <span className="text-sm">{comp}</span>
-                    </label>
-                  ))}
-                </div>
-                <Input
-                  placeholder="Ou saisir une composition personnalisée"
-                  value={selectedComposition && !COMPOSITIONS.includes(selectedComposition) ? selectedComposition : ''}
-                  onChange={(e) => setSelectedComposition(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label>Instructions d'entretien</Label>
-                <div className="flex flex-wrap gap-2">
-                  {CARE_INSTRUCTIONS.map(care => (
-                    <label
-                      key={care}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${selectedCareInstructions === care
-                          ? 'bg-rose-50 border-rose-300 text-rose-900'
-                          : 'hover:bg-muted'
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="care_instructions"
-                        checked={selectedCareInstructions === care}
-                        onChange={() => setSelectedCareInstructions(care)}
-                        className="sr-only"
-                      />
-                      <span className="text-sm">{care}</span>
-                    </label>
-                  ))}
-                </div>
-                <Textarea
-                  placeholder="Ou saisir des instructions personnalisées"
-                  value={selectedCareInstructions && !CARE_INSTRUCTIONS.includes(selectedCareInstructions) ? selectedCareInstructions : ''}
-                  onChange={(e) => setSelectedCareInstructions(e.target.value)}
-                  rows={2}
-                  className="mt-2"
-                />
               </div>
             </CardContent>
           </Card>
@@ -1179,65 +756,35 @@ export default function ProductEdit() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Actif</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Le produit sera visible sur le site
-                  </p>
+                  <p className="text-sm text-muted-foreground">Le produit sera visible sur le site</p>
                 </div>
-                <Switch
-                  checked={form.watch('is_active')}
-                  onCheckedChange={(checked) => form.setValue('is_active', checked)}
-                />
+                <Switch checked={form.watch('is_active')} onCheckedChange={(checked) => form.setValue('is_active', checked)} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Nouveau</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Affiché avec le badge "Nouveau"
-                  </p>
+                  <p className="text-sm text-muted-foreground">Affiché avec le badge "Nouveau"</p>
                 </div>
-                <Switch
-                  checked={form.watch('is_new')}
-                  onCheckedChange={(checked) => form.setValue('is_new', checked)}
-                />
+                <Switch checked={form.watch('is_new')} onCheckedChange={(checked) => form.setValue('is_new', checked)} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Mis en avant</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Affiché sur la page d'accueil
-                  </p>
+                  <p className="text-sm text-muted-foreground">Affiché sur la page d'accueil</p>
                 </div>
-                <Switch
-                  checked={form.watch('is_featured')}
-                  onCheckedChange={(checked) => form.setValue('is_featured', checked)}
-                />
+                <Switch checked={form.watch('is_featured')} onCheckedChange={(checked) => form.setValue('is_featured', checked)} />
               </div>
             </CardContent>
           </Card>
 
           {/* Submit */}
           <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/products')}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              disabled={saveMutation.isPending || uploading}
-            >
+            <Button type="button" variant="outline" onClick={() => navigate('/products')}>Annuler</Button>
+            <Button type="submit" disabled={saveMutation.isPending || uploading}>
               {saveMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Enregistrement...
-                </>
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Enregistrement...</>
               ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isNew ? 'Créer le produit' : 'Enregistrer'}
-                </>
+                <><Save className="h-4 w-4 mr-2" />{isNew ? 'Créer le produit' : 'Enregistrer'}</>
               )}
             </Button>
           </div>
