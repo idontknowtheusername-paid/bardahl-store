@@ -16,22 +16,22 @@ export const fr: TranslationKeys = {
   navContact: 'Contact',
   navFindOil: 'Trouver mon huile',
 
-  heroTag: 'Technologie Polar Plus®',
+  heroTag: '',
   heroTitle1: 'La performance',
   heroTitle2: 'au service de votre moteur',
-  heroDescription: 'Depuis 1939, Bardahl développe des lubrifiants et additifs de haute technologie enrichis au Fullerène C60 pour une protection maximale.',
+  heroDescription: 'Lubrifiants et additifs de haute technologie pour une protection maximale de votre véhicule.',
   heroCta: 'Découvrir nos produits',
   heroSecondary: 'Notre technologie',
 
-  uspPolarPlus: 'Technologie Polar Plus® exclusive',
-  uspFullerene: 'Enrichi au Fullerène C60',
-  uspExpertise: "Depuis 1939 — 85 ans d'expertise",
+  uspPolarPlus: '',
+  uspFullerene: '',
+  uspExpertise: '',
 
   popularProducts: 'Produits populaires',
   seeAll: 'Tout voir',
-  categories: 'Catégories',
+  categories: 'Gammes',
   catalog: 'Catalogue',
-  ourCategories: 'Nos Catégories',
+  ourCategories: 'Nos Gammes',
   newArrivals: 'Nouveautés',
   newTag: 'Nouveau',
   viewProducts: 'Voir les produits',
@@ -164,6 +164,6 @@ export const fr: TranslationKeys = {
   currency: 'Devise',
   changeCurrency: 'Changer la devise',
 
-  catalogTitle: 'Nos Catégories',
+  catalogTitle: 'Nos Gammes',
   catalogDescription: 'Découvrez notre gamme complète de lubrifiants, additifs et produits d\'entretien automobile Bardahl.',
 };

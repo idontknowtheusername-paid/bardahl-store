@@ -151,7 +151,7 @@ export default function Checkout() {
       });
       return;
     }
-    localStorage.setItem('cannesh-checkout-shipping', JSON.stringify(shippingInfo));
+    localStorage.setItem('bardahl-checkout-shipping', JSON.stringify(shippingInfo));
     setCurrentStep('delivery');
   };
 
@@ -216,7 +216,7 @@ export default function Checkout() {
 
       if (result.success && result.payment_url) {
         // Save order info for callback
-        localStorage.setItem('cannesh-pending-order', JSON.stringify({
+        localStorage.setItem('bardahl-pending-order', JSON.stringify({
           orderNumber: result.order_number,
           orderId: result.order_id,
           amount: result.amount,
@@ -224,7 +224,7 @@ export default function Checkout() {
 
         // Clear cart
         clearCart();
-        localStorage.removeItem('cannesh-checkout-shipping');
+        localStorage.removeItem('bardahl-checkout-shipping');
 
         // Redirect to Lygos payment
         toast({

@@ -8,7 +8,7 @@ export default function MentionsLegales() {
           <section className="mb-8">
             <h2 className="font-serif text-2xl font-medium mb-4">Éditeur du site</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Cannesh Lingerie<br />
+              Bardahl<br />
               Société à Responsabilité Limitée (SARL)<br />
               Capital social : 1 000 000 FCFA<br />
               Siège social : Quartier Zongo, Cotonou, Bénin<br />
@@ -20,7 +20,7 @@ export default function MentionsLegales() {
           <section className="mb-8">
             <h2 className="font-serif text-2xl font-medium mb-4">Directeur de la publication</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Cannesh SARL, Gérante de Cannesh Lingerie
+              Bardahl SARL, Gérant de Bardahl
             </p>
           </section>
 
@@ -36,7 +36,7 @@ export default function MentionsLegales() {
           <section className="mb-8">
             <h2 className="font-serif text-2xl font-medium mb-4">Contact</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Email : contact@cannesh-lingerie.com<br />
+              Email : contact@bardahl.com<br />
               Téléphone : +229 01 97 00 00 00<br />
               WhatsApp : +229 01 97 00 00 00
             </p>
@@ -46,7 +46,7 @@ export default function MentionsLegales() {
             <h2 className="font-serif text-2xl font-medium mb-4">Propriété intellectuelle</h2>
             <p className="text-muted-foreground leading-relaxed">
               L'ensemble des contenus (textes, images, logos, vidéos) présents sur ce site sont protégés 
-              par le droit d'auteur et sont la propriété exclusive de Cannesh Lingerie ou de ses partenaires. 
+              par le droit d'auteur et sont la propriété exclusive de Bardahl ou de ses partenaires. 
               Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des 
               éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sauf autorisation 
               écrite préalable.

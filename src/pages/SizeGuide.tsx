@@ -41,8 +41,8 @@ export default function SizeGuide() {
   return (
     <>
       <Helmet>
-        <title>Guide des Tailles | Cannesh Lingerie</title>
-        <meta name="description" content="Trouvez votre taille parfaite grâce à notre guide des tailles détaillé pour soutiens-gorge, culottes et ensembles." />
+        <title>Guide des Tailles | Bardahl</title>
+        <meta name="description" content="Trouvez le produit adapté à votre véhicule grâce à notre guide de sélection détaillé." />
       </Helmet>
 
       <main className="min-h-screen py-12 md:py-20">

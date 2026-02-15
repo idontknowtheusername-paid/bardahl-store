@@ -9,8 +9,8 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 1 - Objet</h2>
             <p className="text-muted-foreground leading-relaxed">
               Les présentes conditions générales de vente régissent les relations contractuelles entre 
-              Cannesh Lingerie et ses clients, dans le cadre de la vente de produits de lingerie via le 
-              site internet cannesh-lingerie.com.
+              Bardahl et ses clients, dans le cadre de la vente de produits automobiles via le
+              site internet bardahl.com.
             </p>
           </section>
 
@@ -79,7 +79,7 @@ export default function CGV() {
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question ou réclamation, notre service client est disponible :<br />
               - Par WhatsApp : +229 01 97 00 00 00 (du lundi au samedi de 8h à 20h)<br />
-              - Par email : contact@cannesh-lingerie.com<br />
+              - Par email : contact@bardahl.com<br />
               - Par téléphone : +229 01 97 00 00 00
             </p>
           </section>

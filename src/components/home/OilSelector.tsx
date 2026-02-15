@@ -3,6 +3,10 @@ import { ChevronDown, Search, Car, Wrench, Fuel, ArrowRight, RotateCcw } from 'l
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
+import { staticProducts } from '@/data/products';
+import { Link } from 'react-router-dom';
+import { useCurrency } from '@/context/CurrencyContext';
+import type { Product } from '@/types/product';
 
 // Vehicle database
 const vehicleData: Record<string, Record<string, string[]>> = {
@@ -76,34 +80,39 @@ const vehicleData: Record<string, Record<string, string[]>> = {
   },
 };
 
-// Recommended oils based on engine type
-const getRecommendedOils = (engine: string): { viscosity: string; product: string }[] => {
+// Recommended oils based on engine type - returns actual products
+const getRecommendedProducts = (engine: string): Product[] => {
   const lowerEngine = engine.toLowerCase();
+  const allOils = staticProducts.filter(p => p.category === 'huiles-moteur');
+
   if (lowerEngine.includes('diesel')) {
-    return [
-      { viscosity: '5W-30', product: 'Bardahl XTC C60 5W-30 C2/C3' },
-      { viscosity: '5W-40', product: 'Bardahl XTC C60 5W-40' },
-    ];
+    return allOils.filter(p =>
+      p.name.includes('5W-30') ||
+      p.name.includes('5W-40') ||
+      p.name.includes('Diesel')
+    ).slice(0, 3);
   }
   if (lowerEngine.includes('hybride') || lowerEngine.includes('hybrid')) {
-    return [
-      { viscosity: '0W-20', product: 'Bardahl XTC C60 0W-20' },
-      { viscosity: '0W-30', product: 'Bardahl XTC C60 0W-30' },
-    ];
+    return allOils.filter(p =>
+      p.name.includes('0W-20') ||
+      p.name.includes('0W-30') ||
+      p.name.includes('5W-30')
+    ).slice(0, 3);
   }
   if (lowerEngine.includes('électrique') || lowerEngine.includes('electric')) {
     return [];
   }
   // Essence / Gasoline
-  return [
-    { viscosity: '5W-30', product: 'Bardahl XTC C60 5W-30' },
-    { viscosity: '5W-40', product: 'Bardahl XTC C60 5W-40' },
-    { viscosity: '10W-40', product: 'Bardahl XTC 10W-40' },
-  ];
+  return allOils.filter(p =>
+    p.name.includes('5W-30') ||
+    p.name.includes('5W-40') ||
+    p.name.includes('10W-40')
+  ).slice(0, 3);
 };
 
 export function OilSelector() {
   const t = useTranslation();
+  const { formatPrice } = useCurrency();
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [engine, setEngine] = useState('');
@@ -126,10 +135,10 @@ export function OilSelector() {
     if (brand && model && engine) setShowResults(true);
   };
 
-  const recommendations = engine ? getRecommendedOils(engine) : [];
+  const recommendedProducts = engine ? getRecommendedProducts(engine) : [];
 
   return (
-    <section className="py-12 md:py-20 bg-secondary">
+    <section className="py-12 md:py-20 bg-muted/30">
       <div className="container">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -138,10 +147,10 @@ export function OilSelector() {
               <Car className="h-4 w-4" />
               {t.navFindOil}
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-secondary-foreground">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground">
               {t.oilSelectorTitle}
             </h2>
-            <p className="text-secondary-foreground/60 mt-3 max-w-lg mx-auto">
+            <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
               {t.oilSelectorDesc}
             </p>
           </div>
@@ -160,12 +169,12 @@ export function OilSelector() {
                     ? 'bg-primary text-primary-foreground'
                     : currentStep === step.num
                     ? 'bg-primary/20 text-primary border-2 border-primary'
-                    : 'bg-secondary-foreground/10 text-secondary-foreground/40'
+                      : 'bg-muted text-muted-foreground'
                 )}>
                   <step.icon className="h-4 w-4" />
                   <span className="hidden sm:inline">{step.label}</span>
                 </div>
-                {i < 2 && <ArrowRight className="h-4 w-4 mx-2 text-secondary-foreground/30" />}
+                {i < 2 && <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />}
               </div>
             ))}
           </div>
@@ -243,31 +252,39 @@ export function OilSelector() {
             </div>
 
             {/* Results */}
-            {showResults && recommendations.length > 0 && (
+            {showResults && recommendedProducts.length > 0 && (
               <div className="mt-8 pt-6 border-t border-border">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-primary" />
                   {t.compatibleProducts} — {brand} {model}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recommendations.map((rec, i) => (
-                    <div key={i} className="bg-muted rounded-xl p-4 hover:shadow-md transition-shadow border border-border/50">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">
-                          {rec.viscosity}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-sm">{rec.product}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {engine}
+                  {recommendedProducts.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/produits/${product.slug}`}
+                      className="bg-background rounded-xl p-4 hover:shadow-lg transition-all border border-border hover:border-primary group"
+                    >
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-32 object-cover rounded-lg mb-3"
+                      />
+                      <h4 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{product.name}</h4>
+                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                        {product.description}
                       </p>
-                    </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-primary font-bold">{formatPrice(product.price)}</span>
+                        <ArrowRight className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </Link>
                   ))}
                 </div>
               </div>
             )}
 
-            {showResults && recommendations.length === 0 && (
+            {showResults && recommendedProducts.length === 0 && (
               <div className="mt-8 pt-6 border-t border-border text-center">
                 <p className="text-muted-foreground">
                   Ce type de véhicule ne nécessite pas d'huile moteur conventionnelle.

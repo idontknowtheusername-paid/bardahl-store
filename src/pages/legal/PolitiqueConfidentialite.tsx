@@ -8,7 +8,7 @@ export default function PolitiqueConfidentialite() {
           <section>
             <h2 className="font-serif text-2xl font-medium mb-4">1. Collecte des données</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Cannesh Lingerie collecte des données personnelles lors de votre navigation sur notre site, 
+              Bardahl collecte des données personnelles lors de votre navigation sur notre site, 
               de la création de votre compte, de vos commandes et de vos échanges avec notre service client. 
               Les données collectées incluent : nom, prénom, adresse email, adresse de livraison, numéro de téléphone 
               et WhatsApp, historique de commandes.
@@ -30,7 +30,7 @@ export default function PolitiqueConfidentialite() {
           <section>
             <h2 className="font-serif text-2xl font-medium mb-4">3. Protection des données</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Cannesh Lingerie met en œuvre des mesures techniques et organisationnelles appropriées 
+              Bardahl met en œuvre des mesures techniques et organisationnelles appropriées 
               pour protéger vos données personnelles contre tout accès non autorisé, toute modification, 
               divulgation ou destruction. Les paiements Mobile Money sont sécurisés par les opérateurs.
             </p>
@@ -54,7 +54,7 @@ export default function PolitiqueConfidentialite() {
               - Droit de rectification<br />
               - Droit à l'effacement<br />
               - Droit d'opposition<br /><br />
-              Pour exercer ces droits, contactez-nous à : contact@cannesh-lingerie.com
+              Pour exercer ces droits, contactez-nous à : contact@bardahl.com
             </p>
           </section>
 
@@ -71,7 +71,7 @@ export default function PolitiqueConfidentialite() {
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question relative à cette politique de confidentialité, vous pouvez nous 
               contacter :<br />
-              - Email : contact@cannesh-lingerie.com<br />
+              - Email : contact@bardahl.com<br />
               - WhatsApp : +229 01 97 00 00 00
             </p>
           </section>

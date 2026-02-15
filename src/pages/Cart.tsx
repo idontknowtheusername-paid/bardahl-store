@@ -18,7 +18,7 @@ export default function Cart() {
             Votre panier est vide
           </h1>
           <p className="text-muted-foreground mb-8">
-            Découvrez notre collection de lingerie et trouvez les pièces qui vous correspondent.
+            Découvrez notre gamme de produits et trouvez ceux qui correspondent à vos besoins.
           </p>
           <Button variant="rose" size="lg" asChild>
             <Link to="/collections">Découvrir nos collections</Link>

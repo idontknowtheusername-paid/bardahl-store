@@ -53,7 +53,7 @@ export function WhatsAppButton() {
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></span>
               </div>
               <div>
-                <h3 className="font-semibold">Cannesh Lingerie</h3>
+                <h3 className="font-semibold">Bardahl</h3>
                 <p className="text-xs text-green-100">En ligne</p>
               </div>
             </div>

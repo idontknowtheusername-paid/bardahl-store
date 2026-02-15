@@ -20,7 +20,7 @@ export default function Confirmation() {
 
   useEffect(() => {
     // Try to retrieve shipping info from localStorage
-    const savedShipping = localStorage.getItem('cannesh-order-details');
+    const savedShipping = localStorage.getItem('bardahl-order-details');
     if (savedShipping) {
       try {
         setOrderDetails(JSON.parse(savedShipping));

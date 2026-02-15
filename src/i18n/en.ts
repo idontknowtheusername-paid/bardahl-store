@@ -29,9 +29,9 @@ export const en: TranslationKeys = {
 
   popularProducts: 'Popular Products',
   seeAll: 'See all',
-  categories: 'Categories',
+  categories: 'Product Lines',
   catalog: 'Catalog',
-  ourCategories: 'Our Categories',
+  ourCategories: 'Our Product Lines',
   newArrivals: 'New Arrivals',
   newTag: 'New',
   viewProducts: 'View products',
@@ -164,6 +164,6 @@ export const en: TranslationKeys = {
   currency: 'Currency',
   changeCurrency: 'Change currency',
 
-  catalogTitle: 'Our Categories',
+  catalogTitle: 'Our Product Lines',
   catalogDescription: 'Discover our complete range of Bardahl lubricants, additives and automotive maintenance products.',
 };

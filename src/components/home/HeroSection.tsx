@@ -56,26 +56,6 @@ export function HeroSection() {
         </div>
       </section>
 
-      {/* USP Strip */}
-      <section className="bg-primary py-4">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-            <div className="flex items-center justify-center gap-3 text-primary-foreground">
-              <Shield className="h-6 w-6 shrink-0" />
-              <span className="font-bold text-sm">{t.uspPolarPlus}</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 text-primary-foreground">
-              <Zap className="h-6 w-6 shrink-0" />
-              <span className="font-bold text-sm">{t.uspFullerene}</span>
-            </div>
-            <div className="flex items-center justify-center gap-3 text-primary-foreground">
-              <Award className="h-6 w-6 shrink-0" />
-              <span className="font-bold text-sm">{t.uspExpertise}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Popular Products */}
       <section className="py-10 md:py-16 bg-background">
         <div className="container">

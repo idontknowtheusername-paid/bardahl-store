@@ -216,7 +216,7 @@ export default function Settings() {
                 type="email"
                 value={formData.contact_email || ''}
                 onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                placeholder="contact@cannesh.com"
+                placeholder="contact@bardahl.com"
               />
             </div>
 

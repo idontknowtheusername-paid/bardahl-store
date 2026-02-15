@@ -132,10 +132,10 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Email</h3>
                 <a
-                  href="mailto:contact@cannesh-lingerie.com"
+                  href="mailto:contact@bardahl.com"
                   className="text-muted-foreground hover:text-rose transition-colors"
                 >
-                  contact@cannesh-lingerie.com
+                  contact@bardahl.com
                 </a>
               </div>
             </div>

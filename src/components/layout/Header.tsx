@@ -78,7 +78,7 @@ export function Header() {
             {/* Mobile Menu */}
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-secondary-foreground hover:text-primary">
+                <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-primary">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
@@ -105,10 +105,10 @@ export function Header() {
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
               {navLinks.map(({ label, href }) => (
                 <Link key={href} to={href}
-                  className="text-sm font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-primary transition-colors">
+                  className="text-xs xl:text-sm font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-primary transition-colors whitespace-nowrap">
                   {label}
                 </Link>
               ))}

@@ -34,24 +34,24 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer className="bg-primary text-primary-foreground">
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <span className="text-primary font-extrabold text-2xl tracking-tight">BARDAHL</span>
+              <span className="text-secondary font-extrabold text-2xl tracking-tight">BARDAHL</span>
             </Link>
-            <p className="text-secondary-foreground/60 text-sm leading-relaxed">
+            <p className="text-primary-foreground/70 text-sm leading-relaxed">
               {t.footerDescription}
             </p>
           </div>
 
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">{t.footerProducts}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerProducts}</h3>
             <ul className="space-y-2.5">
               {footerLinks.produits.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -60,11 +60,11 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">{t.footerInfo}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerInfo}</h3>
             <ul className="space-y-2.5">
               {footerLinks.informations.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -73,11 +73,11 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary">{t.footerLegal}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerLegal}</h3>
             <ul className="space-y-2.5">
               {footerLinks.legal.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -86,17 +86,17 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-secondary-foreground/10">
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-primary-foreground/20">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             {socialLinks.map(({ icon: Icon, href, label }) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-secondary-foreground/10 flex items-center justify-center text-secondary-foreground/60 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center text-primary-foreground/70 hover:bg-secondary hover:text-secondary-foreground transition-all duration-300"
                 aria-label={label}>
                 <Icon className="h-4 w-4" />
               </a>
             ))}
           </div>
-          <p className="text-xs text-secondary-foreground/40">
+          <p className="text-xs text-primary-foreground/60">
             © {new Date().getFullYear()} Bardahl. {t.allRightsReserved}
           </p>
         </div>

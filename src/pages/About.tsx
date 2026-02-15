@@ -5,8 +5,8 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>À Propos | Cannesh Lingerie</title>
-        <meta name="description" content="Découvrez l'histoire de Cannesh Lingerie, notre passion pour la lingerie de qualité et notre engagement envers nos clientes." />
+        <title>À Propos | Bardahl</title>
+        <meta name="description" content="Découvrez l'histoire de Bardahl, notre passion pour les produits automobiles de qualité et notre engagement envers nos clients." />
       </Helmet>
 
       <main className="min-h-screen">
@@ -14,10 +14,10 @@ export default function About() {
         <section className="relative py-20 bg-gradient-to-b from-rose/10 to-background">
           <div className="container text-center">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-foreground mb-6">
-              À Propos de <span className="text-rose">Cannesh</span>
+              À Propos de <span className="text-rose">Bardahl</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Votre destination privilégiée pour une lingerie élégante, confortable et accessible au Cameroun.
+              Votre partenaire de confiance pour l'entretien et la performance de votre véhicule.
             </p>
           </div>
         </section>
@@ -32,25 +32,25 @@ export default function About() {
                 </h2>
                 <div className="space-y-4 text-muted-foreground">
                   <p>
-                    Cannesh Lingerie est née d'une passion pour la beauté et le confort féminin. 
-                    Fondée au Cameroun, notre marque s'est donné pour mission de proposer une 
-                    lingerie de qualité qui sublime chaque femme.
+                    Bardahl est une marque reconnue mondialement pour ses produits automobiles de haute qualité.
+                    Fondée avec une passion pour l'excellence, notre mission est de fournir des solutions
+                    d'entretien et de performance pour tous types de véhicules.
                   </p>
                   <p>
-                    Nous croyons que chaque femme mérite de se sentir belle et confiante, 
-                    c'est pourquoi nous sélectionnons soigneusement chaque pièce de notre 
-                    collection pour allier élégance, confort et qualité.
+                    Nous croyons que chaque véhicule mérite les meilleurs soins,
+                    c'est pourquoi nous développons des produits innovants qui allient
+                    performance, protection et durabilité.
                   </p>
                   <p>
-                    Notre engagement : vous offrir une expérience d'achat exceptionnelle 
-                    avec des produits qui répondent à vos attentes et à vos envies.
+                    Notre engagement : vous offrir des produits de qualité supérieure
+                    qui prolongent la vie de votre moteur et optimisent ses performances.
                   </p>
                 </div>
               </div>
               <div className="relative">
                 <img 
                   src="/IMG_3005.JPG" 
-                  alt="Cannesh Lingerie Collection"
+                  alt="Bardahl Collection"
                   className="rounded-2xl shadow-2xl w-full object-cover aspect-[4/5]"
                 />
                 <div className="absolute -bottom-6 -left-6 bg-rose text-white p-6 rounded-xl shadow-lg">
@@ -73,12 +73,12 @@ export default function About() {
                 {
                   icon: Heart,
                   title: 'Passion',
-                  description: 'Nous mettons tout notre cœur dans la sélection de chaque pièce.',
+                  description: 'Nous mettons tout notre cœur dans le développement de chaque produit.',
                 },
                 {
                   icon: Award,
                   title: 'Qualité',
-                  description: 'Des matériaux premium pour un confort et une durabilité exceptionnels.',
+                  description: 'Des formules premium pour une protection et une performance exceptionnelles.',
                 },
                 {
                   icon: Truck,
@@ -88,7 +88,7 @@ export default function About() {
                 {
                   icon: Users,
                   title: 'Communauté',
-                  description: 'Une relation de confiance avec nos clientes fidèles.',
+                  description: 'Une relation de confiance avec nos clients fidèles.',
                 },
               ].map((value, index) => (
                 <div 
@@ -119,12 +119,12 @@ export default function About() {
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  title: 'Large Sélection',
-                  description: 'Des ensembles aux accessoires, trouvez la pièce parfaite pour chaque occasion.',
+                  title: 'Large Gamme',
+                  description: 'Des huiles moteur aux additifs, trouvez le produit parfait pour votre véhicule.',
                 },
                 {
-                  title: 'Prix Accessibles',
-                  description: 'La qualité premium à des prix justes, pour toutes les bourses.',
+                  title: 'Prix Compétitifs',
+                  description: 'La qualité premium à des prix justes, pour tous les budgets.',
                 },
                 {
                   title: 'Paiement Sécurisé',
@@ -154,10 +154,10 @@ export default function About() {
         <section className="py-16 md:py-24 bg-rose text-white">
           <div className="container text-center">
             <h2 className="font-serif text-3xl md:text-4xl font-medium mb-6">
-              Prête à Découvrir Notre Collection ?
+              Prêt à Découvrir Notre Gamme ?
             </h2>
             <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-              Explorez notre sélection soigneusement choisie et trouvez la lingerie qui vous correspond.
+              Explorez notre sélection de produits et trouvez celui qui correspond à votre véhicule.
             </p>
             <a 
               href="/collections"
