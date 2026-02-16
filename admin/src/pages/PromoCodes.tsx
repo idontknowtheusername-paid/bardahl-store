@@ -271,6 +271,8 @@ function PromoCodeForm({ code, onSuccess }: { code: PromoCode | null; onSuccess:
         ...data,
         // Set discount_value to 0 for free_shipping
         discount_value: data.discount_type === 'free_shipping' ? 0 : data.discount_value,
+        // Convert empty string to null for timestamp fields
+        valid_until: data.valid_until || null,
       };
 
       if (code) {
