@@ -36,16 +36,17 @@ export function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-          <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="inline-block mb-4">
-              <img src="/Bardahl_idiSpcDptj_1.svg" alt="Bardahl" className="h-12 w-auto" />
-            </Link>
-            <p className="text-primary-foreground/70 text-sm leading-relaxed">
-              {t.footerDescription}
-            </p>
-          </div>
+        {/* Logo centré en haut */}
+        <div className="text-center mb-10">
+          <Link to="/" className="inline-block mb-4">
+            <img src="/Bardahl_idiSpcDptj_1.svg" alt="Bardahl" className="h-16 w-auto mx-auto" />
+          </Link>
+          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-2xl mx-auto">
+            {t.footerDescription}
+          </p>
+        </div>
 
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
           <div>
             <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerProducts}</h3>
             <ul className="space-y-2.5">

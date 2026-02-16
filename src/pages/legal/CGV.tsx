@@ -59,8 +59,8 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 6 - Échanges et Retours</h2>
             <p className="text-muted-foreground leading-relaxed">
               Vous disposez d'un délai de 7 jours à compter de la réception de votre commande pour 
-              demander un échange. Les articles doivent être retournés dans leur état d'origine, 
-              non portés et non lavés, avec leurs étiquettes. Les frais de retour sont à la charge 
+              demander un échange. Les produits doivent être retournés dans leur état d'origine,
+              non ouverts, avec leur emballage d'origine intact. Les frais de retour sont à la charge 
               du client sauf en cas de défaut du produit.
             </p>
           </section>

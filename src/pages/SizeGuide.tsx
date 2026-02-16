@@ -1,38 +1,41 @@
 import { Helmet } from 'react-helmet-async';
-import { Ruler, Info } from 'lucide-react';
+import { Wrench, Info, Car, Fuel, Settings } from 'lucide-react';
 
-const sizeTables = {
-  soutiensGorge: {
-    title: 'Soutiens-gorge',
-    headers: ['Taille', 'Tour de poitrine', 'Tour de dos'],
+const productGuides = {
+  motorOils: {
+    title: 'Huiles Moteur',
+    icon: Car,
+    headers: ['Viscosité', 'Type de moteur', 'Spécifications'],
     rows: [
-      ['XS / 85A', '78-82 cm', '68-72 cm'],
-      ['S / 90B', '83-87 cm', '73-77 cm'],
-      ['M / 95C', '88-92 cm', '78-82 cm'],
-      ['L / 100D', '93-97 cm', '83-87 cm'],
-      ['XL / 105E', '98-102 cm', '88-92 cm'],
+      ['5W-30', 'Essence & Diesel moderne', 'API SN, ACEA A3/B4'],
+      ['10W-40', 'Essence & Diesel classique', 'API SL, ACEA A3/B3'],
+      ['15W-40', 'Diesel lourd & industriel', 'API CI-4, ACEA E7'],
+      ['0W-20', 'Essence moderne (Eco)', 'API SP, ACEA C5'],
+      ['5W-40', 'Haute performance', 'API SN Plus, ACEA A3/B4'],
     ],
   },
-  culottes: {
-    title: 'Culottes & Strings',
-    headers: ['Taille', 'Tour de hanches', 'Tour de taille'],
+  additives: {
+    title: 'Additifs & Traitements',
+    icon: Fuel,
+    headers: ['Type', 'Application', 'Bénéfices'],
     rows: [
-      ['XS / 34', '84-88 cm', '60-64 cm'],
-      ['S / 36', '88-92 cm', '64-68 cm'],
-      ['M / 38', '92-96 cm', '68-72 cm'],
-      ['L / 40', '96-100 cm', '72-76 cm'],
-      ['XL / 42', '100-104 cm', '76-80 cm'],
+      ['Additif moteur', 'Huile moteur', 'Réduction friction, protection'],
+      ['Nettoyant injecteurs', 'Carburant', 'Décalaminage, économie'],
+      ['Traitement diesel', 'Gazole', 'Antigel, lubrification'],
+      ['Additif boîte', 'Boîte automatique', 'Fluidité, protection'],
+      ['Traitement freins', 'Liquide frein', 'Anti-humidité, performance'],
     ],
   },
-  bonnets: {
-    title: 'Bonnets',
-    headers: ['Bonnet', 'Différence poitrine - dos'],
+  maintenance: {
+    title: 'Produits d\'Entretien',
+    icon: Settings,
+    headers: ['Produit', 'Utilisation', 'Fréquence'],
     rows: [
-      ['A', '12-14 cm'],
-      ['B', '14-16 cm'],
-      ['C', '16-18 cm'],
-      ['D', '18-20 cm'],
-      ['E', '20-22 cm'],
+      ['Liquide refroidissement', 'Circuit refroidissement', 'Tous les 2 ans'],
+      ['Liquide frein DOT4', 'Système freinage', 'Tous les 2 ans'],
+      ['Huile direction', 'Direction assistée', 'Tous les 60 000 km'],
+      ['Graisse universelle', 'Châssis, cardans', 'Selon usure'],
+      ['Nettoyant freins', 'Disques & plaquettes', 'À chaque entretien'],
     ],
   },
 };
@@ -41,7 +44,7 @@ export default function SizeGuide() {
   return (
     <>
       <Helmet>
-        <title>Guide des Tailles | Bardahl</title>
+        <title>Guide de Sélection | Bardahl</title>
         <meta name="description" content="Trouvez le produit adapté à votre véhicule grâce à notre guide de sélection détaillé." />
       </Helmet>
 
@@ -50,130 +53,131 @@ export default function SizeGuide() {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-rose/10 rounded-full mb-6">
-              <Ruler className="w-8 h-8 text-rose" />
+              <Wrench className="w-8 h-8 text-rose" />
             </div>
             <h1 className="font-serif text-4xl md:text-5xl font-medium text-foreground mb-4">
-              Guide des Tailles
+              Guide de Sélection
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Trouvez votre taille parfaite en quelques étapes simples. 
-              Un bon ajustement est essentiel pour votre confort au quotidien.
+              Choisissez le produit Bardahl adapté à votre véhicule pour une performance optimale et une protection maximale.
             </p>
           </div>
 
-          {/* Comment prendre ses mesures */}
+          {/* Comment choisir */}
           <section className="bg-muted/50 rounded-2xl p-6 md:p-8 mb-12">
             <h2 className="font-serif text-2xl font-medium text-foreground mb-6 flex items-center gap-2">
               <Info className="w-6 h-6 text-rose" />
-              Comment Prendre Vos Mesures
+              Comment Choisir le Bon Produit
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="bg-background p-4 rounded-lg">
-                  <h3 className="font-medium text-foreground mb-2">Tour de Poitrine</h3>
+                  <h3 className="font-medium text-foreground mb-2">1. Consultez le manuel</h3>
                   <p className="text-sm text-muted-foreground">
-                    Mesurez autour de la partie la plus forte de votre poitrine, 
-                    en passant le mètre ruban sous les aisselles et sur les omoplates.
+                    Vérifiez les spécifications recommandées par le constructeur (viscosité, normes API/ACEA).
                   </p>
                 </div>
                 <div className="bg-background p-4 rounded-lg">
-                  <h3 className="font-medium text-foreground mb-2">Tour de Dos</h3>
+                  <h3 className="font-medium text-foreground mb-2">2. Type de moteur</h3>
                   <p className="text-sm text-muted-foreground">
-                    Mesurez juste en dessous de votre poitrine, là où se place 
-                    la bande du soutien-gorge.
+                    Essence, diesel, hybride ou électrique ? Chaque type a des besoins spécifiques.
                   </p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-background p-4 rounded-lg">
-                  <h3 className="font-medium text-foreground mb-2">Tour de Taille</h3>
+                  <h3 className="font-medium text-foreground mb-2">3. Conditions d'utilisation</h3>
                   <p className="text-sm text-muted-foreground">
-                    Mesurez à l'endroit le plus étroit de votre taille, 
-                    généralement au niveau du nombril.
+                    Ville, autoroute, climat chaud ou froid ? Adaptez le produit à votre usage.
                   </p>
                 </div>
                 <div className="bg-background p-4 rounded-lg">
-                  <h3 className="font-medium text-foreground mb-2">Tour de Hanches</h3>
+                  <h3 className="font-medium text-foreground mb-2">4. Kilométrage</h3>
                   <p className="text-sm text-muted-foreground">
-                    Mesurez autour de la partie la plus large de vos hanches, 
-                    en passant par le point le plus fort des fesses.
+                    Les véhicules à fort kilométrage peuvent nécessiter des produits spécifiques.
                   </p>
                 </div>
               </div>
             </div>
             <div className="mt-6 p-4 bg-rose/10 rounded-lg">
               <p className="text-sm text-foreground">
-                <strong>Conseil :</strong> Prenez vos mesures en sous-vêtements fins ou nue, 
-                debout et détendue. Le mètre ruban doit être bien à plat, sans serrer.
+                <strong>Conseil :</strong> Utilisez notre sélecteur d'huile intelligent sur la page d'accueil
+                pour une recommandation personnalisée basée sur votre véhicule.
               </p>
             </div>
           </section>
 
-          {/* Tableaux de tailles */}
+          {/* Guides produits */}
           <div className="space-y-12">
-            {Object.entries(sizeTables).map(([key, table]) => (
-              <section key={key}>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-6">
-                  {table.title}
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-muted">
-                        {table.headers.map((header, index) => (
-                          <th 
-                            key={index}
-                            className="text-left p-4 font-medium text-foreground border-b border-border"
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => (
-                        <tr 
-                          key={rowIndex}
-                          className="hover:bg-muted/50 transition-colors"
-                        >
-                          {row.map((cell, cellIndex) => (
-                            <td 
-                              key={cellIndex}
-                              className={`p-4 border-b border-border ${cellIndex === 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
+            {Object.entries(productGuides).map(([key, guide]) => {
+              const Icon = guide.icon;
+              return (
+                <section key={key}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <Icon className="w-6 h-6 text-rose" />
+                    <h2 className="font-serif text-2xl font-medium text-foreground">
+                      {guide.title}
+                    </h2>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-muted">
+                          {guide.headers.map((header, index) => (
+                            <th
+                              key={index}
+                              className="text-left p-4 font-medium text-foreground border-b border-border"
                             >
-                              {cell}
-                            </td>
+                              {header}
+                            </th>
                           ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            ))}
+                      </thead>
+                      <tbody>
+                        {guide.rows.map((row, rowIndex) => (
+                          <tr
+                            key={rowIndex}
+                            className="hover:bg-muted/50 transition-colors"
+                          >
+                            {row.map((cell, cellIndex) => (
+                              <td
+                                key={cellIndex}
+                                className={`p-4 border-b border-border ${cellIndex === 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              );
+            })}
           </div>
 
           {/* Conseils */}
           <section className="mt-12 bg-gradient-to-br from-rose/10 to-transparent rounded-2xl p-6 md:p-8">
             <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-              Nos Conseils
+              Nos Conseils Techniques
             </h2>
             <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-rose mt-1">•</span>
-                <span>Si vous êtes entre deux tailles, optez pour la taille supérieure pour plus de confort.</span>
+                <span>Respectez toujours les intervalles de vidange recommandés par le constructeur.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-rose mt-1">•</span>
-                <span>Les tailles peuvent varier légèrement selon les modèles et les matières.</span>
+                <span>Utilisez des produits compatibles avec les normes spécifiées dans votre manuel.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-rose mt-1">•</span>
-                <span>Pour les soutiens-gorge, la bande doit être parallèle au sol et ne pas remonter dans le dos.</span>
+                <span>Pour les véhicules anciens, privilégiez les huiles minérales ou semi-synthétiques.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-rose mt-1">•</span>
-                <span>Un soutien-gorge bien ajusté ne doit ni serrer ni laisser des marques.</span>
+                <span>En climat extrême, adaptez la viscosité (0W-XX pour froid, 15W-XX pour chaud).</span>
               </li>
             </ul>
           </section>
@@ -181,7 +185,7 @@ export default function SizeGuide() {
           {/* Contact */}
           <section className="mt-12 text-center">
             <p className="text-muted-foreground mb-4">
-              Besoin d'aide pour trouver votre taille ?
+              Besoin d'un conseil personnalisé pour votre véhicule ?
             </p>
             <a 
               href="https://wa.me/22901970000000"

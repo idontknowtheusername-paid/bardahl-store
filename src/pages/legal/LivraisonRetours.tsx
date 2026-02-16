@@ -82,23 +82,23 @@ export default function LivraisonRetours() {
           
           <div className="bg-rose-light p-4 rounded-lg mb-6">
             <p className="font-medium text-center">
-              7 jours pour échanger votre article
+              7 jours pour échanger votre produit
             </p>
           </div>
 
           <div className="space-y-4 text-muted-foreground">
             <p className="leading-relaxed">
               <strong className="text-foreground">Conditions d'échange :</strong><br />
-              Les articles doivent être retournés dans leur état d'origine, non portés, non lavés, 
-              avec toutes les étiquettes attachées. Pour des raisons d'hygiène, les articles ayant 
-              été portés ne peuvent être ni repris ni échangés.
+              Les produits doivent être retournés dans leur état d'origine, non ouverts,
+              avec l'emballage d'origine intact. Pour des raisons de sécurité, les produits
+              ayant été ouverts ne peuvent être ni repris ni échangés.
             </p>
 
             <p className="leading-relaxed">
               <strong className="text-foreground">Procédure d'échange :</strong><br />
               1. Contactez-nous via WhatsApp au +229 01 97 00 00 00<br />
-              2. Envoyez une photo de l'article et votre numéro de commande<br />
-              3. Nous organisons la récupération de l'article<br />
+              2. Envoyez une photo du produit et votre numéro de commande<br />
+              3. Nous organisons la récupération du produit<br />
               4. L'échange est effectué sous 48h après réception
             </p>
 

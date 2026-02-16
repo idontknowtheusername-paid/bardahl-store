@@ -22,24 +22,24 @@ import { useContactSubmit } from '@/hooks/use-supabase-api';
 
 const faqs = [
   {
-    question: "Comment choisir ma taille ?",
-    answer: "Consultez notre guide des tailles disponible sur chaque fiche produit. En cas de doute entre deux tailles, nous vous conseillons de prendre la taille supérieure pour plus de confort. Vous pouvez aussi nous contacter sur WhatsApp pour un conseil personnalisé."
+    question: "Comment choisir la bonne huile pour mon véhicule ?",
+    answer: "Utilisez notre sélecteur d'huile intelligent sur la page d'accueil ou consultez le manuel de votre véhicule pour connaître la viscosité recommandée. Vous pouvez aussi nous contacter sur WhatsApp pour un conseil personnalisé."
   },
   {
     question: "Quels sont les délais de livraison ?",
     answer: "Cotonou : 24-48h. Autres villes du Bénin : 2-4 jours. Afrique de l'Ouest : 5-10 jours selon la destination."
   },
   {
-    question: "Comment retourner un article ?",
-    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 97 00 00 00 avec votre numéro de commande et une photo de l'article."
+    question: "Comment retourner un produit ?",
+    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 97 00 00 00 avec votre numéro de commande et une photo du produit (non ouvert)."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
     answer: "Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires, et le paiement à la livraison (Cotonou uniquement)."
   },
   {
-    question: "La livraison est-elle discrète ?",
-    answer: "Oui, tous nos colis sont emballés de manière neutre sans mention du contenu. L'expéditeur affiché est 'CL Express'."
+    question: "La livraison est-elle sécurisée ?",
+    answer: "Oui, tous nos colis sont emballés de manière professionnelle et suivis. L'expéditeur affiché est 'Bardahl Express'."
   },
 ];
 
@@ -192,7 +192,7 @@ export default function Contact() {
                   <SelectContent>
                     <SelectItem value="order">Ma commande</SelectItem>
                     <SelectItem value="return">Échange</SelectItem>
-                    <SelectItem value="size">Conseil taille</SelectItem>
+                    <SelectItem value="advice">Conseil technique</SelectItem>
                     <SelectItem value="delivery">Livraison</SelectItem>
                     <SelectItem value="other">Autre</SelectItem>
                   </SelectContent>

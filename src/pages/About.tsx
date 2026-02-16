@@ -49,9 +49,9 @@ export default function About() {
               </div>
               <div className="relative">
                 <img 
-                  src="/IMG_3005.JPG" 
-                  alt="Bardahl Collection"
-                  className="rounded-2xl shadow-2xl w-full object-cover aspect-[4/5]"
+                  src="/Bardahl_idiSpcDptj_1.svg"
+                  alt="Bardahl Logo"
+                  className="rounded-2xl shadow-2xl w-full object-contain aspect-square p-8 bg-white"
                 />
                 <div className="absolute -bottom-6 -left-6 bg-rose text-white p-6 rounded-xl shadow-lg">
                   <p className="font-serif text-2xl font-medium">100%</p>

@@ -40,7 +40,7 @@ export default function Cart() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item, index) => (
               <div
-                key={`${item.product.id}-${item.size}-${item.color}-${item.cupSize}`}
+                key={`${item.product.id}-${item.viscosity}-${item.capacity}`}
                 className="flex gap-4 p-4 bg-card rounded-lg border border-border animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -62,13 +62,13 @@ export default function Cart() {
                         {item.product.name}
                       </Link>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {item.color} • Taille {item.size}
-                        {item.cupSize && ` • Bonnet ${item.cupSize}`}
+                        {item.viscosity && `Viscosité: ${item.viscosity} • `}
+                        {item.capacity && `Contenance: ${item.capacity}L`}
                       </p>
                     </div>
                     <button
                       onClick={() =>
-                        removeItem(item.product.id, item.size, item.color, item.cupSize)
+                        removeItem(item.product.id, item.viscosity, item.capacity)
                       }
                       className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                       aria-label="Supprimer"
@@ -83,10 +83,9 @@ export default function Cart() {
                         onClick={() =>
                           updateQuantity(
                             item.product.id,
-                            item.size,
-                            item.color,
-                            item.quantity - 1,
-                            item.cupSize
+                            item.viscosity,
+                            item.capacity,
+                            item.quantity - 1
                           )
                         }
                         className="p-1.5 border border-border rounded hover:bg-muted transition-colors"
@@ -101,10 +100,9 @@ export default function Cart() {
                         onClick={() =>
                           updateQuantity(
                             item.product.id,
-                            item.size,
-                            item.color,
-                            item.quantity + 1,
-                            item.cupSize
+                            item.viscosity,
+                            item.capacity,
+                            item.quantity + 1
                           )
                         }
                         className="p-1.5 border border-border rounded hover:bg-muted transition-colors"
@@ -114,7 +112,7 @@ export default function Cart() {
                       </button>
                     </div>
                     <p className="font-medium text-rose">
-                      {(item.product.price * item.quantity).toFixed(2)} €
+                      {(item.product.price * item.quantity).toFixed(0)} FCFA
                     </p>
                   </div>
                 </div>
@@ -140,7 +138,7 @@ export default function Cart() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Sous-total</span>
-                  <span>{subtotal.toFixed(2)} €</span>
+                  <span>{subtotal.toFixed(0)} FCFA</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Livraison</span>
@@ -148,13 +146,13 @@ export default function Cart() {
                     {shippingCost === 0 ? (
                       <span className="text-green-600">Gratuite</span>
                     ) : (
-                      `${shippingCost.toFixed(2)} €`
+                        `${shippingCost.toFixed(0)} FCFA`
                     )}
                   </span>
                 </div>
                 {shippingCost > 0 && (
                   <p className="text-xs text-muted-foreground bg-rose-light p-2 rounded">
-                    Plus que <strong>{(80 - subtotal).toFixed(2)} €</strong> pour bénéficier de la livraison gratuite !
+                    Plus que <strong>{(50000 - subtotal).toFixed(0)} FCFA</strong> pour bénéficier de la livraison gratuite !
                   </p>
                 )}
               </div>
@@ -162,7 +160,7 @@ export default function Cart() {
               <div className="border-t border-border mt-4 pt-4">
                 <div className="flex justify-between font-medium text-lg">
                   <span>Total</span>
-                  <span>{total.toFixed(2)} €</span>
+                  <span>{total.toFixed(0)} FCFA</span>
                 </div>
               </div>
 

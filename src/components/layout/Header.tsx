@@ -61,12 +61,72 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Promo Bar */}
+      {/* Promo Bar avec sélecteur de langue */}
       <div className="bg-primary text-primary-foreground">
         <div className="container">
-          <div className="flex items-center justify-center gap-2 py-2 text-sm font-semibold">
-            <Truck className="h-4 w-4" />
-            <span>{t.freeShipping}</span>
+          <div className="flex items-center justify-center py-2 text-sm relative">
+            {/* Message de promotion centré */}
+            <div className="flex items-center gap-2 font-semibold">
+              <Truck className="h-4 w-4" />
+              <span>{t.freeShipping}</span>
+            </div>
+
+            {/* Sélecteur de langue positionné absolument à droite */}
+            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-white gap-1 text-xs h-6 px-2 font-medium"
+                  onClick={() => setShowLangMenu(!showLangMenu)}
+                >
+                  <span className="text-base">{currentLang?.flag}</span>
+                  <span className="hidden sm:inline">{currentLang?.name}</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+
+                {showLangMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[180px]">
+                      {/* Languages */}
+                      <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
+                        <Globe className="h-3 w-3 inline mr-1" />
+                        Language
+                      </p>
+                      {languages.map(lang => (
+                        <button
+                          key={lang.code}
+                          onClick={() => { setLanguage(lang.code); setShowLangMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted flex items-center gap-2 ${language === lang.code ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'
+                            }`}
+                        >
+                          <span>{lang.flag}</span>
+                          <span>{lang.name}</span>
+                        </button>
+                      ))}
+
+                      <div className="border-t border-border my-2" />
+
+                      {/* Currency */}
+                      <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
+                        {t.currency}
+                      </p>
+                      {(['EUR', 'FCFA'] as const).map(c => (
+                        <button
+                          key={c}
+                          onClick={() => { setCurrency(c); setShowLangMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted ${currency === c ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'
+                            }`}
+                        >
+                          {c === 'EUR' ? '€ Euro' : 'FCFA Franc CFA'}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -116,63 +176,6 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-1">
-              {/* Language & Currency Selector */}
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-secondary-foreground hover:text-primary gap-1 text-xs"
-                  onClick={() => setShowLangMenu(!showLangMenu)}
-                >
-                  <span className="text-base">{currentLang?.flag}</span>
-                  <span className="hidden sm:inline">{currency}</span>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-
-                {showLangMenu && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-50 bg-secondary border border-secondary/20 rounded-lg shadow-lg p-2 min-w-[200px]">
-                      {/* Languages */}
-                      <p className="text-xs font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
-                        <Globe className="h-3 w-3 inline mr-1" />
-                        Language
-                      </p>
-                      {languages.map(lang => (
-                        <button
-                          key={lang.code}
-                          onClick={() => { setLanguage(lang.code); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted flex items-center gap-2 ${
-                            language === lang.code ? 'bg-primary/10 text-primary font-bold' : ''
-                          }`}
-                        >
-                          <span>{lang.flag}</span>
-                          <span>{lang.name}</span>
-                        </button>
-                      ))}
-
-                      <div className="border-t border-border my-2" />
-
-                      {/* Currency */}
-                      <p className="text-xs font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
-                        {t.currency}
-                      </p>
-                      {(['EUR', 'FCFA'] as const).map(c => (
-                        <button
-                          key={c}
-                          onClick={() => { setCurrency(c); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted ${
-                            currency === c ? 'bg-primary/10 text-primary font-bold' : ''
-                          }`}
-                        >
-                          {c === 'EUR' ? '€ Euro' : 'FCFA Franc CFA'}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
               {/* Search */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>

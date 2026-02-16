@@ -3,25 +3,25 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { products } from '@/data/products';
 
 const collections = {
-  'saint-valentin': {
-    name: 'Collection Saint-Valentin',
-    description: 'Séduisez avec notre sélection spéciale Saint-Valentin',
-    image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=1200&q=80',
+  'haute-performance': {
+    name: 'Haute Performance',
+    description: 'Produits premium pour une protection et performance maximales',
+    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=1200&q=80',
   },
-  'essentiels': {
-    name: 'Essentiels du Quotidien',
-    description: 'Les indispensables pour votre confort au quotidien',
-    image: 'https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=1200&q=80',
+  'entretien-complet': {
+    name: 'Entretien Complet',
+    description: 'Gamme complète pour l\'entretien et la maintenance de votre véhicule',
+    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&q=80',
   },
-  'nuits-ete': {
-    name: 'Nuits d\'Été',
-    description: 'Légèreté et fraîcheur pour les nuits chaudes',
-    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1200&q=80',
+  'technologie-avancee': {
+    name: 'Technologie Avancée',
+    description: 'Solutions innovantes avec la technologie Polar Plus® exclusive',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
   },
-  'luxe-elegance': {
-    name: 'Luxe & Élégance',
-    description: 'Pièces d\'exception pour des moments uniques',
-    image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=1200&q=80',
+  'economie-durable': {
+    name: 'Économie & Durabilité',
+    description: 'Produits pour réduire la consommation et prolonger la durée de vie',
+    image: 'https://images.unsplash.com/photo-1563720223485-8d6d5c5c8c6b?w=1200&q=80',
   },
 };
 
