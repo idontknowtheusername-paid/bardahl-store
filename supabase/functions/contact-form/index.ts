@@ -5,89 +5,40 @@ import { corsHeaders } from "../_shared/cors.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "admin@cannesh.com";
-
-interface ContactRequest {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
+const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "contact@bardahl.ci";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { name, email, subject, message }: ContactRequest = await req.json();
-
-    if (!name || !email || !subject || !message) {
-      throw new Error("Tous les champs sont requis");
-    }
+    const { name, email, subject, message } = await req.json();
+    if (!name || !email || !subject || !message) throw new Error("Tous les champs sont requis");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-    // Save to database
-    const { data, error } = await supabase
-      .from("contact_messages")
-      .insert({
-        name,
-        email,
-        subject,
-        message,
-        status: "new",
-      })
-      .select()
-      .single();
-
+    const { data, error } = await supabase.from("contact_messages").insert({ name, email, subject, message, status: "new" }).select().single();
     if (error) throw error;
 
-    // Notify admin
     if (RESEND_API_KEY) {
       try {
         await fetch("https://api.resend.com/emails", {
           method: "POST",
-          headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
+          headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            from: "Cannesh Lingerie <noreply@cannesh.com>",
+            from: "Bardahl <onboarding@resend.dev>",
             to: [ADMIN_EMAIL],
-            subject: `[Contact] ${subject}`,
-            html: `
-              <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Nouveau message de contact</h2>
-                <p><strong>De:</strong> ${name} (${email})</p>
-                <p><strong>Sujet:</strong> ${subject}</p>
-                <hr style="border: 1px solid #e5e5e5; margin: 20px 0;">
-                <p>${message.replace(/\n/g, '<br>')}</p>
-              </div>
-            `,
+            subject: `[Contact Bardahl] ${subject}`,
+            html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #0a0a0a; padding: 15px; text-align: center;"><h2 style="color: #FFD000; margin: 0;">BARDAHL</h2></div>
+              <div style="padding: 20px;"><h3>Nouveau message de contact</h3><p><strong>De:</strong> ${name} (${email})</p><p><strong>Sujet:</strong> ${subject}</p><hr/><p>${message.replace(/\n/g, '<br>')}</p></div>
+            </div>`,
           }),
         });
-      } catch (emailError) {
-        console.error("Admin notification failed:", emailError);
-      }
+      } catch (e) { console.error("Admin notification failed:", e); }
     }
 
-    return new Response(
-      JSON.stringify({ success: true, id: data.id }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
+    return new Response(JSON.stringify({ success: true, id: data.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
   } catch (error) {
     console.error("Contact form error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
   }
 });

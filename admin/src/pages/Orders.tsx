@@ -6,21 +6,8 @@ import { formatPrice, formatDateShort } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Search, Eye, Download } from 'lucide-react';
 
@@ -42,19 +29,9 @@ export default function Orders() {
   const { data: orders, isLoading } = useQuery({
     queryKey: ['orders', search, statusFilter],
     queryFn: async () => {
-      let query = supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (search) {
-        query = query.or(`order_number.ilike.%${search}%,shipping_email.ilike.%${search}%,shipping_phone.ilike.%${search}%`);
-      }
-
-      if (statusFilter && statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
-      }
-
+      let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+      if (search) query = query.or(`order_number.ilike.%${search}%,customer_email.ilike.%${search}%,customer_phone.ilike.%${search}%`);
+      if (statusFilter && statusFilter !== 'all') query = query.eq('status', statusFilter);
       const { data, error } = await query;
       if (error) throw error;
       return data;
@@ -63,92 +40,48 @@ export default function Orders() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq('id', id);
+      const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Statut mis à jour');
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['orders'] }); toast.success('Statut mis à jour'); },
   });
 
   const exportCSV = () => {
     if (!orders?.length) return;
-
-    const headers = ['Numéro', 'Date', 'Client', 'Email', 'Téléphone', 'Ville', 'Total', 'Statut', 'Paiement'];
-    const rows = orders.map(o => [
-      o.order_number,
-      formatDateShort(o.created_at),
-      `${o.shipping_first_name} ${o.shipping_last_name || ''}`,
-      o.shipping_email,
-      o.shipping_phone,
-      o.shipping_city,
-      o.total,
-      o.status,
-      o.payment_status,
-    ]);
-
+    const headers = ['Numéro', 'Date', 'Client', 'Email', 'Téléphone', 'Total', 'Statut', 'Paiement'];
+    const rows = orders.map(o => [o.order_number, formatDateShort(o.created_at), o.customer_name || '', o.customer_email || '', o.customer_phone || '', o.total, o.status, o.payment_status]);
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = `commandes-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
-  };
-
-  const getStatusBadge = (status: string) => {
-    const s = ORDER_STATUSES.find(s => s.value === status) || ORDER_STATUSES[0];
-    return <span className={`px-2 py-1 rounded-full text-xs font-medium ${s.color}`}>{s.label}</span>;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Commandes</h1>
-        <Button variant="outline" onClick={exportCSV}>
-          <Download className="h-4 w-4 mr-2" />
-          Exporter CSV
-        </Button>
+        <Button variant="outline" onClick={exportCSV}><Download className="h-4 w-4 mr-2" />Exporter CSV</Button>
       </div>
-
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filtrer par statut" />
-          </SelectTrigger>
+          <SelectTrigger className="w-48"><SelectValue placeholder="Filtrer par statut" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les statuts</SelectItem>
-            {ORDER_STATUSES.map(s => (
-              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-            ))}
+            {ORDER_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
-
       <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Commande</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Paiement</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="w-10"></TableHead>
+              <TableHead>Commande</TableHead><TableHead>Date</TableHead><TableHead>Client</TableHead><TableHead>Total</TableHead><TableHead>Paiement</TableHead><TableHead>Statut</TableHead><TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -163,37 +96,24 @@ export default function Orders() {
                   <TableCell className="text-muted-foreground">{formatDateShort(order.created_at)}</TableCell>
                   <TableCell>
                     <div>
-                      <p>{order.shipping_first_name} {order.shipping_last_name}</p>
-                      <p className="text-sm text-muted-foreground">{order.shipping_city}</p>
+                      <p>{order.customer_name || 'N/A'}</p>
+                      <p className="text-sm text-muted-foreground">{order.customer_email}</p>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{formatPrice(order.total)}</TableCell>
                   <TableCell>
                     <Badge variant={order.payment_status === 'paid' ? 'default' : 'secondary'}>
-                      {order.payment_status === 'paid' ? 'Payé' : order.payment_status === 'pending' ? 'En attente' : 'Échoué'}
+                      {order.payment_status === 'paid' ? 'Payé' : order.payment_status === 'failed' ? 'Échoué' : 'En attente'}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Select
-                      value={order.status || 'pending'}
-                      onValueChange={(status) => updateStatusMutation.mutate({ id: order.id, status })}
-                    >
-                      <SelectTrigger className="w-32 h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ORDER_STATUSES.map(s => (
-                          <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                        ))}
-                      </SelectContent>
+                    <Select value={order.status || 'pending'} onValueChange={(status) => updateStatusMutation.mutate({ id: order.id, status })}>
+                      <SelectTrigger className="w-32 h-8"><SelectValue /></SelectTrigger>
+                      <SelectContent>{ORDER_STATUSES.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}</SelectContent>
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link to={`/orders/${order.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <Button variant="ghost" size="icon" asChild><Link to={`/orders/${order.id}`}><Eye className="h-4 w-4" /></Link></Button>
                   </TableCell>
                 </TableRow>
               ))

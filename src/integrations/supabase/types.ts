@@ -124,29 +124,35 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          admin_reply: string | null
           created_at: string | null
           email: string
           id: string
           message: string
           name: string
+          replied_at: string | null
           status: string | null
           subject: string
         }
         Insert: {
+          admin_reply?: string | null
           created_at?: string | null
           email: string
           id?: string
           message: string
           name: string
+          replied_at?: string | null
           status?: string | null
           subject: string
         }
         Update: {
+          admin_reply?: string | null
           created_at?: string | null
           email?: string
           id?: string
           message?: string
           name?: string
+          replied_at?: string | null
           status?: string | null
           subject?: string
         }
@@ -235,6 +241,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          admin_note: string | null
           billing_address: Json | null
           created_at: string | null
           currency: string | null
@@ -245,16 +252,23 @@ export type Database = {
           id: string
           notes: string | null
           order_number: string
+          payment_gateway_id: string | null
+          payment_id: string | null
+          payment_status: string | null
+          payment_transaction_id: string | null
           promo_code_id: string | null
           shipping_address: Json | null
           shipping_cost: number | null
+          shipping_method: string | null
           status: string | null
           subtotal: number
           total: number
+          tracking_number: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          admin_note?: string | null
           billing_address?: Json | null
           created_at?: string | null
           currency?: string | null
@@ -265,16 +279,23 @@ export type Database = {
           id?: string
           notes?: string | null
           order_number: string
+          payment_gateway_id?: string | null
+          payment_id?: string | null
+          payment_status?: string | null
+          payment_transaction_id?: string | null
           promo_code_id?: string | null
           shipping_address?: Json | null
           shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string | null
           subtotal?: number
           total?: number
+          tracking_number?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          admin_note?: string | null
           billing_address?: Json | null
           created_at?: string | null
           currency?: string | null
@@ -285,12 +306,18 @@ export type Database = {
           id?: string
           notes?: string | null
           order_number?: string
+          payment_gateway_id?: string | null
+          payment_id?: string | null
+          payment_status?: string | null
+          payment_transaction_id?: string | null
           promo_code_id?: string | null
           shipping_address?: Json | null
           shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string | null
           subtotal?: number
           total?: number
+          tracking_number?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -459,6 +486,7 @@ export type Database = {
           is_featured: boolean | null
           is_new: boolean | null
           price: number
+          product_type: string | null
           short_description: string | null
           sku: string | null
           slug: string
@@ -486,6 +514,7 @@ export type Database = {
           is_featured?: boolean | null
           is_new?: boolean | null
           price?: number
+          product_type?: string | null
           short_description?: string | null
           sku?: string | null
           slug: string
@@ -513,6 +542,7 @@ export type Database = {
           is_featured?: boolean | null
           is_new?: boolean | null
           price?: number
+          product_type?: string | null
           short_description?: string | null
           sku?: string | null
           slug?: string
@@ -573,6 +603,143 @@ export type Database = {
           uses_count?: number | null
           valid_from?: string
           valid_until?: string | null
+        }
+        Relationships: []
+      }
+      shipping_rates: {
+        Row: {
+          created_at: string | null
+          delivery_time: string | null
+          description: string | null
+          free_shipping_threshold: number | null
+          id: string
+          is_active: boolean | null
+          min_order_amount: number | null
+          name: string
+          price: number
+          shipping_zone_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_time?: string | null
+          description?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          is_active?: boolean | null
+          min_order_amount?: number | null
+          name: string
+          price?: number
+          shipping_zone_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_time?: string | null
+          description?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          is_active?: boolean | null
+          min_order_amount?: number | null
+          name?: string
+          price?: number
+          shipping_zone_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_rates_shipping_zone_id_fkey"
+            columns: ["shipping_zone_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_zones: {
+        Row: {
+          cities: string[] | null
+          countries: string[] | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          cities?: string[] | null
+          countries?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          cities?: string[] | null
+          countries?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          announcement_bar: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          currency: string | null
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          maintenance_mode: boolean | null
+          minimum_order_amount: number | null
+          site_description: string | null
+          site_name: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
+          updated_at: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          announcement_bar?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          currency?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          maintenance_mode?: boolean | null
+          minimum_order_amount?: number | null
+          site_description?: string | null
+          site_name?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          announcement_bar?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          currency?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          maintenance_mode?: boolean | null
+          minimum_order_amount?: number | null
+          site_description?: string | null
+          site_name?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
