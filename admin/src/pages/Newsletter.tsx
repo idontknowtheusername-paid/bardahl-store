@@ -41,7 +41,7 @@ export default function Newsletter() {
       }
 
       const { data, count, error } = await query
-        .order('subscribed_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (error) throw error;
@@ -68,10 +68,7 @@ export default function Newsletter() {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase
         .from('newsletter_subscribers')
-        .update({
-          status,
-          unsubscribed_at: status === 'unsubscribed' ? new Date().toISOString() : null,
-        })
+        .update({ status })
         .eq('id', id);
       if (error) throw error;
     },
@@ -91,8 +88,8 @@ export default function Newsletter() {
       s.name || '',
       s.status || 'active',
       s.source || '',
-      formatDate(s.subscribed_at),
-      s.unsubscribed_at ? formatDate(s.unsubscribed_at) : '',
+      formatDate(s.created_at),
+      '',
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -215,7 +212,7 @@ export default function Newsletter() {
                         {subscriber.source || '-'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {formatDate(subscriber.subscribed_at)}
+                        {formatDate(subscriber.created_at)}
                       </TableCell>
                       <TableCell>
                         {subscriber.status === 'active' ? (
