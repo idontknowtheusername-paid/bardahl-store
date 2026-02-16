@@ -1,7 +1,7 @@
 import type { TranslationKeys } from './types';
 
 export const fr: TranslationKeys = {
-  freeShipping: "Livraison gratuite dès 59€ d'achat",
+  freeShipping: "Livraison gratuite dès 50 000 FCFA d'achat",
   search: 'Rechercher',
   searchPlaceholder: 'Rechercher par nom, référence...',
   searchResults: 'résultat(s)',

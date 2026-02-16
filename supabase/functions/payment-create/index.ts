@@ -100,35 +100,74 @@ serve(async (req) => {
     }
 
     const frontendUrl = "https://bardahl.maxiimarket.com";
-    const paymentResponse = await fetch(`${GENIUS_PAY_API_URL}/payments`, {
-      method: "POST",
-      headers: {
-        "X-API-Key": GENIUS_PAY_API_KEY,
-        "X-API-Secret": GENIUS_PAY_API_SECRET,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: total,
-        description: `Commande ${orderNumber} - Bardahl`,
-        success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
-        error_url: `${frontendUrl}/checkout`,
-        customer: {
-          email: shipping.email,
-          phone: shipping.phone,
-          name: shipping.firstName,
+
+    // Create payment with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+    let paymentResponse;
+    try {
+      paymentResponse = await fetch(`${GENIUS_PAY_API_URL}/payments`, {
+        method: "POST",
+        headers: {
+          "X-API-Key": GENIUS_PAY_API_KEY,
+          "X-API-Secret": GENIUS_PAY_API_SECRET,
+          "Content-Type": "application/json",
         },
-        metadata: {
+        body: JSON.stringify({
+          amount: total,
+          description: `Commande ${orderNumber} - Bardahl`,
+          success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
+          error_url: `${frontendUrl}/checkout`,
+          customer: {
+            email: shipping.email,
+            phone: shipping.phone,
+            name: shipping.firstName,
+          },
+          metadata: {
+            order_id: order.id,
+            order_number: orderNumber,
+          },
+        }),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error("Genius Pay fetch error:", fetchError);
+
+      // Return order info even if payment fails
+      return new Response(
+        JSON.stringify({
+          success: true,
           order_id: order.id,
           order_number: orderNumber,
-        },
-      }),
-    });
+          amount: total,
+          message: "Commande créée. Le paiement sera traité manuellement.",
+          payment_error: true,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
+    clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
 
     if (!paymentResponse.ok) {
       console.error("Genius Pay error:", paymentData);
-      throw new Error(paymentData.message || "Payment creation failed");
+
+      // Return order info even if payment creation fails
+      return new Response(
+        JSON.stringify({
+          success: true,
+          order_id: order.id,
+          order_number: orderNumber,
+          amount: total,
+          message: "Commande créée. Le paiement sera traité manuellement.",
+          payment_error: true,
+          error_details: paymentData.error?.message || paymentData.message,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Update order with payment ID

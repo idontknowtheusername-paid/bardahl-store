@@ -212,7 +212,69 @@ export function getProductBySlug(slug: string): Product | undefined {
 }
 
 export function getRelatedProducts(product: Product): Product[] {
-  return products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  console.log('🔍 getRelatedProducts called with product:', product);
+  console.log('product.id:', product.id);
+  console.log('product.slug:', product.slug);
+  console.log('product.category:', product.category);
+
+  // Vérifier si le produit a une catégorie
+  if (!product.category) {
+    console.log('⚠️ No category found, returning bestsellers');
+    // Retourner les bestsellers si pas de catégorie
+    return products.filter(p => p.isBestseller).slice(0, 4);
+  }
+
+  // Si le produit est dans les produits mock, chercher dans les produits mock
+  const productInMock = products.find(p => p.id === product.id || p.slug === product.slug);
+  console.log('productInMock found:', !!productInMock);
+
+  if (productInMock) {
+    const filtered = products.filter(p => p.category === product.category && p.id !== product.id);
+    console.log(`Found ${filtered.length} products in same category (excluding self)`);
+    if (filtered.length > 0) {
+      return filtered.slice(0, 4);
+    }
+  }
+
+  // Chercher des produits mock de la même catégorie
+  const sameCategoryProducts = products.filter(p => p.category === product.category);
+  console.log(`Found ${sameCategoryProducts.length} mock products in category "${product.category}"`);
+
+  if (sameCategoryProducts.length > 0) {
+    return sameCategoryProducts.slice(0, 4);
+  }
+
+  // Fallback 1: Si catégorie "autres", chercher dans les catégories automobiles
+  if (product.category === 'autres') {
+    console.log('🔄 Category is "autres", looking for automotive products');
+    const automotiveProducts = products.filter(p =>
+      p.category === 'huiles-moteur' ||
+      p.category === 'additifs' ||
+      p.category === 'entretien'
+    );
+    if (automotiveProducts.length > 0) {
+      console.log(`Found ${automotiveProducts.length} automotive products`);
+      return automotiveProducts.slice(0, 4);
+    }
+  }
+
+  // Fallback 2: Retourner les bestsellers
+  console.log('🔄 No products in same category, returning bestsellers');
+  const bestsellers = products.filter(p => p.isBestseller);
+  if (bestsellers.length > 0) {
+    return bestsellers.slice(0, 4);
+  }
+
+  // Fallback 3: Retourner les nouveaux produits
+  console.log('🔄 No bestsellers, returning new products');
+  const newProducts = products.filter(p => p.isNew);
+  if (newProducts.length > 0) {
+    return newProducts.slice(0, 4);
+  }
+
+  // Fallback final: Retourner les 4 premiers produits
+  console.log('🔄 No criteria matched, returning first 4 products');
+  return products.slice(0, 4);
 }
 
 export function getNewProducts(): Product[] {

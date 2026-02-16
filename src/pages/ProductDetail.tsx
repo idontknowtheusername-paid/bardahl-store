@@ -30,7 +30,18 @@ export default function ProductDetail() {
   const { data: apiProduct, isLoading } = useProduct(slug || '');
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
+
+  // Debug logs
+  console.log('🔍 ProductDetail Debug:');
+  console.log('slug:', slug);
+  console.log('apiProduct:', apiProduct);
+  console.log('staticProduct:', staticProduct);
+  console.log('product:', product);
+  console.log('product category:', product?.category);
+
   const relatedProducts = product ? getRelatedProducts(product) : [];
+  console.log('relatedProducts count:', relatedProducts.length);
+  console.log('relatedProducts:', relatedProducts);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
