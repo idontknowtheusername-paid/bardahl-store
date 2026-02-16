@@ -99,7 +99,7 @@ export default function CheckoutCallback() {
             <p className="text-muted-foreground mb-6">{message}</p>
             <div className="flex flex-col gap-3">
               <Button
-                variant="rose"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                 onClick={() => navigate('/panier')}
               >
                 Retour au panier

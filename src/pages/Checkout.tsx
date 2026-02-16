@@ -409,7 +409,7 @@ export default function Checkout() {
                   </Label>
                 </div>
 
-                <Button variant="rose" size="lg" type="submit" className="w-full sm:w-auto">
+                <Button size="lg" type="submit" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
                   Continuer
                 </Button>
               </form>
@@ -479,7 +479,7 @@ export default function Checkout() {
                   <Button variant="outline" onClick={() => setCurrentStep('shipping')}>
                     Retour
                   </Button>
-                  <Button variant="rose" onClick={handleDeliverySubmit}>
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold" onClick={handleDeliverySubmit}>
                     Continuer
                   </Button>
                 </div>

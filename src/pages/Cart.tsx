@@ -20,7 +20,7 @@ export default function Cart() {
           <p className="text-muted-foreground mb-8">
             Découvrez notre gamme de produits et trouvez ceux qui correspondent à vos besoins.
           </p>
-          <Button variant="rose" size="lg" asChild>
+          <Button size="lg" asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
             <Link to="/collections">Découvrir nos collections</Link>
           </Button>
         </div>
@@ -167,16 +167,15 @@ export default function Cart() {
               </div>
 
               <Button
-                variant="rose"
                 size="lg"
-                className="w-full mt-6"
+                className="w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                 asChild
               >
                 <Link to="/checkout">Passer commande</Link>
               </Button>
 
               <p className="text-xs text-center text-muted-foreground mt-4">
-                Paiement sécurisé via Lygos
+                Paiement sécurisé via GeniusPay
               </p>
             </div>
           </div>

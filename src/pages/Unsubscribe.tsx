@@ -59,7 +59,7 @@ export default function Unsubscribe() {
               Vous ne recevrez plus d'emails concernant les nouveaux articles du blog.
               Vous pouvez vous réabonner à tout moment lors d'un prochain achat.
             </p>
-            <Button asChild variant="rose">
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
               <Link to="/">Retour à l'accueil</Link>
             </Button>
           </div>
@@ -72,7 +72,7 @@ export default function Unsubscribe() {
               <h1 className="font-serif text-3xl font-medium">Erreur</h1>
               <p className="text-muted-foreground">{message}</p>
             </div>
-            <Button asChild variant="rose">
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
               <Link to="/">Retour à l'accueil</Link>
             </Button>
           </div>

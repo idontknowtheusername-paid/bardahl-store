@@ -142,7 +142,7 @@ export default function Confirmation() {
 
         {/* CTA Button */}
         <div className="text-center mt-8">
-          <Button variant="rose" size="lg" asChild>
+          <Button size="lg" asChild className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold">
             <Link to="/collections">Continuer mes achats</Link>
           </Button>
         </div>

@@ -212,8 +212,8 @@ export default function Contact() {
 
               <Button
                 type="submit"
-                variant="rose"
                 size="lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                 disabled={contactMutation.isPending}
               >
                 {contactMutation.isPending ? (
