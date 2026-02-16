@@ -112,7 +112,9 @@ export default function Checkout() {
   // Use calculated shipping or fallback to default option price
   const shippingCost = (selectedShipping === 'pickup' || isFreeShipping)
     ? 0 
-    : (calculatedShippingCost !== null ? calculatedShippingCost : (selectedShippingOption?.price || 0));
+    : (calculatedShippingCost !== null && !isNaN(calculatedShippingCost)
+      ? calculatedShippingCost
+      : (selectedShippingOption?.price || 0));
   
   const total = subtotal - discountAmount + shippingCost;
 
@@ -435,7 +437,7 @@ export default function Checkout() {
                   {shippingOptions.map(option => {
                     const Icon = option.icon;
                     const displayPrice = option.id === 'pickup' ? 0 : (
-                      option.id === selectedShipping && calculatedShippingCost !== null 
+                      option.id === selectedShipping && calculatedShippingCost !== null && !isNaN(calculatedShippingCost)
                         ? calculatedShippingCost 
                         : option.price
                     );
