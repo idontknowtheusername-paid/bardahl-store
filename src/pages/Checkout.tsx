@@ -552,9 +552,8 @@ export default function Checkout() {
                     Retour
                   </Button>
                   <Button
-                    variant="rose"
                     size="lg"
-                    className="flex-1"
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                     onClick={handlePayment}
                     disabled={isProcessing || !acceptCGV}
                   >
