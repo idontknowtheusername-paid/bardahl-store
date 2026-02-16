@@ -47,6 +47,7 @@ const productSchema = z.object({
   description: z.string().optional(),
   sku: z.string().optional(),
   stock: z.number().min(0).optional(),
+  product_type: z.string().min(1, 'Gamme requise'),
   viscosity: z.string().optional(),
   api_norm: z.string().optional(),
   acea_norm: z.string().optional(),
@@ -63,12 +64,12 @@ const API_NORMS = ['API SN', 'API SN Plus', 'API SP', 'API CJ-4', 'API CK-4', 'A
 const ACEA_NORMS = ['ACEA A3/B4', 'ACEA A5/B5', 'ACEA C2', 'ACEA C3', 'ACEA C4', 'ACEA C5', 'ACEA E6', 'ACEA E9'];
 const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '20L', '60L', '200L'];
 const PRODUCT_TYPES = [
-  { value: 'huile-moteur', label: 'Huile Moteur' },
-  { value: 'additif', label: 'Additif' },
-  { value: 'graisse', label: 'Graisse' },
-  { value: 'entretien', label: 'Produit d\'Entretien' },
-  { value: 'liquide-refroidissement', label: 'Liquide de Refroidissement' },
-  { value: 'huile-transmission', label: 'Huile de Transmission' },
+  { value: 'huiles-moteur', label: 'Huiles Moteur' },
+  { value: 'additifs', label: 'Additifs & Traitements' },
+  { value: 'entretien', label: 'Entretien & Nettoyage' },
+  { value: 'graisses', label: 'Graisses & Lubrifiants' },
+  { value: 'liquides', label: 'Liquides de refroidissement' },
+  { value: 'transmission', label: 'Transmission & Freinage' },
 ];
 
 // Sortable Image Component
@@ -202,9 +203,6 @@ export default function ProductEdit() {
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [images, setImages] = useState<string[]>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-  const [productType, setProductType] = useState('huile-moteur');
 
   useEffect(() => {
     return () => {
@@ -217,31 +215,13 @@ export default function ProductEdit() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('categories').select('*').eq('is_active', true).order('title');
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: collections } = useQuery({
-    queryKey: ['collections'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('product_collections').select('*').eq('is_active', true).order('title');
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
       if (isNew) return null;
       const { data, error } = await supabase
         .from('products')
-        .select('*, product_images(*), product_categories(category_id), product_collection_items(collection_id)')
+        .select('*, product_images(*)')
         .eq('id', id)
         .single();
       if (error) throw error;
@@ -258,12 +238,6 @@ export default function ProductEdit() {
         .map((img: any) => img.image_url);
       setImages(imageUrls);
     }
-    if (product.product_categories && product.product_categories.length > 0) {
-      setSelectedCategories(product.product_categories.map((pc: any) => pc.category_id));
-    }
-    if (product.product_collection_items && product.product_collection_items.length > 0) {
-      setSelectedCollections(product.product_collection_items.map((pci: any) => pci.collection_id));
-    }
   }, [product]);
 
   const form = useForm<ProductFormData>({
@@ -271,6 +245,7 @@ export default function ProductEdit() {
     defaultValues: {
       title: '', slug: '', price: 0, compare_at_price: null,
       short_description: '', description: '', sku: '', stock: 100,
+      product_type: 'huiles-moteur',
       viscosity: '', api_norm: '', acea_norm: '', capacity: '',
       is_active: true, is_new: false, is_featured: false,
     },
@@ -280,18 +255,17 @@ export default function ProductEdit() {
       price: product.price,
       compare_at_price: product.compare_at_price,
       short_description: product.short_description || '',
-      description: typeof product.description === 'object' && product.description
-        ? (product.description as any).text || ''
-        : (product.description || ''),
+      description: product.description || '',
       sku: product.sku || '',
       stock: product.stock || 0,
+      product_type: product.product_type || 'huiles-moteur',
       viscosity: product.viscosity || '',
       api_norm: product.api_norm || '',
       acea_norm: product.acea_norm || '',
       capacity: product.capacity || '',
-      is_active: product.is_active ?? true,
-      is_new: product.is_new ?? false,
-      is_featured: product.is_featured ?? false,
+      is_active: product.is_active,
+      is_new: product.is_new,
+      is_featured: product.is_featured,
     } : undefined,
   });
 
@@ -390,11 +364,11 @@ export default function ProductEdit() {
           description: data.description || null,
           sku: data.sku?.trim() || generateSKU(data.title),
           stock: data.stock || 0,
+          product_type: data.product_type,
           viscosity: data.viscosity || null,
           api_norm: data.api_norm || null,
           acea_norm: data.acea_norm || null,
           capacity: data.capacity || null,
-          style: productType,
           is_active: data.is_active,
           is_new: data.is_new,
           is_featured: data.is_featured,
@@ -403,6 +377,7 @@ export default function ProductEdit() {
           available_cup_sizes: null,
           composition: null,
           care_instructions: null,
+          style: null,
         };
 
         let productId = id;
@@ -429,22 +404,6 @@ export default function ProductEdit() {
           );
         }
 
-        // Categories
-        if (!isNew) await supabase.from('product_categories').delete().eq('product_id', productId);
-        if (selectedCategories.length > 0) {
-          await supabase.from('product_categories').insert(
-            selectedCategories.map(categoryId => ({ product_id: productId, category_id: categoryId }))
-          );
-        }
-
-        // Collections
-        if (!isNew) await supabase.from('product_collection_items').delete().eq('product_id', productId);
-        if (selectedCollections.length > 0) {
-          await supabase.from('product_collection_items').insert(
-            selectedCollections.map(collectionId => ({ product_id: productId, collection_id: collectionId }))
-          );
-        }
-
         return productId;
       } finally { isSavingRef.current = false; }
     },
@@ -460,7 +419,6 @@ export default function ProductEdit() {
   });
 
   const onSubmit = (data: ProductFormData) => {
-    if (selectedCategories.length === 0) { toast.error('Veuillez sélectionner au moins une catégorie'); return; }
     if (saveMutation.isPending || isSavingRef.current) { toast.warning('Sauvegarde en cours...'); return; }
     saveMutation.mutate(data);
   };
@@ -557,10 +515,10 @@ export default function ProductEdit() {
               </div>
 
               <div className="space-y-2">
-                <Label>Type de produit</Label>
-                <Select value={productType} onValueChange={setProductType}>
+                <Label>Gamme *</Label>
+                <Select value={form.watch('product_type')} onValueChange={(value) => form.setValue('product_type', value)}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Sélectionner une gamme" />
                   </SelectTrigger>
                   <SelectContent>
                     {PRODUCT_TYPES.map(type => (
@@ -568,6 +526,9 @@ export default function ProductEdit() {
                     ))}
                   </SelectContent>
                 </Select>
+                {form.formState.errors.product_type && (
+                  <p className="text-sm text-destructive">{form.formState.errors.product_type.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -678,71 +639,6 @@ export default function ProductEdit() {
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU / Référence</Label>
                 <Input id="sku" {...form.register('sku')} placeholder="Auto-généré si vide" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Categories & Collections */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Catégories et Collections</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Catégories *</Label>
-                <div className="flex flex-wrap gap-2">
-                  {categories?.map(category => (
-                    <label
-                      key={category.id}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${
-                        selectedCategories.includes(category.id)
-                        ? 'bg-primary/20 border-primary text-primary'
-                        : 'border-border hover:bg-muted'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(category.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setSelectedCategories([...selectedCategories, category.id]);
-                          else setSelectedCategories(selectedCategories.filter(cid => cid !== category.id));
-                        }}
-                        className="sr-only"
-                      />
-                      <span className="text-sm">{category.title}</span>
-                    </label>
-                  ))}
-                </div>
-                {selectedCategories.length === 0 && (
-                  <p className="text-sm text-destructive">Au moins une catégorie requise</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Collections</Label>
-                <div className="flex flex-wrap gap-2">
-                  {collections?.map(collection => (
-                    <label
-                      key={collection.id}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-colors ${
-                        selectedCollections.includes(collection.id)
-                        ? 'bg-primary/20 border-primary text-primary'
-                        : 'border-border hover:bg-muted'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCollections.includes(collection.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setSelectedCollections([...selectedCollections, collection.id]);
-                          else setSelectedCollections(selectedCollections.filter(cid => cid !== collection.id));
-                        }}
-                        className="sr-only"
-                      />
-                      <span className="text-sm">{collection.title}</span>
-                    </label>
-                  ))}
-                </div>
               </div>
             </CardContent>
           </Card>

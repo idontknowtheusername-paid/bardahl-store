@@ -11,8 +11,6 @@ import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import Products from '@/pages/Products';
 import ProductEdit from '@/pages/ProductEdit';
-import Categories from '@/pages/Categories';
-import Collections from '@/pages/Collections';
 import Orders from '@/pages/Orders';
 import OrderDetail from '@/pages/OrderDetail';
 import Customers from '@/pages/Customers';
@@ -52,8 +50,6 @@ function App() {
                         <Route path="/products" element={<Products />} />
                         <Route path="/products/new" element={<ProductEdit />} />
                         <Route path="/products/:id" element={<ProductEdit />} />
-                        <Route path="/categories" element={<Categories />} />
-                        <Route path="/collections" element={<Collections />} />
                         <Route path="/orders" element={<Orders />} />
                         <Route path="/orders/:id" element={<OrderDetail />} />
                         <Route path="/customers" element={<Customers />} />

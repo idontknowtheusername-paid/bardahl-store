@@ -132,7 +132,7 @@ export function Header() {
                 {showLangMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[200px]">
+                    <div className="absolute right-0 top-full mt-1 z-50 bg-secondary border border-secondary/20 rounded-lg shadow-lg p-2 min-w-[200px]">
                       {/* Languages */}
                       <p className="text-xs font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
                         <Globe className="h-3 w-3 inline mr-1" />

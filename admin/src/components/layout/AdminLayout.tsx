@@ -8,8 +8,6 @@ import { ChatWidget } from '@/components/ChatWidget';
 import {
   LayoutDashboard,
   Package,
-  FolderTree,
-  Layers,
   ShoppingCart,
   Users,
   Percent,
@@ -41,8 +39,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navItems = [
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
     { href: '/products', label: t.nav.products, icon: Package },
-    { href: '/categories', label: t.nav.categories, icon: FolderTree },
-    { href: '/collections', label: t.nav.collections, icon: Layers },
     { href: '/orders', label: t.nav.orders, icon: ShoppingCart },
     { href: '/customers', label: t.nav.customers, icon: UsersIcon },
     { href: '/users', label: t.nav.users, icon: UsersIcon },
