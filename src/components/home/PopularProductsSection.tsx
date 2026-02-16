@@ -6,15 +6,12 @@ import { useTranslation } from '@/context/LanguageContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useMemo } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useProducts } from '@/hooks/use-supabase-api';
+import { useFeaturedProducts } from '@/hooks/use-supabase-api';
 
 export function PopularProductsSection() {
   const t = useTranslation();
-  const { data: products, isLoading } = useProducts({ limit: 8 });
+  const { data: products, isLoading } = useFeaturedProducts();
   const autoplayPlugin = useMemo(() => Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true }), []);
-
-  // Filter bestsellers or fallback to all products
-  const popularProducts = products?.filter(p => p.isBestseller) || products || [];
 
   if (isLoading) {
     return (
@@ -32,7 +29,7 @@ export function PopularProductsSection() {
     );
   }
 
-  if (!popularProducts || popularProducts.length === 0) return null;
+  if (!products || products.length === 0) return null;
 
   return (
     <section className="py-10 md:py-16 bg-background">
@@ -43,12 +40,12 @@ export function PopularProductsSection() {
             <h2 className="text-2xl md:text-3xl font-bold mt-1">{t.popularProducts || 'Produits Populaires'}</h2>
           </div>
           <Button variant="link" className="p-0 text-primary font-semibold shrink-0 ml-4" asChild>
-            <Link to="/produits">{t.seeAll}</Link>
+            <Link to="/categories">{t.seeAll}</Link>
           </Button>
         </div>
         <Carousel opts={{ align: 'start', loop: true }} plugins={[autoplayPlugin]} className="w-full">
           <CarouselContent className="-ml-4 md:-ml-6">
-            {popularProducts.map((product, index) => (
+            {products.map((product, index) => (
               <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[45%] sm:basis-[40%] md:basis-1/3 lg:basis-1/4">
                 <ProductCard product={product} className="animate-slide-up"
                   style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties} />

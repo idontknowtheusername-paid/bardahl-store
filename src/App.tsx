@@ -51,6 +51,8 @@ const App = () => (
                 <Layout>
                   <Routes>
                     <Route path="/" element={<Index />} />
+                    <Route path="/categories" element={<Categories />} />
+                    <Route path="/categories/:slug" element={<CategoryDetail />} />
                     <Route path="/collections" element={<Categories />} />
                     <Route path="/collections/:slug" element={<CategoryDetail />} />
                     <Route path="/selections" element={<Selections />} />

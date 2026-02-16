@@ -39,7 +39,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <span className="text-secondary font-extrabold text-2xl tracking-tight">BARDAHL</span>
+              <img src="/Bardahl_idiSpcDptj_1.svg" alt="Bardahl" className="h-12 w-auto" />
             </Link>
             <p className="text-primary-foreground/70 text-sm leading-relaxed">
               {t.footerDescription}

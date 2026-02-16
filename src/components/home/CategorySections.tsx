@@ -8,17 +8,24 @@ import { useTranslation } from '@/context/LanguageContext';
 import { useMemo } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
 
-const CATEGORY_CONFIG = [
-  { slug: 'huiles-moteur', titleKey: 'navMotorOils' as const },
-  { slug: 'additifs', titleKey: 'navAdditives' as const },
-  { slug: 'entretien', titleKey: 'navMaintenance' as const },
-  { slug: 'graisses', title: 'Graisses & Lubrifiants' },
+const PRODUCT_TYPE_CONFIG = [
+  { type: 'huiles-moteur', title: 'Huiles Moteur' },
+  { type: 'additifs', title: 'Additifs & Traitements' },
+  { type: 'entretien', title: 'Entretien & Nettoyage' },
+  { type: 'graisses', title: 'Graisses & Lubrifiants' },
+  { type: 'liquides', title: 'Liquides de refroidissement' },
+  { type: 'transmission', title: 'Transmission & Freinage' },
 ];
 
-function CategorySection({ title, slug }: { title: string; slug: string }) {
+function CategorySection({ title, productType }: { title: string; productType: string }) {
   const t = useTranslation();
-  const { data: categoryProducts, isLoading } = useProducts({ categorySlug: slug, limit: 8 });
+  const { data: allProducts, isLoading } = useProducts();
   const autoplayPlugin = useMemo(() => Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true }), []);
+
+  // Filter products by product_type (stored in style field)
+  const categoryProducts = useMemo(() => {
+    return allProducts?.filter(p => p.style === productType).slice(0, 8) || [];
+  }, [allProducts, productType]);
 
   if (isLoading) {
     return (
@@ -39,7 +46,7 @@ function CategorySection({ title, slug }: { title: string; slug: string }) {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
           <Button variant="link" className="p-0 text-primary font-semibold shrink-0 ml-4" asChild>
-            <Link to={`/collections/${slug}`}>{t.seeAll}</Link>
+            <Link to={`/categories/${productType}`}>{t.seeAll}</Link>
           </Button>
         </div>
         <Carousel opts={{ align: 'start', loop: true }} plugins={[autoplayPlugin]} className="w-full">
@@ -60,14 +67,13 @@ function CategorySection({ title, slug }: { title: string; slug: string }) {
 }
 
 export function CategorySections() {
-  const t = useTranslation();
   return (
     <>
-      {CATEGORY_CONFIG.map((category) => (
+      {PRODUCT_TYPE_CONFIG.map((config) => (
         <CategorySection
-          key={category.slug}
-          title={category.titleKey ? t[category.titleKey] : category.title || ''}
-          slug={category.slug}
+          key={config.type}
+          title={config.title}
+          productType={config.type}
         />
       ))}
     </>

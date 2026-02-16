@@ -47,6 +47,14 @@ export function transformProduct(dbProduct: DbProduct & {
   // Global stock
   const globalStock = dbProduct.stock || 0;
 
+  // Build technical specs string
+  const techSpecs: string[] = [];
+  if (dbProduct.viscosity) techSpecs.push(`Viscosité: ${dbProduct.viscosity}`);
+  if (dbProduct.capacity) techSpecs.push(`Contenance: ${dbProduct.capacity}`);
+  if (dbProduct.api_norm) techSpecs.push(`Norme API: ${dbProduct.api_norm}`);
+  if (dbProduct.acea_norm) techSpecs.push(`Norme ACEA: ${dbProduct.acea_norm}`);
+  const composition = techSpecs.length > 0 ? techSpecs.join(' | ') : (dbProduct.composition || '');
+
   return {
     id: dbProduct.id,
     slug: dbProduct.slug,
@@ -60,9 +68,9 @@ export function transformProduct(dbProduct: DbProduct & {
     sizes,
     cupSizes,
     description: typeof dbProduct.description === 'string' ? dbProduct.description : (dbProduct.short_description || ''),
-    composition: dbProduct.composition || '',
+    composition,
     care: dbProduct.care_instructions || '',
-    style: dbProduct.style || 'Classique',
+    style: dbProduct.product_type || dbProduct.style || 'Classique',
     isNew: dbProduct.is_new || false,
     isBestseller: dbProduct.is_featured || false,
     stock: { global: globalStock },

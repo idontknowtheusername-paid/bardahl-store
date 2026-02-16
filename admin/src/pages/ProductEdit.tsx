@@ -124,19 +124,11 @@ function SortableImage({ url, index, onRemove }: { url: string; index: number; o
   );
 }
 
-// Chunked upload helper
-async function uploadFileChunked(
-  file: File,
-  bucket: string,
-  fileName: string,
-): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
-  const uint8Array = new Uint8Array(arrayBuffer);
-  const blob = new Blob([uint8Array], { type: file.type });
-  
+// Simple upload helper
+async function uploadFile(file: File, bucket: string, fileName: string): Promise<string> {
   const { error: uploadError } = await supabase.storage
     .from(bucket)
-    .upload(fileName, blob, {
+    .upload(fileName, file, {
       cacheControl: '3600',
       upsert: false,
       contentType: file.type,
@@ -288,9 +280,7 @@ export default function ProductEdit() {
         try {
           const compressedFile = await compressImage(file, 1, 1920);
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.webp`;
-          const uploadPromise = uploadFileChunked(compressedFile, 'products', fileName);
-          const timeoutPromise = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 30000));
-          const publicUrl = await Promise.race([uploadPromise, timeoutPromise]);
+          const publicUrl = await uploadFile(compressedFile, 'products', fileName);
           uploadedUrls.push(publicUrl);
           completed++;
           setUploadProgress({ current: completed, total: fileArray.length });
@@ -619,13 +609,13 @@ export default function ProductEdit() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Prix (€) *</Label>
-                  <Input id="price" type="number" step="0.01" placeholder="Ex: 29.90" {...form.register('price', { valueAsNumber: true })} />
+                  <Label htmlFor="price">Prix (FCFA) *</Label>
+                  <Input id="price" type="number" step="1" placeholder="Ex: 25000" {...form.register('price', { valueAsNumber: true })} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="compare_at_price">Ancien prix (barré)</Label>
+                  <Label htmlFor="compare_at_price">Ancien prix (barré) FCFA</Label>
                   <Input
-                    id="compare_at_price" type="number" step="0.01" placeholder="Optionnel"
+                    id="compare_at_price" type="number" step="1" placeholder="Optionnel"
                     {...form.register('compare_at_price', {
                       setValueAs: v => { if (v === '' || v === null || v === undefined) return null; const p = parseFloat(v); return isNaN(p) ? null : p; }
                     })}
