@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Search, Eye, Download } from 'lucide-react';
+import { Search, Eye, Download, Trash2 } from 'lucide-react';
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
@@ -55,6 +56,23 @@ export default function Orders() {
     },
   });
 
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('orders').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Commande supprimée');
+    },
+    onError: (error: any) => {
+      console.error('Delete order error:', error);
+      toast.error('Erreur lors de la suppression', {
+        description: error.message || 'Impossible de supprimer la commande'
+      });
+    },
+  });
+
   const exportCSV = () => {
     if (!orders?.length) return;
     const headers = ['Numéro', 'Date', 'Client', 'Email', 'Téléphone', 'Total', 'Statut', 'Paiement'];
@@ -90,7 +108,7 @@ export default function Orders() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Commande</TableHead><TableHead>Date</TableHead><TableHead>Client</TableHead><TableHead>Total</TableHead><TableHead>Paiement</TableHead><TableHead>Statut</TableHead><TableHead className="w-10"></TableHead>
+              <TableHead>Commande</TableHead><TableHead>Date</TableHead><TableHead>Client</TableHead><TableHead>Total</TableHead><TableHead>Paiement</TableHead><TableHead>Statut</TableHead><TableHead className="w-20">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -122,7 +140,35 @@ export default function Orders() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" asChild><Link to={`/orders/${order.id}`}><Eye className="h-4 w-4" /></Link></Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link to={`/orders/${order.id}`}><Eye className="h-4 w-4" /></Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer la commande</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Êtes-vous sûr de vouloir supprimer la commande {order.order_number} ? Cette action est irréversible.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteOrderMutation.mutate(order.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
