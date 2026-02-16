@@ -43,7 +43,16 @@ export default function Orders() {
       const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['orders'] }); toast.success('Statut mis à jour'); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Statut mis à jour');
+    },
+    onError: (error: any) => {
+      console.error('Update status error:', error);
+      toast.error('Erreur lors de la mise à jour', {
+        description: error.message || 'Impossible de mettre à jour le statut'
+      });
+    },
   });
 
   const exportCSV = () => {
