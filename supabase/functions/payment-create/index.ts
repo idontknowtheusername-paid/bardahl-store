@@ -5,7 +5,8 @@ import { corsHeaders } from "../_shared/cors.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GENIUS_PAY_API_KEY = Deno.env.get("GENIUS_PAY_API_KEY");
-const GENIUS_PAY_API_URL = "https://api.pay.genius.ci/v1";
+const GENIUS_PAY_API_SECRET = Deno.env.get("GENIUS_PAY_API_SECRET");
+const GENIUS_PAY_API_URL = "https://pay.genius.ci/api/v1/merchant";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -83,9 +84,9 @@ serve(async (req) => {
     await supabase.from("order_items").insert(itemsWithOrderId);
 
     // Create Genius Pay payment
-    if (!GENIUS_PAY_API_KEY) {
+    if (!GENIUS_PAY_API_KEY || !GENIUS_PAY_API_SECRET) {
       // Fallback: return order without payment URL for testing
-      console.warn("GENIUS_PAY_API_KEY not configured - returning order without payment");
+      console.warn("GENIUS_PAY credentials not configured - returning order without payment");
       return new Response(
         JSON.stringify({
           success: true,
@@ -102,25 +103,23 @@ serve(async (req) => {
     const paymentResponse = await fetch(`${GENIUS_PAY_API_URL}/payments`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GENIUS_PAY_API_KEY}`,
+        "X-API-Key": GENIUS_PAY_API_KEY,
+        "X-API-Secret": GENIUS_PAY_API_SECRET,
         "Content-Type": "application/json",
-        "Accept": "application/json",
       },
       body: JSON.stringify({
         amount: total,
-        currency: "XOF",
         description: `Commande ${orderNumber} - Bardahl`,
-        return_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
-        cancel_url: `${frontendUrl}/checkout`,
-        callback_url: `${SUPABASE_URL}/functions/v1/payment-webhook`,
-        metadata: {
-          order_id: order.id,
-          order_number: orderNumber,
-        },
+        success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
+        error_url: `${frontendUrl}/checkout`,
         customer: {
           email: shipping.email,
           phone: shipping.phone,
           name: shipping.firstName,
+        },
+        metadata: {
+          order_id: order.id,
+          order_number: orderNumber,
         },
       }),
     });
@@ -136,8 +135,8 @@ serve(async (req) => {
     await supabase
       .from("orders")
       .update({
-        payment_id: paymentData.id || paymentData.payment_id,
-        payment_gateway_id: paymentData.id || paymentData.payment_id,
+        payment_id: paymentData.data?.id || paymentData.data?.reference,
+        payment_gateway_id: paymentData.data?.reference,
       })
       .eq("id", order.id);
 
@@ -146,7 +145,7 @@ serve(async (req) => {
         success: true,
         order_id: order.id,
         order_number: orderNumber,
-        payment_url: paymentData.checkout_url || paymentData.payment_url || paymentData.url,
+        payment_url: paymentData.data?.checkout_url || paymentData.data?.payment_url,
         amount: total,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
