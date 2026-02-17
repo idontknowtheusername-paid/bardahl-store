@@ -228,7 +228,7 @@ export default function Checkout() {
         clearCart();
         localStorage.removeItem('bardahl-checkout-shipping');
 
-        // Redirect to Lygos payment
+        // Redirect to Genius Pay checkout
         toast({
           title: "Redirection vers le paiement",
           description: "Vous allez être redirigé vers la page de paiement sécurisée.",
@@ -237,6 +237,27 @@ export default function Checkout() {
         setTimeout(() => {
           paymentApi.redirectToPayment(result.payment_url!);
         }, 1000);
+      } else if (result.success && (result as any).payment_error) {
+        // Payment gateway failed but order was created
+        const errorDetails = (result as any).error_details || '';
+        console.warn('Payment gateway error:', errorDetails);
+        
+        // Save order info
+        localStorage.setItem('bardahl-pending-order', JSON.stringify({
+          orderNumber: result.order_number,
+          orderId: result.order_id,
+          amount: result.amount,
+        }));
+
+        clearCart();
+        localStorage.removeItem('bardahl-checkout-shipping');
+
+        toast({
+          title: "Commande enregistrée",
+          description: `Commande ${result.order_number} créée. Le paiement sera traité manuellement. ${errorDetails}`,
+        });
+
+        navigate(`/confirmation?order=${result.order_number}&manual=true`);
       } else {
         throw new Error(result.message || 'Échec de la création de la commande');
       }

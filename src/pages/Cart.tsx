@@ -40,7 +40,7 @@ export default function Cart() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item, index) => (
               <div
-                key={`${item.product.id}-${item.viscosity}-${item.capacity}`}
+                key={`${item.product.id}-${item.size}-${item.color}`}
                 className="flex gap-4 p-4 bg-card rounded-lg border border-border animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -62,13 +62,13 @@ export default function Cart() {
                         {item.product.name}
                       </Link>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {item.viscosity && `Viscosité: ${item.viscosity} • `}
-                        {item.capacity && `Contenance: ${item.capacity}L`}
+                        {item.product.viscosity && `Viscosité: ${item.product.viscosity} • `}
+                        {item.product.capacity && `Contenance: ${item.product.capacity}`}
                       </p>
                     </div>
                     <button
                       onClick={() =>
-                        removeItem(item.product.id, item.viscosity, item.capacity)
+                        removeItem(item.product.id, item.size, item.color)
                       }
                       className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                       aria-label="Supprimer"
@@ -83,8 +83,8 @@ export default function Cart() {
                         onClick={() =>
                           updateQuantity(
                             item.product.id,
-                            item.viscosity,
-                            item.capacity,
+                            item.size,
+                            item.color,
                             item.quantity - 1
                           )
                         }
@@ -100,8 +100,8 @@ export default function Cart() {
                         onClick={() =>
                           updateQuantity(
                             item.product.id,
-                            item.viscosity,
-                            item.capacity,
+                            item.size,
+                            item.color,
                             item.quantity + 1
                           )
                         }

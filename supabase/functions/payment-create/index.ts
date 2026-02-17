@@ -6,8 +6,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GENIUS_PAY_API_KEY = Deno.env.get("GENIUS_PAY_API_KEY");
 const GENIUS_PAY_API_SECRET = Deno.env.get("GENIUS_PAY_API_SECRET");
-const GENIUS_PAY_API_URL = Deno.env.get("GENIUS_PAY_API_URL") || "https://pay.genius.ci/api/v1/merchant";
-const GENIUS_PAY_ENVIRONMENT = Deno.env.get("GENIUS_PAY_ENVIRONMENT") || "production";
+const GENIUS_PAY_API_URL = "https://pay.genius.ci/api/v1/merchant";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -50,7 +49,7 @@ serve(async (req) => {
     const shippingCost = shippingMethod === "pickup" ? 0 : 2000;
     const total = subtotal + shippingCost;
 
-    // Create order
+    // Create order in DB (store raw amounts)
     const orderNumber = `CMD-${Date.now()}`;
     const { data: order, error: orderError } = await supabase
       .from("orders")
@@ -62,7 +61,7 @@ serve(async (req) => {
         shipping_address: {
           address: shipping.address,
           city: shipping.city,
-          country: shipping.country || "Côte d'Ivoire",
+          country: shipping.country || "Bénin",
         },
         shipping_method: shippingMethod,
         shipping_cost: shippingCost,
@@ -81,13 +80,11 @@ serve(async (req) => {
       ...item,
       order_id: order.id,
     }));
-
     await supabase.from("order_items").insert(itemsWithOrderId);
 
     // Create Genius Pay payment
     if (!GENIUS_PAY_API_KEY || !GENIUS_PAY_API_SECRET) {
-      // Fallback: return order without payment URL for testing
-      console.warn("GENIUS_PAY credentials not configured - returning order without payment");
+      console.warn("GENIUS_PAY credentials not configured");
       return new Response(
         JSON.stringify({
           success: true,
@@ -100,19 +97,37 @@ serve(async (req) => {
       );
     }
 
+    // Debug: log key prefixes to verify sandbox vs live
+    const keyPrefix = GENIUS_PAY_API_KEY.substring(0, 12);
+    const secretPrefix = GENIUS_PAY_API_SECRET.substring(0, 12);
+    console.log("🔑 Genius Pay key diagnostics:", {
+      keyPrefix: keyPrefix + "...",
+      secretPrefix: secretPrefix + "...",
+      isSandboxKey: GENIUS_PAY_API_KEY.includes("sandbox"),
+      isLiveKey: GENIUS_PAY_API_KEY.includes("live"),
+    });
+
     const frontendUrl = "https://bardahl.maxiimarket.com";
 
-    // Create payment with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+    // Amount sent to Genius Pay (in XOF as per their API docs)
+    const paymentAmount = total;
+
+    console.log("💰 Amount details:", {
+      subtotal,
+      shippingCost,
+      total,
+      paymentAmount,
+      itemCount: items.length,
+    });
 
     const paymentPayload = {
-      amount: total,
+      amount: paymentAmount,
+      currency: "XOF",
       description: `Commande ${orderNumber} - Bardahl`,
       success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
       error_url: `${frontendUrl}/checkout`,
       customer: {
-        email: shipping.email,
+        email: shipping.email || undefined,
         phone: shipping.phone,
         name: shipping.firstName,
       },
@@ -122,13 +137,10 @@ serve(async (req) => {
       },
     };
 
-    console.log("Genius Pay request:", {
-      url: `${GENIUS_PAY_API_URL}/payments`,
-      environment: GENIUS_PAY_ENVIRONMENT,
-      hasApiKey: !!GENIUS_PAY_API_KEY,
-      hasApiSecret: !!GENIUS_PAY_API_SECRET,
-      payload: paymentPayload,
-    });
+    console.log("📤 Genius Pay request:", JSON.stringify(paymentPayload));
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     let paymentResponse;
     try {
@@ -144,17 +156,15 @@ serve(async (req) => {
       });
     } catch (fetchError) {
       clearTimeout(timeoutId);
-      console.error("Genius Pay fetch error:", fetchError);
-
-      // Return order info even if payment fails
+      console.error("❌ Genius Pay network error:", fetchError);
       return new Response(
         JSON.stringify({
           success: true,
           order_id: order.id,
           order_number: orderNumber,
           amount: total,
-          message: "Commande créée. Le paiement sera traité manuellement.",
           payment_error: true,
+          error_details: "Impossible de contacter Genius Pay. Veuillez réessayer.",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
@@ -163,39 +173,43 @@ serve(async (req) => {
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
 
-    console.log("Genius Pay response:", {
+    console.log("📥 Genius Pay response:", JSON.stringify({
       status: paymentResponse.status,
       ok: paymentResponse.ok,
       data: paymentData,
-    });
+    }));
 
     if (!paymentResponse.ok) {
-      console.error("Genius Pay error:", {
+      const errorMsg = paymentData.error?.message || paymentData.message || "Erreur Genius Pay";
+      const errorCode = paymentData.error?.code || "UNKNOWN";
+      
+      console.error("❌ Genius Pay error:", {
         status: paymentResponse.status,
-        statusText: paymentResponse.statusText,
-        data: paymentData,
+        code: errorCode,
+        message: errorMsg,
+        keyPrefix,
       });
 
-      // Return order info even if payment creation fails
+      // Provide detailed error for debugging
       return new Response(
         JSON.stringify({
           success: true,
           order_id: order.id,
           order_number: orderNumber,
           amount: total,
-          message: "Commande créée. Le paiement sera traité manuellement.",
           payment_error: true,
-          error_details: paymentData.error?.message || paymentData.message,
+          error_code: errorCode,
+          error_details: errorMsg,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Update order with payment ID
+    // Update order with payment reference
     await supabase
       .from("orders")
       .update({
-        payment_id: paymentData.data?.id || paymentData.data?.reference,
+        payment_id: paymentData.data?.id?.toString() || paymentData.data?.reference,
         payment_gateway_id: paymentData.data?.reference,
       })
       .eq("id", order.id);
