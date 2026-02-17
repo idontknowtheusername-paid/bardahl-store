@@ -17,6 +17,11 @@ export interface Product {
   isNew?: boolean;
   isBestseller?: boolean;
   stock: Record<string, number>;
+  // Technical specs for motor oils
+  viscosity?: string;
+  capacity?: string;
+  apiNorm?: string;
+  aceaNorm?: string;
 }
 
 export interface ProductColor {

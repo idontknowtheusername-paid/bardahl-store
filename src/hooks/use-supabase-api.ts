@@ -74,6 +74,11 @@ export function transformProduct(dbProduct: DbProduct & {
     isNew: dbProduct.is_new || false,
     isBestseller: dbProduct.is_featured || false,
     stock: { global: globalStock },
+    // Technical specs for motor oils
+    viscosity: dbProduct.viscosity || undefined,
+    capacity: dbProduct.capacity || undefined,
+    apiNorm: dbProduct.api_norm || undefined,
+    aceaNorm: dbProduct.acea_norm || undefined,
   };
 }
 
