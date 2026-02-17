@@ -106,6 +106,46 @@ serve(async (req) => {
   try {
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
 
+    // Verify authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("Missing Authorization header");
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      console.error("Auth verification failed:", authError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
+    // Check if user is admin
+    const { data: userRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!userRole || userRole.role !== "admin") {
+      console.error("User is not admin:", user.id);
+      return new Response(
+        JSON.stringify({ success: false, error: "Forbidden - Admin access required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
+
+    console.log("✅ Admin authenticated:", user.email);
+
     const { to, subject, template, data }: EmailRequest = await req.json();
     const htmlContent = templates[template](data);
 
@@ -113,7 +153,7 @@ serve(async (req) => {
       method: "POST",
       headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "Bardahl <onboarding@resend.dev>",
+        from: "Bardahl <noreply@email.maxiimarket.com>",
         to: [to],
         subject,
         html: htmlContent,

@@ -33,7 +33,7 @@ serve(async (req) => {
           method: "POST",
           headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            from: "Bardahl <onboarding@resend.dev>",
+            from: "Bardahl Newsletter <newsletter@email.maxiimarket.com>",
             to: [email],
             subject: "Bienvenue chez Bardahl ! 🏎️",
             html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

@@ -144,8 +144,8 @@ export default function Checkout() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate required fields only
-    if (!shippingInfo.firstName || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.city) {
+    // Validate required fields only (email is now optional)
+    if (!shippingInfo.firstName || !shippingInfo.phone || !shippingInfo.city) {
       toast({
         title: "Formulaire incomplet",
         description: "Veuillez remplir tous les champs obligatoires.",

@@ -57,9 +57,70 @@ export default function OrderDetail() {
     },
   });
 
-  const markAsShipped = () => {
-    if (!trackingNumber) { toast.error('Veuillez entrer un numéro de suivi'); return; }
-    updateMutation.mutate({ status: 'shipped', tracking_number: trackingNumber });
+  const markAsShipped = async () => {
+    if (!trackingNumber) {
+      toast.error('Veuillez entrer un numéro de suivi');
+      return;
+    }
+
+    console.log('🚚 Starting markAsShipped process...', {
+      orderId: id,
+      trackingNumber,
+      customerEmail: order?.customer_email,
+      orderNumber: order?.order_number,
+    });
+
+    try {
+      // Update order status
+      console.log('📝 Updating order status to shipped...');
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          status: 'shipped',
+          tracking_number: trackingNumber,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (updateError) {
+        console.error('❌ Order update error:', updateError);
+        throw updateError;
+      }
+      console.log('✅ Order status updated successfully');
+
+      // Send shipping email
+      console.log('📧 Sending shipping email...');
+      const emailPayload = {
+        to: order.customer_email,
+        subject: `Votre commande ${order.order_number} a été expédiée - Bardahl`,
+        template: 'order_shipped',
+        data: {
+          customerName: order.customer_name,
+          orderNumber: order.order_number,
+          trackingNumber: trackingNumber,
+        },
+      };
+      console.log('Email payload:', emailPayload);
+
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email', {
+        body: emailPayload,
+      });
+
+      if (emailError) {
+        console.error('❌ Email sending error:', emailError);
+        toast.warning('Commande expédiée mais email non envoyé');
+      } else {
+        console.log('✅ Email sent successfully:', emailData);
+        toast.success('Commande expédiée et email envoyé');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['order', id] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+
+    } catch (error) {
+      console.error('❌ markAsShipped error:', error);
+      toast.error('Erreur lors de la mise à jour');
+    }
   };
 
   if (isLoading) return <div className="flex items-center justify-center min-h-[400px]"><Loader2 className="h-8 w-8 animate-spin" /></div>;

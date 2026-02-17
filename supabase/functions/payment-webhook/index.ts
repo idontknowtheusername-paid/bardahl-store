@@ -35,6 +35,15 @@ serve(async (req) => {
     if (event === "payment.succeeded" || event === "payment.success" || event === "payment.paid" || event === "succeeded" || event === "paid") {
       const orderId = data.metadata?.order_id || body.metadata?.order_id;
       if (orderId) {
+        // Get order details
+        const { data: order, error: fetchError } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
         const { error } = await supabase
           .from("orders")
           .update({
@@ -46,15 +55,73 @@ serve(async (req) => {
           .eq("id", orderId);
         if (error) { console.error("Error updating order:", error); throw error; }
         console.log(`Order ${orderId} updated to paid`);
+
+        // Send confirmation email
+        if (order?.customer_email) {
+          try {
+            await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                to: order.customer_email,
+                subject: `Confirmation de commande ${order.order_number} - Bardahl`,
+                template: "order_confirmation",
+                data: {
+                  customerName: order.customer_name,
+                  orderNumber: order.order_number,
+                  total: order.total,
+                },
+              }),
+            });
+            console.log(`Confirmation email sent to ${order.customer_email}`);
+          } catch (emailError) {
+            console.error("Failed to send confirmation email:", emailError);
+          }
+        }
       }
     } else if (event === "payment.failed" || event === "failed") {
       const orderId = data.metadata?.order_id || body.metadata?.order_id;
       if (orderId) {
+        // Get order details
+        const { data: order } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .single();
+
         await supabase
           .from("orders")
           .update({ payment_status: "failed", updated_at: new Date().toISOString() })
           .eq("id", orderId);
         console.log(`Order ${orderId} marked as failed`);
+
+        // Send failure email
+        if (order?.customer_email) {
+          try {
+            await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                to: order.customer_email,
+                subject: `Échec du paiement - Commande ${order.order_number}`,
+                template: "order_failed",
+                data: {
+                  customerName: order.customer_name,
+                  orderNumber: order.order_number,
+                },
+              }),
+            });
+            console.log(`Failure email sent to ${order.customer_email}`);
+          } catch (emailError) {
+            console.error("Failed to send failure email:", emailError);
+          }
+        }
       }
     } else if (event === "payment.cancelled" || event === "cancelled") {
       const orderId = data.metadata?.order_id || body.metadata?.order_id;

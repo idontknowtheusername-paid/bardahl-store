@@ -6,7 +6,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GENIUS_PAY_API_KEY = Deno.env.get("GENIUS_PAY_API_KEY");
 const GENIUS_PAY_API_SECRET = Deno.env.get("GENIUS_PAY_API_SECRET");
-const GENIUS_PAY_API_URL = "https://pay.genius.ci/api/v1/merchant";
+const GENIUS_PAY_API_URL = Deno.env.get("GENIUS_PAY_API_URL") || "https://pay.genius.ci/api/v1/merchant";
+const GENIUS_PAY_ENVIRONMENT = Deno.env.get("GENIUS_PAY_ENVIRONMENT") || "production";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -105,6 +106,30 @@ serve(async (req) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
+    const paymentPayload = {
+      amount: total,
+      description: `Commande ${orderNumber} - Bardahl`,
+      success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
+      error_url: `${frontendUrl}/checkout`,
+      customer: {
+        email: shipping.email,
+        phone: shipping.phone,
+        name: shipping.firstName,
+      },
+      metadata: {
+        order_id: order.id,
+        order_number: orderNumber,
+      },
+    };
+
+    console.log("Genius Pay request:", {
+      url: `${GENIUS_PAY_API_URL}/payments`,
+      environment: GENIUS_PAY_ENVIRONMENT,
+      hasApiKey: !!GENIUS_PAY_API_KEY,
+      hasApiSecret: !!GENIUS_PAY_API_SECRET,
+      payload: paymentPayload,
+    });
+
     let paymentResponse;
     try {
       paymentResponse = await fetch(`${GENIUS_PAY_API_URL}/payments`, {
@@ -114,21 +139,7 @@ serve(async (req) => {
           "X-API-Secret": GENIUS_PAY_API_SECRET,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          amount: total,
-          description: `Commande ${orderNumber} - Bardahl`,
-          success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
-          error_url: `${frontendUrl}/checkout`,
-          customer: {
-            email: shipping.email,
-            phone: shipping.phone,
-            name: shipping.firstName,
-          },
-          metadata: {
-            order_id: order.id,
-            order_number: orderNumber,
-          },
-        }),
+        body: JSON.stringify(paymentPayload),
         signal: controller.signal,
       });
     } catch (fetchError) {
@@ -152,8 +163,18 @@ serve(async (req) => {
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
 
+    console.log("Genius Pay response:", {
+      status: paymentResponse.status,
+      ok: paymentResponse.ok,
+      data: paymentData,
+    });
+
     if (!paymentResponse.ok) {
-      console.error("Genius Pay error:", paymentData);
+      console.error("Genius Pay error:", {
+        status: paymentResponse.status,
+        statusText: paymentResponse.statusText,
+        data: paymentData,
+      });
 
       // Return order info even if payment creation fails
       return new Response(

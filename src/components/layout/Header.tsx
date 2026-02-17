@@ -64,15 +64,15 @@ export function Header() {
       {/* Promo Bar avec sélecteur de langue */}
       <div className="bg-primary text-primary-foreground">
         <div className="container">
-          <div className="flex items-center justify-center py-2 text-sm relative">
-            {/* Message de promotion centré */}
+          <div className="flex items-center justify-between sm:justify-center py-2 text-sm relative">
+            {/* Message de promotion à gauche sur mobile, centré sur desktop */}
             <div className="flex items-center gap-2 font-semibold">
               <Truck className="h-4 w-4" />
               <span>{t.freeShipping}</span>
             </div>
 
-            {/* Sélecteur de langue positionné absolument à droite */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {/* Sélecteur de langue à droite sur mobile, positionné absolument sur desktop */}
+            <div className="sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2">
               <div className="relative">
                 <Button
                   variant="ghost"
