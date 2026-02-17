@@ -49,6 +49,18 @@ serve(async (req) => {
     const shippingCost = shippingMethod === "pickup" ? 0 : 2000;
     const total = subtotal + shippingCost;
 
+    console.log("💰 CALCUL DES MONTANTS:", {
+      subtotal,
+      shippingCost,
+      total,
+      items: orderItems.map(i => ({
+        title: i.product_title,
+        quantity: i.quantity,
+        unit_price: i.unit_price,
+        total: i.total_price
+      }))
+    });
+
     // Create order in DB (store raw amounts)
     const orderNumber = `CMD-${Date.now()}`;
     const { data: order, error: orderError } = await supabase
@@ -114,6 +126,15 @@ serve(async (req) => {
     // Amount sent to Genius Pay (in XOF as per their API docs)
     const paymentAmount = total;
 
+    console.log("🚀 ENVOI À GENIUS PAY:", {
+      paymentAmount,
+      currency: "XOF",
+      total_from_db: total,
+      subtotal,
+      shipping: shippingCost,
+      country_code: countryCode,
+    });
+
 
     const customerData: Record<string, string> = {
       phone: shipping.phone,
@@ -168,6 +189,15 @@ serve(async (req) => {
 
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
+
+    console.log("📥 RÉPONSE GENIUS PAY:", {
+      status: paymentResponse.status,
+      ok: paymentResponse.ok,
+      full_response: paymentData,
+      amount_sent: paymentAmount,
+      amount_in_response: paymentData.data?.amount || paymentData.amount,
+      checkout_url: paymentData.data?.checkout_url || paymentData.data?.payment_url,
+    });
 
 
     if (!paymentResponse.ok) {
