@@ -7,7 +7,7 @@ export function HeroSection() {
   const t = useTranslation();
 
   return (
-    <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-gradient-to-br from-black via-gray-900 to-gray-800">
+    <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-black via-gray-900 to-gray-800">
       {/* Image de fond produit Bardahl */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent" />
@@ -24,50 +24,22 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="container relative z-10 py-16 md:py-24">
+      <div className="container relative z-10 py-16 md:py-20">
         <div className="max-w-2xl animate-slide-up">
-          {/* Tagline avec icônes */}
-          <div className="inline-flex items-center gap-3 bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
-            <Sparkles className="h-4 w-4" />
-            <span>Depuis 1939 • Technologie Polar Plus®</span>
-          </div>
-
           {/* Titre principal */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
             <span className="text-white">Performance </span>
-            <span className="text-primary block">Bardahl</span>
-            <span className="text-white text-2xl md:text-3xl lg:text-4xl font-normal mt-4 block">
-              pour votre moteur
-            </span>
+            <span className="text-primary">Bardahl</span>
           </h1>
 
-          {/* Description améliorée */}
-          <div className="space-y-4 mb-8 max-w-xl">
-            <p className="text-white/90 text-lg md:text-xl leading-relaxed">
-              Huiles moteur, additifs et produits d'entretien avec la technologie exclusive
-              <span className="text-primary font-semibold"> Polar Plus®</span> et
-              <span className="text-primary font-semibold"> Fullerène C60</span>.
-            </p>
-
-            {/* Points clés */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 text-white/80 text-sm">
-                <Shield className="h-4 w-4 text-primary" />
-                <span>Protection maximale</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80 text-sm">
-                <Zap className="h-4 w-4 text-primary" />
-                <span>Performance optimale</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80 text-sm">
-                <span className="text-primary font-bold">✓</span>
-                <span>Livraison gratuite dès 50 000 FCFA</span>
-              </div>
-            </div>
-          </div>
+          {/* Description */}
+          <p className="text-white/90 text-lg md:text-xl leading-relaxed mb-8">
+            Huiles moteur, additifs et produits d'entretien avec la technologie exclusive
+            <span className="text-primary font-semibold"> Polar Plus®</span>.
+          </p>
 
           {/* Boutons d'action */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-wrap gap-4">
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base px-8 group shadow-lg" asChild>
               <Link to="/categories">
                 Découvrir nos produits
@@ -77,20 +49,10 @@ export function HeroSection() {
             <Button size="lg"
               className="border border-white/30 text-white hover:border-white/50 hover:text-white font-bold backdrop-blur-sm bg-transparent hover:bg-transparent" asChild>
               <Link to="/selections/haute-performance">
-                <Sparkles className="h-5 w-5 mr-2" />
                 Haute Performance
               </Link>
             </Button>
           </div>
-
-
-        </div>
-      </div>
-
-      {/* Indicateur de scroll */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
         </div>
       </div>
     </section>
