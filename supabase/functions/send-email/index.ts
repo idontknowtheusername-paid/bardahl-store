@@ -112,7 +112,7 @@ serve(async (req) => {
     // Verify authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      console.error("Missing Authorization header");
+      
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
@@ -125,7 +125,7 @@ serve(async (req) => {
     // Verify user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
-      console.error("Auth verification failed:", authError);
+      
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
@@ -140,14 +140,14 @@ serve(async (req) => {
       .single();
 
     if (!userRole || userRole.role !== "admin") {
-      console.error("User is not admin:", user.id);
+      
       return new Response(
         JSON.stringify({ success: false, error: "Forbidden - Admin access required" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
       );
     }
 
-    console.log("✅ Admin authenticated:", user.email);
+    
 
     const { to, subject, template, data }: EmailRequest = await req.json();
     const htmlContent = templates[template](data);
@@ -164,11 +164,10 @@ serve(async (req) => {
     });
 
     const result = await response.json();
-    if (!response.ok) { console.error("Resend error:", result); throw new Error(result.message || "Email sending failed"); }
+    if (!response.ok) { throw new Error(result.message || "Email sending failed"); }
 
     return new Response(JSON.stringify({ success: true, messageId: result.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
   } catch (error) {
-    console.error("Send email error:", error);
     return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
   }
 });

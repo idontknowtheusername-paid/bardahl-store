@@ -18,7 +18,7 @@ serve(async (req) => {
     if (WEBHOOK_SECRET) {
       const signature = req.headers.get("x-geniuspay-signature") || req.headers.get("x-webhook-signature");
       if (!signature) {
-        console.error("Missing webhook signature");
+        
         return new Response(JSON.stringify({ error: "Missing signature" }), { status: 401 });
       }
       // Note: GeniusPay signature verification would go here
@@ -26,7 +26,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    console.log("Payment webhook received:", JSON.stringify(body, null, 2));
+    
 
     // Handle Genius Pay webhook
     const event = body.event || body.type || body.status;
@@ -53,8 +53,7 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           })
           .eq("id", orderId);
-        if (error) { console.error("Error updating order:", error); throw error; }
-        console.log(`Order ${orderId} updated to paid`);
+        if (error) throw error;
 
         // Send confirmation email
         if (order?.customer_email) {
@@ -76,9 +75,9 @@ serve(async (req) => {
                 },
               }),
             });
-            console.log(`Confirmation email sent to ${order.customer_email}`);
+            
           } catch (emailError) {
-            console.error("Failed to send confirmation email:", emailError);
+            // Email send failed silently
           }
         }
       }
@@ -96,7 +95,7 @@ serve(async (req) => {
           .from("orders")
           .update({ payment_status: "failed", updated_at: new Date().toISOString() })
           .eq("id", orderId);
-        console.log(`Order ${orderId} marked as failed`);
+        
 
         // Send failure email
         if (order?.customer_email) {
@@ -117,9 +116,9 @@ serve(async (req) => {
                 },
               }),
             });
-            console.log(`Failure email sent to ${order.customer_email}`);
+            
           } catch (emailError) {
-            console.error("Failed to send failure email:", emailError);
+            // Email send failed silently
           }
         }
       }
@@ -130,7 +129,7 @@ serve(async (req) => {
           .from("orders")
           .update({ payment_status: "cancelled", status: "cancelled", updated_at: new Date().toISOString() })
           .eq("id", orderId);
-        console.log(`Order ${orderId} marked as cancelled`);
+        
       }
     } else if (event === "payment.refunded" || event === "refunded") {
       const orderId = data.metadata?.order_id || body.metadata?.order_id;
@@ -139,7 +138,7 @@ serve(async (req) => {
           .from("orders")
           .update({ payment_status: "refunded", status: "refunded", updated_at: new Date().toISOString() })
           .eq("id", orderId);
-        console.log(`Order ${orderId} marked as refunded`);
+        
       }
     }
 
@@ -148,7 +147,7 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    console.error("Webhook error:", error);
+    
     return new Response(
       JSON.stringify({ success: false, message: error instanceof Error ? error.message : "Unknown error" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }

@@ -84,7 +84,7 @@ serve(async (req) => {
 
     // Create Genius Pay payment
     if (!GENIUS_PAY_API_KEY || !GENIUS_PAY_API_SECRET) {
-      console.warn("GENIUS_PAY credentials not configured");
+      // GENIUS_PAY credentials not configured - return order without payment
       return new Response(
         JSON.stringify({
           success: true,
@@ -97,47 +97,43 @@ serve(async (req) => {
       );
     }
 
-    // Debug: log key prefixes to verify sandbox vs live
-    const keyPrefix = GENIUS_PAY_API_KEY.substring(0, 12);
-    const secretPrefix = GENIUS_PAY_API_SECRET.substring(0, 12);
-    console.log("🔑 Genius Pay key diagnostics:", {
-      keyPrefix: keyPrefix + "...",
-      secretPrefix: secretPrefix + "...",
-      isSandboxKey: GENIUS_PAY_API_KEY.includes("sandbox"),
-      isLiveKey: GENIUS_PAY_API_KEY.includes("live"),
-    });
+    // Country code mapping for Genius Pay
+    const countryCodeMap: Record<string, string> = {
+      "Bénin": "BJ", "Benin": "BJ",
+      "Côte d'Ivoire": "CI", "Cote d'Ivoire": "CI",
+      "Sénégal": "SN", "Senegal": "SN",
+      "Mali": "ML", "Burkina Faso": "BF",
+      "Togo": "TG", "Niger": "NE",
+      "Guinée": "GN", "Guinee": "GN",
+      "Cameroun": "CM", "Congo": "CG",
+    };
+    const countryCode = countryCodeMap[shipping.country] || "BJ";
 
     const frontendUrl = "https://bardahl.maxiimarket.com";
 
     // Amount sent to Genius Pay (in XOF as per their API docs)
     const paymentAmount = total;
 
-    console.log("💰 Amount details:", {
-      subtotal,
-      shippingCost,
-      total,
-      paymentAmount,
-      itemCount: items.length,
-    });
 
-    const paymentPayload = {
+    const customerData: Record<string, string> = {
+      phone: shipping.phone,
+      name: shipping.firstName,
+    };
+    if (shipping.email) customerData.email = shipping.email;
+
+    const paymentPayload: Record<string, unknown> = {
       amount: paymentAmount,
       currency: "XOF",
+      country_code: countryCode,
       description: `Commande ${orderNumber} - Bardahl`,
       success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
       error_url: `${frontendUrl}/checkout`,
-      customer: {
-        email: shipping.email || undefined,
-        phone: shipping.phone,
-        name: shipping.firstName,
-      },
+      customer: customerData,
       metadata: {
         order_id: order.id,
         order_number: orderNumber,
       },
     };
-
-    console.log("📤 Genius Pay request:", JSON.stringify(paymentPayload));
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -156,7 +152,7 @@ serve(async (req) => {
       });
     } catch (fetchError) {
       clearTimeout(timeoutId);
-      console.error("❌ Genius Pay network error:", fetchError);
+      
       return new Response(
         JSON.stringify({
           success: true,
@@ -173,22 +169,11 @@ serve(async (req) => {
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
 
-    console.log("📥 Genius Pay response:", JSON.stringify({
-      status: paymentResponse.status,
-      ok: paymentResponse.ok,
-      data: paymentData,
-    }));
 
     if (!paymentResponse.ok) {
       const errorMsg = paymentData.error?.message || paymentData.message || "Erreur Genius Pay";
       const errorCode = paymentData.error?.code || "UNKNOWN";
       
-      console.error("❌ Genius Pay error:", {
-        status: paymentResponse.status,
-        code: errorCode,
-        message: errorMsg,
-        keyPrefix,
-      });
 
       // Provide detailed error for debugging
       return new Response(
@@ -225,7 +210,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Payment create error:", error);
+    
     return new Response(
       JSON.stringify({
         success: false,

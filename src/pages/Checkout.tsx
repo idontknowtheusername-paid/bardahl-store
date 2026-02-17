@@ -93,7 +93,7 @@ export default function Checkout() {
           setFreeShippingApplied(result.freeShipping);
         }
       } catch (error) {
-        console.warn('Shipping calculation failed, using defaults');
+        // Shipping calculation failed, using defaults
       } finally {
         setIsCalculatingShipping(false);
       }
@@ -188,7 +188,7 @@ export default function Checkout() {
               ignoreDuplicates: false
             });
         } catch (error) {
-          console.warn('Failed to subscribe to blog:', error);
+          // Don't block checkout if blog subscription fails
           // Don't block checkout if blog subscription fails
         }
       }
@@ -240,7 +240,7 @@ export default function Checkout() {
       } else if (result.success && (result as any).payment_error) {
         // Payment gateway failed but order was created
         const errorDetails = (result as any).error_details || '';
-        console.warn('Payment gateway error:', errorDetails);
+        
         
         // Save order info
         localStorage.setItem('bardahl-pending-order', JSON.stringify({
@@ -262,7 +262,7 @@ export default function Checkout() {
         throw new Error(result.message || 'Échec de la création de la commande');
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      
       toast({
         title: "Erreur",
         description: error instanceof Error ? error.message : "Une erreur est survenue lors du paiement",
@@ -356,7 +356,7 @@ export default function Checkout() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email <span className="text-muted-foreground text-xs">(recommandé)</span></Label>
                     <Input
                       id="email"
                       type="email"
@@ -364,7 +364,7 @@ export default function Checkout() {
                       onChange={(e) =>
                         setShippingInfo(prev => ({ ...prev, email: e.target.value }))
                       }
-                      required
+                      placeholder="Pour recevoir la confirmation"
                     />
                   </div>
                   <div>
