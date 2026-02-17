@@ -22,10 +22,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Copy } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Copy, Upload } from 'lucide-react';
+import { ProductImportDialog } from '@/components/ProductImportDialog';
 
 export default function Products() {
   const [search, setSearch] = useState('');
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const { t } = useLanguage();
 
@@ -99,12 +101,18 @@ export default function Products() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t.products.title}</h1>
-        <Button asChild>
-          <Link to="/products/new">
-            <Plus className="h-4 w-4 mr-2" />
-            {t.products.newProduct}
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Importer CSV
+          </Button>
+          <Button asChild>
+            <Link to="/products/new">
+              <Plus className="h-4 w-4 mr-2" />
+              {t.products.newProduct}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
@@ -254,6 +262,8 @@ export default function Products() {
           </TableBody>
         </Table>
       </div>
+
+      <ProductImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
     </div>
   );
 }
