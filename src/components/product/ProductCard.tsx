@@ -40,7 +40,7 @@ export function ProductCard({ product, className, style }: ProductCardProps) {
       <Link to={`/produits/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img src={product.images[0]} alt={product.name}
-            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+            className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" loading="lazy" />
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {product.isNew && <Badge variant="new">{t.new}</Badge>}
             {discount > 0 && <Badge variant="sale">-{discount}%</Badge>}
