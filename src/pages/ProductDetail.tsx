@@ -5,6 +5,7 @@ import { formatPrice } from '@/lib/format';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Accordion,
   AccordionContent,
@@ -138,8 +139,19 @@ function ReviewsSection({ productId }: { productId: string }) {
           </AccordionTrigger>
           <AccordionContent className="px-6 pb-6 pt-2">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-16 w-full" />
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="space-y-6">
@@ -238,8 +250,45 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return (
-      <div className="py-20 flex justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+      <div className="container py-8">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+          {/* Image skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="aspect-square w-full rounded-lg" />
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map(i => (
+                <Skeleton key={i} className="w-20 h-20 rounded-lg" />
+              ))}
+            </div>
+          </div>
+
+          {/* Content skeleton */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-6 w-32" />
+            </div>
+
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-40" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+
+            <div className="flex gap-3">
+              <Skeleton className="h-12 w-32" />
+              <Skeleton className="h-12 flex-1" />
+            </div>
+
+            <Skeleton className="h-32 w-full rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }

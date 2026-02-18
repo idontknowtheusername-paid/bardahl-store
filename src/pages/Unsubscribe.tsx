@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function Unsubscribe() {
@@ -43,8 +44,9 @@ export default function Unsubscribe() {
       <div className="container max-w-md text-center">
         {status === 'loading' && (
           <div className="space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin mx-auto text-rose" />
-            <h1 className="font-serif text-2xl">Désabonnement en cours...</h1>
+            <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+            <Skeleton className="h-8 w-64 mx-auto" />
+            <Skeleton className="h-4 w-48 mx-auto" />
           </div>
         )}
 
