@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronRight, Minus, Plus, Share2, ShoppingBag, ChevronLeft } from 'lucide-react';
+import { ChevronRight, Minus, Plus, Share2, ShoppingBag, Star, ChevronDown } from 'lucide-react';
 import { formatPrice } from '@/lib/format';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,203 @@ import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
 import { getProductBySlug, getRelatedProducts } from '@/data/products';
 import { useProduct } from '@/hooks/use-supabase-api';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Review {
+  id: string;
+  author_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
+
+function StarRating({ rating, onRate, readonly = false }: { rating: number; onRate?: (r: number) => void; readonly?: boolean }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map(star => (
+        <button
+          key={star}
+          type="button"
+          disabled={readonly}
+          onClick={() => onRate?.(star)}
+          onMouseEnter={() => !readonly && setHover(star)}
+          onMouseLeave={() => !readonly && setHover(0)}
+          className={cn("transition-colors", readonly ? "cursor-default" : "cursor-pointer")}
+          aria-label={`${star} étoile${star > 1 ? 's' : ''}`}
+        >
+          <Star
+            className={cn(
+              "h-5 w-5",
+              (hover || rating) >= star
+                ? "fill-primary text-primary"
+                : "fill-muted text-muted-foreground"
+            )}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReviewsSection({ productId }: { productId: string }) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [formData, setFormData] = useState({ author_name: '', rating: 0, comment: '' });
+  const [submitted, setSubmitted] = useState(false);
+  const [open, setOpen] = useState('');
+
+  const fetchReviews = async () => {
+    if (loaded) return;
+    setLoading(true);
+    const { data } = await supabase
+      .from('product_reviews' as any)
+      .select('*')
+      .eq('product_id', productId)
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false });
+    setReviews((data as unknown as Review[]) || []);
+    setLoaded(true);
+    setLoading(false);
+  };
+
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.author_name.trim() || formData.rating === 0) return;
+    setSubmitting(true);
+    const { error } = await supabase
+      .from('product_reviews' as any)
+      .insert({
+        product_id: productId,
+        author_name: formData.author_name.trim(),
+        rating: formData.rating,
+        comment: formData.comment.trim() || null,
+      });
+    setSubmitting(false);
+    if (!error) {
+      setSubmitted(true);
+      setFormData({ author_name: '', rating: 0, comment: '' });
+      // Refresh reviews
+      setLoaded(false);
+      await fetchReviews();
+    }
+  };
+
+  const handleToggle = (value: string) => {
+    const newVal = open === value ? '' : value;
+    setOpen(newVal);
+    if (newVal === 'reviews' && !loaded) fetchReviews();
+  };
+
+  return (
+    <div className="mt-8">
+      <Accordion type="single" collapsible value={open} onValueChange={handleToggle}>
+        <AccordionItem value="reviews" className="border rounded-lg overflow-hidden">
+          <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-base">Avis clients</span>
+              {loaded && reviews.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <StarRating rating={Math.round(avgRating)} readonly />
+                  <span className="text-sm text-muted-foreground">
+                    {avgRating.toFixed(1)} ({reviews.length} avis)
+                  </span>
+                </div>
+              )}
+              {!loaded && (
+                <span className="text-sm text-muted-foreground">Cliquez pour voir les avis</span>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-6 pb-6 pt-2">
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Reviews list */}
+                {reviews.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4 text-sm">
+                    Aucun avis pour l'instant. Soyez le premier à donner votre avis !
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map(review => (
+                      <div key={review.id} className="border-b border-border pb-4 last:border-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold text-sm">{review.author_name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(review.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <StarRating rating={review.rating} readonly />
+                        {review.comment && (
+                          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{review.comment}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Submit form */}
+                <div className="border-t border-border pt-6">
+                  <h4 className="font-semibold mb-4">Laisser un avis</h4>
+                  {submitted ? (
+                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-center">
+                      <p className="text-sm font-medium text-primary">✓ Merci pour votre avis !</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium block mb-1">Votre nom *</label>
+                        <input
+                          type="text"
+                          value={formData.author_name}
+                          onChange={e => setFormData(f => ({ ...f, author_name: e.target.value }))}
+                          required
+                          placeholder="Votre prénom"
+                          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium block mb-1">Note *</label>
+                        <StarRating rating={formData.rating} onRate={r => setFormData(f => ({ ...f, rating: r }))} />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium block mb-1">Commentaire</label>
+                        <textarea
+                          value={formData.comment}
+                          onChange={e => setFormData(f => ({ ...f, comment: e.target.value }))}
+                          rows={3}
+                          placeholder="Partagez votre expérience avec ce produit..."
+                          className="w-full border border-border rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        disabled={submitting || !formData.author_name.trim() || formData.rating === 0}
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      >
+                        {submitting ? 'Envoi...' : 'Publier l\'avis'}
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -31,17 +228,7 @@ export default function ProductDetail() {
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
 
-  // Debug logs
-  console.log('🔍 ProductDetail Debug:');
-  console.log('slug:', slug);
-  console.log('apiProduct:', apiProduct);
-  console.log('staticProduct:', staticProduct);
-  console.log('product:', product);
-  console.log('product category:', product?.category);
-
   const relatedProducts = product ? getRelatedProducts(product) : [];
-  console.log('relatedProducts count:', relatedProducts.length);
-  console.log('relatedProducts:', relatedProducts);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -217,6 +404,9 @@ export default function ProductDetail() {
                   </AccordionItem>
                 )}
               </Accordion>
+
+              {/* Reviews Section */}
+              <ReviewsSection productId={product.id} />
             </div>
           </div>
         </div>

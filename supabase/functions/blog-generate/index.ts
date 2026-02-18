@@ -8,7 +8,6 @@ const corsHeaders = {
 
 interface GenerateRequest {
   topic?: string
-  category?: string
   autoPublish?: boolean
 }
 
@@ -46,54 +45,43 @@ serve(async (req) => {
       throw new Error('Unauthorized: Admin access required')
     }
 
-    const { topic, category, autoPublish = false }: GenerateRequest = await req.json()
+    const { topic, autoPublish = true }: GenerateRequest = await req.json()
 
-    // Get random category if not specified
-    let selectedCategory = category
-    if (!selectedCategory) {
-      const { data: categories } = await supabaseClient
-        .from('blog_categories')
-        .select('slug')
-        .limit(5)
-      
-      if (categories && categories.length > 0) {
-        selectedCategory = categories[Math.floor(Math.random() * categories.length)].slug
-      }
-    }
-
-    // Generate topic if not provided
+    // Bardahl automotive topics
     const topics = [
-      'Les secrets pour choisir la lingerie parfaite selon votre morphologie',
-      'Comment prendre soin de sa peau naturellement',
-      'Les tendances lingerie de la saison',
-      'Astuces pour se sentir belle et confiante au quotidien',
-      'Guide complet des matières de lingerie',
-      'Les essentiels d\'une garde-robe lingerie',
-      'Conseils beauté pour une peau éclatante',
-      'Comment bien choisir sa taille de soutien-gorge',
-      'Les bienfaits de la lingerie de qualité',
-      'Routine beauté du matin en 10 minutes'
+      'Comment choisir la bonne huile moteur pour votre véhicule',
+      'Les avantages des huiles synthétiques Bardahl pour votre moteur',
+      'Guide complet des additifs moteur : à quoi servent-ils vraiment ?',
+      'Entretien de la boîte de vitesses : conseils et produits recommandés',
+      'Viscosité des huiles moteur : comprendre les normes SAE et ACEA',
+      'Comment l\'huile moteur protège votre moteur au quotidien',
+      'Changement d\'huile : fréquence recommandée selon votre utilisation',
+      'Les normes API et ACEA expliquées pour les automobilistes',
+      'Additifs Bardahl : comment améliorer les performances de votre moteur',
+      'Entretien préventif automobile : les produits indispensables',
+      'Huile pour transmission : différences entre huile de boîte et différentiel',
+      'Pourquoi choisir des lubrifiants de qualité pour votre véhicule',
     ]
 
     const selectedTopic = topic || topics[Math.floor(Math.random() * topics.length)]
 
-    // Call Mistral AI
     const mistralApiKey = Deno.env.get('MISTRAL_API_KEY')
     if (!mistralApiKey) {
       throw new Error('MISTRAL_API_KEY not configured')
     }
 
-    const prompt = `Tu es une experte en beauté, mode féminine et lingerie. Écris un article de blog complet et engageant sur le sujet suivant : "${selectedTopic}".
+    const prompt = `Tu es un expert en lubrifiants automobiles et en produits Bardahl. Écris un article de blog complet et professionnel sur le sujet suivant : "${selectedTopic}".
 
 L'article doit :
-- Avoir un titre accrocheur et optimisé SEO
+- Avoir un titre accrocheur et optimisé SEO, pertinent pour Bardahl et l'entretien automobile
 - Contenir une introduction captivante (2-3 paragraphes)
 - Être structuré avec des sous-titres (utilise ## pour les titres de section)
 - Contenir 800-1200 mots
-- Être informatif, pratique et inspirant
-- Inclure des conseils concrets et applicables
-- Avoir un ton chaleureux et professionnel
-- Se terminer par une conclusion engageante
+- Être informatif, pratique et technique
+- Mentionner les produits et solutions Bardahl de façon naturelle quand c'est pertinent
+- Inclure des conseils concrets pour les automobilistes
+- Avoir un ton professionnel et expert
+- Se terminer par une conclusion engageante avec un appel à l'action
 
 Format de réponse (JSON strict) :
 {
@@ -113,12 +101,7 @@ Format de réponse (JSON strict) :
       },
       body: JSON.stringify({
         model: 'mistral-large-latest',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
+        messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         response_format: { type: 'json_object' }
       }),
@@ -141,22 +124,19 @@ Format de réponse (JSON strict) :
       .replace(/(^-|-$)/g, '')
       + '-' + Date.now().toString(36)
 
-    // Calculate read time (assuming 200 words per minute)
+    // Calculate read time
     const wordCount = generatedContent.content.split(/\s+/).length
     const readTime = Math.ceil(wordCount / 200)
 
-    // Create blog post
     const blogPostData = {
       title: generatedContent.title,
-      slug: slug,
+      slug,
       excerpt: generatedContent.excerpt,
       content: generatedContent.content,
       tags: generatedContent.tags || [],
-      meta_title: generatedContent.meta_title,
-      meta_description: generatedContent.meta_description,
       read_time: readTime,
-      status: 'published',
-      published_at: new Date().toISOString(),
+      status: autoPublish ? 'published' : 'draft',
+      published_at: autoPublish ? new Date().toISOString() : null,
     }
 
     const { data: blogPost, error: insertError } = await supabaseClient
@@ -169,38 +149,11 @@ Format de réponse (JSON strict) :
       throw insertError
     }
 
-    // Link to category if specified
-    if (selectedCategory) {
-      const { data: categoryData } = await supabaseClient
-        .from('blog_categories')
-        .select('id')
-        .eq('slug', selectedCategory)
-        .single()
-
-      if (categoryData) {
-        await supabaseClient
-          .from('blog_post_categories')
-          .insert({
-            blog_post_id: blogPost.id,
-            category_id: categoryData.id
-          })
-      }
-    }
-
-    // Log generation
-    await supabaseClient
-      .from('blog_generation_log')
-      .insert({
-        blog_post_id: blogPost.id,
-        prompt: selectedTopic,
-        status: 'success'
-      })
-
     return new Response(
       JSON.stringify({ 
         success: true, 
         blogPost,
-        message: 'Article généré avec succès'
+        message: 'Article Bardahl généré avec succès'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -209,8 +162,6 @@ Format de réponse (JSON strict) :
     )
 
   } catch (error) {
-    console.error('Error:', error)
-    
     return new Response(
       JSON.stringify({ 
         success: false, 

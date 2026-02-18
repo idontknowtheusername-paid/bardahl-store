@@ -468,6 +468,36 @@ export type Database = {
           },
         ]
       }
+      product_reviews: {
+        Row: {
+          author_name: string
+          comment: string | null
+          created_at: string
+          id: string
+          is_approved: boolean
+          product_id: string
+          rating: number
+        }
+        Insert: {
+          author_name: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          product_id: string
+          rating: number
+        }
+        Update: {
+          author_name?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          product_id?: string
+          rating?: number
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           acea_norm: string | null
@@ -688,6 +718,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          admin_email: string | null
           announcement_bar: string | null
           contact_email: string | null
           contact_phone: string | null
@@ -706,6 +737,7 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          admin_email?: string | null
           announcement_bar?: string | null
           contact_email?: string | null
           contact_phone?: string | null
@@ -724,6 +756,7 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          admin_email?: string | null
           announcement_bar?: string | null
           contact_email?: string | null
           contact_phone?: string | null

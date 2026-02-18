@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
+import { useShippingSettings } from '@/hooks/use-shipping-settings';
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, subtotal } = useCart();
+  const { freeShippingThreshold, defaultRate } = useShippingSettings();
 
-  const shippingCost = subtotal >= 80 ? 0 : 5.90;
+  const isAboveThreshold = freeShippingThreshold ? subtotal >= freeShippingThreshold : false;
+  const shippingCost = isAboveThreshold ? 0 : (defaultRate ?? 0);
   const total = subtotal + shippingCost;
+  const remaining = freeShippingThreshold ? freeShippingThreshold - subtotal : 0;
 
   if (items.length === 0) {
     return (
@@ -38,6 +42,15 @@ export default function Cart() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
+            {freeShippingThreshold && !isAboveThreshold && (
+              <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                <Truck className="h-4 w-4 text-primary shrink-0" />
+                <p className="text-sm">
+                  Plus que <strong className="text-primary">{remaining.toFixed(0)} FCFA</strong> pour bénéficier de la livraison gratuite !
+                </p>
+              </div>
+            )}
+
             {items.map((item, index) => (
               <div
                 key={`${item.product.id}-${item.size}-${item.color}`}
@@ -57,7 +70,7 @@ export default function Cart() {
                     <div>
                       <Link
                         to={`/produits/${item.product.slug}`}
-                        className="font-medium hover:text-rose transition-colors"
+                        className="font-medium hover:text-primary transition-colors"
                       >
                         {item.product.name}
                       </Link>
@@ -67,9 +80,7 @@ export default function Cart() {
                       </p>
                     </div>
                     <button
-                      onClick={() =>
-                        removeItem(item.product.id, item.size, item.color)
-                      }
+                      onClick={() => removeItem(item.product.id, item.size, item.color)}
                       className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                       aria-label="Supprimer"
                     >
@@ -80,38 +91,22 @@ export default function Cart() {
                   <div className="flex items-end justify-between mt-4">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() =>
-                          updateQuantity(
-                            item.product.id,
-                            item.size,
-                            item.color,
-                            item.quantity - 1
-                          )
-                        }
+                        onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
                         className="p-1.5 border border-border rounded hover:bg-muted transition-colors"
                         aria-label="Diminuer la quantité"
                       >
                         <Minus className="h-3 w-3" />
                       </button>
-                      <span className="w-10 text-center font-medium">
-                        {item.quantity}
-                      </span>
+                      <span className="w-10 text-center font-medium">{item.quantity}</span>
                       <button
-                        onClick={() =>
-                          updateQuantity(
-                            item.product.id,
-                            item.size,
-                            item.color,
-                            item.quantity + 1
-                          )
-                        }
+                        onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
                         className="p-1.5 border border-border rounded hover:bg-muted transition-colors"
                         aria-label="Augmenter la quantité"
                       >
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
-                    <p className="font-medium text-rose">
+                    <p className="font-medium text-primary">
                       {(item.product.price * item.quantity).toFixed(0)} FCFA
                     </p>
                   </div>
@@ -143,23 +138,20 @@ export default function Cart() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Livraison</span>
                   <span>
-                    {shippingCost === 0 ? (
-                      <span className="text-green-600">Gratuite</span>
+                    {isAboveThreshold ? (
+                      <span className="text-green-600 font-medium">Gratuite</span>
+                    ) : defaultRate !== null ? (
+                      `${defaultRate.toFixed(0)} FCFA`
                     ) : (
-                        `${shippingCost.toFixed(0)} FCFA`
+                      <span className="text-xs italic text-muted-foreground">Calculée au checkout</span>
                     )}
                   </span>
                 </div>
-                {shippingCost > 0 && (
-                  <p className="text-xs text-muted-foreground bg-rose-light p-2 rounded">
-                    Plus que <strong>{(50000 - subtotal).toFixed(0)} FCFA</strong> pour bénéficier de la livraison gratuite !
-                  </p>
-                )}
               </div>
 
               <div className="border-t border-border mt-4 pt-4">
                 <div className="flex justify-between font-medium text-lg">
-                  <span>Total</span>
+                  <span>Total estimé</span>
                   <span>{total.toFixed(0)} FCFA</span>
                 </div>
               </div>
