@@ -4,18 +4,20 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTranslation } from '@/context/LanguageContext';
-
-const FREE_SHIPPING_THRESHOLD = 59 * 655.957; // 59€ in FCFA
+import { useShippingSettings } from '@/hooks/use-shipping-settings';
 
 export function CartModal() {
   const { items, isCartOpen, setIsCartOpen, removeItem, updateQuantity, subtotal } = useCart();
   const { formatPrice } = useCurrency();
   const t = useTranslation();
+  const { freeShippingThreshold } = useShippingSettings();
 
   if (!isCartOpen) return null;
 
-  const progressToFreeShipping = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
-  const remainingForFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
+  const progressToFreeShipping = freeShippingThreshold
+    ? Math.min((subtotal / freeShippingThreshold) * 100, 100)
+    : 0;
+  const remainingForFreeShipping = freeShippingThreshold ? freeShippingThreshold - subtotal : 0;
 
   return (
     <>
@@ -31,7 +33,7 @@ export function CartModal() {
           </button>
         </div>
 
-        {items.length > 0 && (
+        {items.length > 0 && freeShippingThreshold && (
           <div className="px-4 py-3 bg-primary/5 border-b border-border">
             <div className="flex items-center gap-2 mb-2">
               <Truck className="h-4 w-4 text-primary" />

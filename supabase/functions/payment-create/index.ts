@@ -45,30 +45,75 @@ serve(async (req) => {
       });
     }
 
-    // Calculate shipping
-    const shippingCost = shippingMethod === "pickup" ? 0 : 2000;
+    // Dynamic shipping calculation from DB
+    let shippingCost = 0;
+    if (shippingMethod !== "pickup") {
+      const city = shipping.city || "";
+      const country = shipping.country || "Bénin";
+
+      // Find matching shipping zone
+      const { data: zones } = await supabase
+        .from("shipping_zones")
+        .select("id, name, cities, countries")
+        .eq("is_active", true);
+
+      let matchedZoneId: string | null = null;
+      if (zones) {
+        for (const zone of zones) {
+          const zoneCountries = (zone.countries as string[]) || [];
+          const zoneCities = (zone.cities as string[]) || [];
+          const countryMatch = zoneCountries.some(
+            c => c.toLowerCase() === country.toLowerCase()
+          );
+          const cityMatch = zoneCities.length === 0 || zoneCities.some(
+            c => c.toLowerCase() === city.toLowerCase()
+          );
+          if (countryMatch && cityMatch) {
+            matchedZoneId = zone.id;
+            break;
+          }
+        }
+      }
+
+      if (matchedZoneId) {
+        const { data: rates } = await supabase
+          .from("shipping_rates")
+          .select("price, free_shipping_threshold, min_order_amount")
+          .eq("shipping_zone_id", matchedZoneId)
+          .eq("is_active", true)
+          .order("price", { ascending: true });
+
+        if (rates && rates.length > 0) {
+          const rate = rates[0];
+          const threshold = rate.free_shipping_threshold;
+          if (threshold && subtotal >= threshold) {
+            shippingCost = 0;
+          } else {
+            shippingCost = rate.price;
+          }
+        }
+      } else {
+        // Fallback: get cheapest active rate
+        const { data: fallbackRates } = await supabase
+          .from("shipping_rates")
+          .select("price")
+          .eq("is_active", true)
+          .order("price", { ascending: true })
+          .limit(1);
+        shippingCost = fallbackRates?.[0]?.price ?? 2000;
+      }
+    }
+
     const total = subtotal + shippingCost;
 
-    console.log("💰 CALCUL DES MONTANTS:", {
-      subtotal,
-      shippingCost,
-      total,
-      items: orderItems.map(i => ({
-        title: i.product_title,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        total: i.total_price
-      }))
-    });
-
-    // Create order in DB (store raw amounts)
+    // Create order in DB
     const orderNumber = `CMD-${Date.now()}`;
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
         order_number: orderNumber,
         customer_name: shipping.firstName,
-        customer_email: shipping.email,
+        customer_email: shipping.email || null,
         customer_phone: shipping.phone,
         shipping_address: {
           address: shipping.address,
@@ -94,9 +139,52 @@ serve(async (req) => {
     }));
     await supabase.from("order_items").insert(itemsWithOrderId);
 
+    // Notify admin of new order
+    try {
+      const { data: settings } = await supabase
+        .from("site_settings")
+        .select("admin_email")
+        .single();
+
+      const adminEmail = (settings as any)?.admin_email;
+      if (adminEmail) {
+        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: adminEmail,
+            subject: `Nouvelle commande ${orderNumber} - Bardahl`,
+            template: "new_order_admin",
+            data: {
+              orderNumber,
+              customerName: shipping.firstName,
+              customerPhone: shipping.phone,
+              customerEmail: shipping.email || "Non fourni",
+              city: shipping.city,
+              country: shipping.country || "Bénin",
+              items: orderItems.map(i => ({
+                title: i.product_title,
+                quantity: i.quantity,
+                unitPrice: i.unit_price,
+                total: i.total_price,
+              })),
+              subtotal,
+              shippingCost,
+              total,
+              shippingMethod,
+            },
+          }),
+        });
+      }
+    } catch (_emailErr) {
+      // Admin email failure is non-blocking
+    }
+
     // Create Genius Pay payment
     if (!GENIUS_PAY_API_KEY || !GENIUS_PAY_API_SECRET) {
-      // GENIUS_PAY credentials not configured - return order without payment
       return new Response(
         JSON.stringify({
           success: true,
@@ -109,7 +197,6 @@ serve(async (req) => {
       );
     }
 
-    // Country code mapping for Genius Pay
     const countryCodeMap: Record<string, string> = {
       "Bénin": "BJ", "Benin": "BJ",
       "Côte d'Ivoire": "CI", "Cote d'Ivoire": "CI",
@@ -122,20 +209,6 @@ serve(async (req) => {
     const countryCode = countryCodeMap[shipping.country] || "BJ";
 
     const frontendUrl = "https://bardahl.maxiimarket.com";
-
-    // Amount sent to Genius Pay (in XOF as per their API docs)
-    const paymentAmount = total;
-
-    console.log("🚀 ENVOI À GENIUS PAY:", {
-      paymentAmount,
-      currency: "XOF",
-      total_from_db: total,
-      subtotal,
-      shipping: shippingCost,
-      country_code: countryCode,
-    });
-
-
     const customerData: Record<string, string> = {
       phone: shipping.phone,
       name: shipping.firstName,
@@ -143,17 +216,14 @@ serve(async (req) => {
     if (shipping.email) customerData.email = shipping.email;
 
     const paymentPayload: Record<string, unknown> = {
-      amount: paymentAmount,
+      amount: total,
       currency: "XOF",
       country_code: countryCode,
       description: `Commande ${orderNumber} - Bardahl`,
       success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
       error_url: `${frontendUrl}/checkout`,
       customer: customerData,
-      metadata: {
-        order_id: order.id,
-        order_number: orderNumber,
-      },
+      metadata: { order_id: order.id, order_number: orderNumber },
     };
 
     const controller = new AbortController();
@@ -171,9 +241,8 @@ serve(async (req) => {
         body: JSON.stringify(paymentPayload),
         signal: controller.signal,
       });
-    } catch (fetchError) {
+    } catch (_fetchError) {
       clearTimeout(timeoutId);
-      
       return new Response(
         JSON.stringify({
           success: true,
@@ -190,22 +259,9 @@ serve(async (req) => {
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
 
-    console.log("📥 RÉPONSE GENIUS PAY:", {
-      status: paymentResponse.status,
-      ok: paymentResponse.ok,
-      full_response: paymentData,
-      amount_sent: paymentAmount,
-      amount_in_response: paymentData.data?.amount || paymentData.amount,
-      checkout_url: paymentData.data?.checkout_url || paymentData.data?.payment_url,
-    });
-
-
     if (!paymentResponse.ok) {
       const errorMsg = paymentData.error?.message || paymentData.message || "Erreur Genius Pay";
       const errorCode = paymentData.error?.code || "UNKNOWN";
-      
-
-      // Provide detailed error for debugging
       return new Response(
         JSON.stringify({
           success: true,
@@ -220,7 +276,6 @@ serve(async (req) => {
       );
     }
 
-    // Update order with payment reference
     await supabase
       .from("orders")
       .update({
@@ -240,7 +295,6 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    
     return new Response(
       JSON.stringify({
         success: false,

@@ -258,7 +258,7 @@ export default function BlogPosts() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => window.open(`https://cannesh-lingerie-suite.vercel.app/blog/${post.slug}`, '_blank')}
+                          onClick={() => window.open(`https://bardahl.maxiimarket.com/blog/${post.slug}`, '_blank')}
                           title="Voir sur le site"
                         >
                           <Eye className="w-4 h-4" />
@@ -332,7 +332,7 @@ export default function BlogPosts() {
                 id="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="beauté, lingerie, conseils"
+                placeholder="huile-moteur, entretien, automobile"
               />
             </div>
             <div>

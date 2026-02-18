@@ -21,6 +21,7 @@ import {
   X,
   ChevronLeft,
   FileText,
+  Receipt,
   Users as UsersIcon,
 } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
     { href: '/products', label: t.nav.products, icon: Package },
     { href: '/orders', label: t.nav.orders, icon: ShoppingCart },
+    { href: '/invoices', label: 'Factures', icon: Receipt },
     { href: '/customers', label: t.nav.customers, icon: UsersIcon },
     { href: '/users', label: t.nav.users, icon: UsersIcon },
     { href: '/promo-codes', label: t.nav.promoCodes, icon: Percent },

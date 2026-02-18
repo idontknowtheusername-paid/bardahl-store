@@ -4,18 +4,18 @@ import { corsHeaders } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 interface EmailRequest {
   to: string;
   subject: string;
-  template: "order_confirmation" | "order_shipped" | "order_failed" | "newsletter_welcome" | "contact_reply";
+  template: "order_confirmation" | "order_shipped" | "order_failed" | "newsletter_welcome" | "contact_reply" | "new_order_admin";
   data: Record<string, unknown>;
 }
 
 const brandHeader = `
   <div style="background-color: #0a0a0a; padding: 20px; text-align: center;">
-    <h1 style="color: #FFD000; font-size: 28px; margin: 0; font-weight: bold;">BARDAHL</h1>
+    <h1 style="color: #FFD000; font-size: 28px; margin: 0; font-weight: bold; letter-spacing: 2px;">BARDAHL</h1>
     <p style="color: #999; font-size: 12px; margin: 5px 0 0;">Lubrifiants & Solutions Automobile</p>
   </div>
 `;
@@ -34,13 +34,13 @@ const templates = {
       <div style="padding: 30px;">
         <h2 style="color: #1a1a1a;">Merci pour votre commande !</h2>
         <p>Bonjour ${data.customerName},</p>
-        <p>Votre commande <strong style="color: #FFD000;">${data.orderNumber}</strong> a été confirmée.</p>
-        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="margin-top: 0;">Récapitulatif :</h3>
-          <p><strong>Total : ${data.total} FCFA</strong></p>
+        <p>Votre commande <strong style="color: #FFD000;">${data.orderNumber}</strong> a été confirmée avec succès.</p>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD000;">
+          <h3 style="margin-top: 0; color: #1a1a1a;">Récapitulatif :</h3>
+          <p style="margin: 5px 0;"><strong>Total : ${data.total} FCFA</strong></p>
         </div>
-        <p>Nous vous tiendrons informé de l'expédition de votre commande.</p>
-        <p>L'équipe Bardahl</p>
+        <p>Nous préparons votre commande et vous tiendrons informé de son expédition.</p>
+        <p>Merci de votre confiance,<br><strong>L'équipe Bardahl</strong></p>
       </div>
       ${brandFooter}
     </div>
@@ -51,9 +51,9 @@ const templates = {
       <div style="padding: 30px;">
         <h2 style="color: #1a1a1a;">Votre commande a été expédiée ! 🚚</h2>
         <p>Bonjour ${data.customerName},</p>
-        <p>Votre commande <strong style="color: #FFD000;">${data.orderNumber}</strong> est en route.</p>
-        ${data.trackingNumber ? `<p>Numéro de suivi : <strong>${data.trackingNumber}</strong></p>` : ''}
-        <p>L'équipe Bardahl</p>
+        <p>Votre commande <strong style="color: #FFD000;">${data.orderNumber}</strong> est en cours de livraison.</p>
+        ${data.trackingNumber ? `<div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #FFD000;"><p style="margin: 0;">Numéro de suivi : <strong>${data.trackingNumber}</strong></p></div>` : ''}
+        <p>Merci de votre confiance,<br><strong>L'équipe Bardahl</strong></p>
       </div>
       ${brandFooter}
     </div>
@@ -64,8 +64,8 @@ const templates = {
       <div style="padding: 30px;">
         <h2 style="color: #dc2626;">Échec du paiement</h2>
         <p>Bonjour ${data.customerName},</p>
-        <p>Le paiement pour votre commande <strong>${data.orderNumber}</strong> a échoué.</p>
-        <p>Veuillez réessayer ou nous contacter pour assistance.</p>
+        <p>Le paiement pour votre commande <strong>${data.orderNumber}</strong> n'a pas pu être traité.</p>
+        <p>Vous pouvez réessayer ou nous contacter pour toute assistance.</p>
         <p>L'équipe Bardahl</p>
       </div>
       ${brandFooter}
@@ -99,6 +99,50 @@ const templates = {
       ${brandFooter}
     </div>
   `,
+  new_order_admin: (data: Record<string, unknown>) => {
+    const items = (data.items as Array<{title: string; quantity: number; unitPrice: number; total: number}>) || [];
+    const itemsHtml = items.map(item => `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.title}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${item.unitPrice?.toFixed(0)} FCFA</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">${item.total?.toFixed(0)} FCFA</td>
+      </tr>
+    `).join('');
+
+    return `
+    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff;">
+      ${brandHeader}
+      <div style="padding: 30px;">
+        <h2 style="color: #1a1a1a; border-bottom: 2px solid #FFD000; padding-bottom: 10px;">🛒 Nouvelle commande reçue !</h2>
+        <div style="background: #f9f9f9; border-radius: 8px; padding: 15px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>N° Commande :</strong> <span style="color: #FFD000; font-weight: bold;">${data.orderNumber}</span></p>
+          <p style="margin: 5px 0;"><strong>Client :</strong> ${data.customerName}</p>
+          <p style="margin: 5px 0;"><strong>Téléphone :</strong> ${data.customerPhone}</p>
+          <p style="margin: 5px 0;"><strong>Email :</strong> ${data.customerEmail}</p>
+          <p style="margin: 5px 0;"><strong>Ville :</strong> ${data.city}, ${data.country}</p>
+          <p style="margin: 5px 0;"><strong>Mode livraison :</strong> ${data.shippingMethod}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <thead>
+            <tr style="background: #0a0a0a; color: #FFD000;">
+              <th style="padding: 10px; text-align: left;">Produit</th>
+              <th style="padding: 10px; text-align: center;">Qté</th>
+              <th style="padding: 10px; text-align: right;">Prix unitaire</th>
+              <th style="padding: 10px; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #FFD000;">
+          <p style="margin: 5px 0;">Sous-total : ${(data.subtotal as number)?.toFixed(0)} FCFA</p>
+          <p style="margin: 5px 0;">Livraison : ${(data.shippingCost as number)?.toFixed(0)} FCFA</p>
+          <p style="margin: 5px 0; font-size: 18px;"><strong>TOTAL : ${(data.total as number)?.toFixed(0)} FCFA</strong></p>
+        </div>
+      </div>
+      ${brandFooter}
+    </div>
+  `},
 };
 
 serve(async (req) => {
@@ -109,10 +153,8 @@ serve(async (req) => {
   try {
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
 
-    // Verify authentication
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      
       return new Response(
         JSON.stringify({ success: false, error: "Unauthorized" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
@@ -120,41 +162,52 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      
-      return new Response(
-        JSON.stringify({ success: false, error: "Unauthorized" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
-      );
+    // Allow internal service calls (from other edge functions using service role key)
+    const isServiceCall = token === SUPABASE_SERVICE_KEY;
+
+    if (!isServiceCall) {
+      // Verify user is an authenticated admin
+      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Unauthorized" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+        );
+      }
+
+      const { data: userRole } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!userRole || userRole.role !== "admin") {
+        return new Response(
+          JSON.stringify({ success: false, error: "Forbidden - Admin access required" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+        );
+      }
     }
-
-    // Check if user is admin
-    const { data: userRole } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .single();
-
-    if (!userRole || userRole.role !== "admin") {
-      
-      return new Response(
-        JSON.stringify({ success: false, error: "Forbidden - Admin access required" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
-      );
-    }
-
-    
 
     const { to, subject, template, data }: EmailRequest = await req.json();
-    const htmlContent = templates[template](data);
+
+    if (!to || !subject || !template || !data) {
+      throw new Error("Missing required fields: to, subject, template, data");
+    }
+
+    const templateFn = templates[template];
+    if (!templateFn) throw new Error(`Unknown template: ${template}`);
+
+    const htmlContent = templateFn(data);
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         from: "Bardahl <noreply@email.maxiimarket.com>",
         to: [to],
@@ -164,10 +217,16 @@ serve(async (req) => {
     });
 
     const result = await response.json();
-    if (!response.ok) { throw new Error(result.message || "Email sending failed"); }
+    if (!response.ok) throw new Error(result.message || "Email sending failed");
 
-    return new Response(JSON.stringify({ success: true, messageId: result.id }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
+    return new Response(
+      JSON.stringify({ success: true, messageId: result.id }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
+    return new Response(
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+    );
   }
 });

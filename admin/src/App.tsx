@@ -22,6 +22,7 @@ import Shipping from '@/pages/Shipping';
 import Settings from '@/pages/Settings';
 import BlogPosts from '@/pages/BlogPosts';
 import Users from '@/pages/Users';
+import Invoices from '@/pages/Invoices';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +62,7 @@ function App() {
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/blog" element={<BlogPosts />} />
                         <Route path="/users" element={<Users />} />
+                        <Route path="/invoices" element={<Invoices />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </AdminLayout>
