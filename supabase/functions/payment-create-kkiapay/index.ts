@@ -4,9 +4,9 @@ import { corsHeaders } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const GENIUS_PAY_API_KEY = Deno.env.get("GENIUS_PAY_API_KEY");
-const GENIUS_PAY_API_SECRET = Deno.env.get("GENIUS_PAY_API_SECRET");
-const GENIUS_PAY_API_URL = "https://pay.genius.ci/api/v1/merchant";
+const KKIAPAY_PUBLIC_KEY = Deno.env.get("KKIAPAY_PUBLIC_KEY");
+const KKIAPAY_PRIVATE_KEY = Deno.env.get("KKIAPAY_PRIVATE_KEY");
+const KKIAPAY_API_URL = "https://api.kkiapay.me/api/v1";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -51,7 +51,6 @@ serve(async (req) => {
       const city = shipping.city || "";
       const country = shipping.country || "Bénin";
 
-      // Find matching shipping zone
       const { data: zones } = await supabase
         .from("shipping_zones")
         .select("id, name, cities, countries")
@@ -93,7 +92,6 @@ serve(async (req) => {
           }
         }
       } else {
-        // Fallback: get cheapest active rate
         const { data: fallbackRates } = await supabase
           .from("shipping_rates")
           .select("price")
@@ -126,6 +124,7 @@ serve(async (req) => {
         total,
         status: "pending",
         payment_status: "pending",
+        payment_gateway: "kkiapay",
       })
       .select()
       .single();
@@ -139,7 +138,7 @@ serve(async (req) => {
     }));
     await supabase.from("order_items").insert(itemsWithOrderId);
 
-    // Notify admin of new order
+    // Notify admin
     try {
       const { data: settings } = await supabase
         .from("site_settings")
@@ -180,121 +179,44 @@ serve(async (req) => {
         });
       }
     } catch (_emailErr) {
-      // Admin email failure is non-blocking
+      // Non-blocking
     }
 
-    // Create Genius Pay payment
-    if (!GENIUS_PAY_API_KEY || !GENIUS_PAY_API_SECRET) {
+    // Create KkiaPay payment
+    if (!KKIAPAY_PUBLIC_KEY || !KKIAPAY_PRIVATE_KEY) {
       return new Response(
         JSON.stringify({
           success: true,
           order_id: order.id,
           order_number: orderNumber,
           amount: total,
-          message: "Commande créée (paiement non configuré)",
+          message: "Commande créée (KkiaPay non configuré)",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const countryCodeMap: Record<string, string> = {
-      "Bénin": "BJ", "Benin": "BJ",
-      "Côte d'Ivoire": "CI", "Cote d'Ivoire": "CI",
-      "Sénégal": "SN", "Senegal": "SN",
-      "Mali": "ML", "Burkina Faso": "BF",
-      "Togo": "TG", "Niger": "NE",
-      "Guinée": "GN", "Guinee": "GN",
-      "Cameroun": "CM", "Congo": "CG",
-    };
-    const countryCode = countryCodeMap[shipping.country] || "BJ";
-
-    // Log pour debug
-    console.log("Country received:", shipping.country);
-    console.log("Country code mapped:", countryCode);
-
-    const frontendUrl = "https://bardahl.maxiimarket.com";
-    const customerData: Record<string, string> = {
-      phone: shipping.phone,
-      name: shipping.firstName,
-    };
-    if (shipping.email) customerData.email = shipping.email;
-
-    const paymentPayload: Record<string, unknown> = {
-      amount: total,
-      currency: "XOF",
-      country_code: countryCode,
-      description: `Commande ${orderNumber} - Bardahl`,
-      success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
-      error_url: `${frontendUrl}/checkout`,
-      customer: customerData,
-      metadata: { order_id: order.id, order_number: orderNumber },
-    };
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    let paymentResponse;
-    try {
-      paymentResponse = await fetch(`${GENIUS_PAY_API_URL}/payments`, {
-        method: "POST",
-        headers: {
-          "X-API-Key": GENIUS_PAY_API_KEY,
-          "X-API-Secret": GENIUS_PAY_API_SECRET,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(paymentPayload),
-        signal: controller.signal,
-      });
-    } catch (_fetchError) {
-      clearTimeout(timeoutId);
-      return new Response(
-        JSON.stringify({
-          success: true,
-          order_id: order.id,
-          order_number: orderNumber,
-          amount: total,
-          payment_error: true,
-          error_details: "Impossible de contacter Genius Pay. Veuillez réessayer.",
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    clearTimeout(timeoutId);
-    const paymentData = await paymentResponse.json();
-
-    if (!paymentResponse.ok) {
-      const errorMsg = paymentData.error?.message || paymentData.message || "Erreur Genius Pay";
-      const errorCode = paymentData.error?.code || "UNKNOWN";
-      return new Response(
-        JSON.stringify({
-          success: true,
-          order_id: order.id,
-          order_number: orderNumber,
-          amount: total,
-          payment_error: true,
-          error_code: errorCode,
-          error_details: errorMsg,
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
+    // Store transaction ID for webhook verification
     await supabase
       .from("orders")
       .update({
-        payment_id: paymentData.data?.id?.toString() || paymentData.data?.reference,
-        payment_gateway_id: paymentData.data?.reference,
+        payment_gateway: "kkiapay",
       })
       .eq("id", order.id);
 
+    // Return config for frontend widget
     return new Response(
       JSON.stringify({
         success: true,
         order_id: order.id,
         order_number: orderNumber,
-        payment_url: paymentData.data?.checkout_url || paymentData.data?.payment_url,
         amount: total,
+        payment_method: "kkiapay",
+        kkiapay_config: {
+          public_key: KKIAPAY_PUBLIC_KEY,
+          amount: total,
+          sandbox: KKIAPAY_PUBLIC_KEY.startsWith("0cf") || KKIAPAY_PUBLIC_KEY.startsWith("tpk_"),
+        },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

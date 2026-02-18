@@ -25,6 +25,13 @@ export interface CreateOrderResponse {
   payment_url?: string;
   amount?: number;
   message?: string;
+  payment_method?: 'genius_pay' | 'kkiapay';
+  kkiapay_config?: {
+    public_key: string;
+    amount: number;
+    sandbox: boolean;
+    callback: string;
+  };
 }
 
 export interface VerifyPaymentResponse {
@@ -43,9 +50,12 @@ export const paymentApi = {
   async createOrder(
     items: OrderItem[],
     shippingInfo: ShippingInfo,
-    shippingMethod: string
+    shippingMethod: string,
+    gateway: 'genius_pay' | 'kkiapay' = 'genius_pay'
   ): Promise<CreateOrderResponse> {
-    const { data, error } = await supabase.functions.invoke('payment-create', {
+    const functionName = gateway === 'kkiapay' ? 'payment-create-kkiapay' : 'payment-create';
+
+    const { data, error } = await supabase.functions.invoke(functionName, {
       body: {
         items,
         shipping: shippingInfo,

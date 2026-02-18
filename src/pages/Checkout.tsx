@@ -202,7 +202,7 @@ export default function Checkout() {
         cupSize: item.cupSize,
       }));
 
-      // Create order and get payment URL
+      // Create order and get payment config
       const result = await paymentApi.createOrder(
         orderItems,
         {
@@ -213,22 +213,76 @@ export default function Checkout() {
           address: shippingInfo.address,
           country: shippingInfo.country,
         },
-        selectedShipping
+        selectedShipping,
+        'kkiapay' // Use KkiaPay by default
       );
 
-      if (result.success && result.payment_url) {
-        // Save order info for callback
+      if (result.success && result.payment_method === 'kkiapay' && result.kkiapay_config) {
+      // Save order info
         localStorage.setItem('bardahl-pending-order', JSON.stringify({
           orderNumber: result.order_number,
           orderId: result.order_id,
           amount: result.amount,
         }));
 
-        // Clear cart
+        // Open KkiaPay widget
+        const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
+
+        addSuccessListener((response: any) => {
+          console.log('Payment success:', response);
+
+          // Update order with transaction ID
+          const updateOrderWithTransaction = async () => {
+            try {
+              const { supabase } = await import('@/integrations/supabase/client');
+              await (supabase as any)
+                .from('orders')
+                .update({ payment_id: response.transactionId })
+                .eq('id', result.order_id);
+            } catch (err) {
+              console.error('Failed to update order with transaction ID:', err);
+            }
+          };
+
+          updateOrderWithTransaction();
+
+          // Clear cart
+          clearCart();
+          localStorage.removeItem('bardahl-checkout-shipping');
+
+          // Redirect to confirmation
+          navigate(`/confirmation?order=${result.order_number}&transaction=${response.transactionId}`);
+        });
+
+        addFailedListener((error: any) => {
+          console.error('Payment failed:', error);
+          toast({
+            title: "Paiement échoué",
+            description: "Le paiement n'a pas pu être effectué. Veuillez réessayer.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        });
+
+        openKkiapayWidget({
+          amount: result.kkiapay_config.amount,
+          key: result.kkiapay_config.public_key,
+          sandbox: result.kkiapay_config.sandbox,
+          phone: shippingInfo.phone,
+          name: shippingInfo.firstName,
+          email: shippingInfo.email || undefined,
+        });
+      } else if (result.success && result.payment_url) {
+        // GeniusPay fallback
+        localStorage.setItem('bardahl-pending-order', JSON.stringify({
+          orderNumber: result.order_number,
+          orderId: result.order_id,
+          amount: result.amount,
+        }));
+
         clearCart();
         localStorage.removeItem('bardahl-checkout-shipping');
 
-        // Redirect to Genius Pay checkout
         toast({
           title: "Redirection vers le paiement",
           description: "Vous allez être redirigé vers la page de paiement sécurisée.",
@@ -382,29 +436,51 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="city">Ville *</Label>
-                  <select
-                    id="city"
-                    value={shippingInfo.city}
-                    onChange={(e) =>
-                      setShippingInfo(prev => ({ ...prev, city: e.target.value }))
-                    }
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    required
-                  >
-                    <option value="">Sélectionnez votre ville</option>
-                    <option value="Cotonou">Cotonou</option>
-                    <option value="Porto-Novo">Porto-Novo</option>
-                    <option value="Parakou">Parakou</option>
-                    <option value="Abomey-Calavi">Abomey-Calavi</option>
-                    <option value="Djougou">Djougou</option>
-                    <option value="Bohicon">Bohicon</option>
-                    <option value="Natitingou">Natitingou</option>
-                    <option value="Lokossa">Lokossa</option>
-                    <option value="Ouidah">Ouidah</option>
-                    <option value="Kandi">Kandi</option>
-                  </select>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="city">Ville *</Label>
+                    <select
+                      id="city"
+                      value={shippingInfo.city}
+                      onChange={(e) =>
+                        setShippingInfo(prev => ({ ...prev, city: e.target.value }))
+                      }
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      required
+                    >
+                      <option value="">Sélectionnez votre ville</option>
+                      <option value="Cotonou">Cotonou</option>
+                      <option value="Porto-Novo">Porto-Novo</option>
+                      <option value="Parakou">Parakou</option>
+                      <option value="Abomey-Calavi">Abomey-Calavi</option>
+                      <option value="Djougou">Djougou</option>
+                      <option value="Bohicon">Bohicon</option>
+                      <option value="Natitingou">Natitingou</option>
+                      <option value="Lokossa">Lokossa</option>
+                      <option value="Ouidah">Ouidah</option>
+                      <option value="Kandi">Kandi</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Pays *</Label>
+                    <select
+                      id="country"
+                      value={shippingInfo.country}
+                      onChange={(e) =>
+                        setShippingInfo(prev => ({ ...prev, country: e.target.value }))
+                      }
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      required
+                    >
+                      <option value="Bénin">Bénin</option>
+                      <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                      <option value="Sénégal">Sénégal</option>
+                      <option value="Togo">Togo</option>
+                      <option value="Mali">Mali</option>
+                      <option value="Burkina Faso">Burkina Faso</option>
+                      <option value="Niger">Niger</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
