@@ -161,6 +161,7 @@ export function Header() {
 
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
+              <span className="text-2xl md:text-3xl grayscale">💧</span>
               <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">BARDAHL</span>
             </Link>
 

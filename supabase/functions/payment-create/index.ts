@@ -157,6 +157,7 @@ serve(async (req) => {
         total,
         status: "pending",
         payment_status: "pending",
+        payment_gateway: "genius_pay",
       })
       .select()
       .single();
@@ -250,6 +251,7 @@ serve(async (req) => {
       amount: total,
       currency: "XOF",
       country_code: countryCode,
+      method_payment: countryCode === "BJ" ? "mtn_money" : undefined,
       description: `Commande ${orderNumber} - Bardahl`,
       success_url: `${frontendUrl}/checkout/callback?order_id=${order.id}`,
       error_url: `${frontendUrl}/checkout`,
@@ -259,6 +261,8 @@ serve(async (req) => {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    console.log("Calling GeniusPay API with payload:", JSON.stringify(paymentPayload));
 
     let paymentResponse;
     try {
@@ -274,6 +278,7 @@ serve(async (req) => {
       });
     } catch (_fetchError) {
       clearTimeout(timeoutId);
+      console.error("GeniusPay fetch error:", _fetchError);
       return new Response(
         JSON.stringify({
           success: true,
@@ -289,6 +294,9 @@ serve(async (req) => {
 
     clearTimeout(timeoutId);
     const paymentData = await paymentResponse.json();
+
+    console.log("GeniusPay response status:", paymentResponse.status);
+    console.log("GeniusPay response data:", JSON.stringify(paymentData));
 
     if (!paymentResponse.ok) {
       const errorMsg = paymentData.error?.message || paymentData.message || "Erreur Genius Pay";
