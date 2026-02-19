@@ -278,7 +278,7 @@ export default function Checkout() {
           localStorage.removeItem('bardahl-checkout-shipping');
 
           // Redirect to confirmation
-          navigate(`/confirmation?order=${result.order_number}&transaction=${response.transactionId}`);
+          navigate(`/confirmation/${result.order_number}`);
         });
 
         addFailedListener((error: any) => {
@@ -338,7 +338,7 @@ export default function Checkout() {
           description: `Commande ${result.order_number} créée. Le paiement sera traité manuellement. ${errorDetails}`,
         });
 
-        navigate(`/confirmation?order=${result.order_number}&manual=true`);
+        navigate(`/confirmation/${result.order_number}`);
       } else {
         throw new Error(result.message || 'Échec de la création de la commande');
       }
