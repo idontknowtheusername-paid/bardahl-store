@@ -9,9 +9,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/context/CartContext';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { shippingApi, paymentApi } from '@/lib/api-payment';
+import { paymentApi } from '@/lib/api-payment';
 import { formatPrice } from '@/lib/format';
 import { usePromoCode } from '@/hooks/use-promo-code';
+import { supabase } from '@/integrations/supabase/client';
 
 type Step = 'shipping' | 'delivery' | 'payment';
 
@@ -20,32 +21,24 @@ interface ShippingOption {
   name: string;
   description: string;
   price: number;
+  originalPrice: number;
+  isFree: boolean;
   icon: typeof Truck;
 }
 
-const defaultShippingOptions: ShippingOption[] = [
-  {
-    id: 'standard',
-    name: 'Livraison Standard',
-    description: '2-4 jours ouvrés',
-    price: 2000,
-    icon: Truck,
-  },
-  {
-    id: 'express',
-    name: 'Livraison Express',
-    description: '24-48h',
-    price: 5000,
-    icon: Zap,
-  },
-  {
-    id: 'pickup',
-    name: 'Retrait en boutique',
-    description: 'Gratuit - Disponible sous 24h',
-    price: 0,
-    icon: Store,
-  },
-];
+const iconMap: Record<string, typeof Truck> = {
+  pickup: Store,
+  retrait: Store,
+  express: Zap,
+};
+
+function getIcon(name: string): typeof Truck {
+  const lower = name.toLowerCase();
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (lower.includes(key)) return icon;
+  }
+  return Truck;
+}
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -67,54 +60,87 @@ export default function Checkout() {
     city: '',
     country: 'Bénin',
   });
-  const [selectedShipping, setSelectedShipping] = useState('standard');
+  const [selectedShipping, setSelectedShipping] = useState('');
   const [acceptCGV, setAcceptCGV] = useState(true);
   const [subscribeToBlog, setSubscribeToBlog] = useState(true);
-  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>(defaultShippingOptions);
-  const [calculatedShippingCost, setCalculatedShippingCost] = useState<number | null>(null);
-  const [freeShippingApplied, setFreeShippingApplied] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
 
-  // Calculate shipping when city changes or delivery step is reached
+  // Fetch dynamic shipping rates from DB when city is entered and delivery step is reached
   useEffect(() => {
-    const calculateShipping = async () => {
+    const loadShippingOptions = async () => {
       if (!shippingInfo.city || currentStep !== 'delivery') return;
-      
+
       setIsCalculatingShipping(true);
       try {
-        const result = await shippingApi.calculateShipping(
-          shippingInfo.city,
-          subtotal,
-          selectedShipping,
-          shippingInfo.country
-        );
-        
-        if (!result.error) {
-          setCalculatedShippingCost(result.shippingCost);
-          setFreeShippingApplied(result.freeShipping);
+        const { data, error } = await supabase.functions.invoke('shipping-calculate', {
+          body: {
+            city: shippingInfo.city,
+            country: shippingInfo.country || 'Bénin',
+            subtotal,
+          },
+        });
+
+        if (!error && data?.success && data.rates?.length > 0) {
+          const options: ShippingOption[] = data.rates.map((rate: any) => ({
+            id: rate.id,
+            name: rate.name,
+            description: rate.delivery_time || rate.description || '',
+            price: rate.price,
+            originalPrice: rate.originalPrice ?? rate.price,
+            isFree: rate.isFree || rate.price === 0,
+            icon: getIcon(rate.name),
+          }));
+          setShippingOptions(options);
+          // Auto-select first option
+          if (!selectedShipping || !options.find(o => o.id === selectedShipping)) {
+            setSelectedShipping(options[0].id);
+          }
+        } else {
+          // Fallback: load from DB directly
+          const { data: rates } = await supabase
+            .from('shipping_rates')
+            .select('*')
+            .eq('is_active', true)
+            .order('price', { ascending: true });
+
+          if (rates && rates.length > 0) {
+            const options: ShippingOption[] = rates.map((rate) => {
+              const isFree = !!(rate.free_shipping_threshold && subtotal >= rate.free_shipping_threshold);
+              return {
+                id: rate.id,
+                name: rate.name,
+                description: rate.delivery_time || rate.description || '',
+                price: isFree ? 0 : rate.price,
+                originalPrice: rate.price,
+                isFree,
+                icon: getIcon(rate.name),
+              };
+            });
+            setShippingOptions(options);
+            if (!selectedShipping || !options.find(o => o.id === selectedShipping)) {
+              setSelectedShipping(options[0].id);
+            }
+          }
         }
-      } catch (error) {
-        // Shipping calculation failed, using defaults
+      } catch (_e) {
+        // Silent fallback
       } finally {
         setIsCalculatingShipping(false);
       }
     };
-    
-    calculateShipping();
-  }, [shippingInfo.city, shippingInfo.country, currentStep, selectedShipping, subtotal]);
+
+    loadShippingOptions();
+  }, [shippingInfo.city, shippingInfo.country, currentStep, subtotal]);
 
   const selectedShippingOption = shippingOptions.find(o => o.id === selectedShipping);
   
   // Calculate discount
   const discount = calculateDiscount(subtotal, items.length);
   const discountAmount = discount?.amount || 0;
-  const isFreeShipping = discount?.freeShipping || freeShippingApplied;
+  const isFreeShipping = discount?.freeShipping || false;
 
-  // Use calculated shipping or fallback to default option price
-  const shippingCost = (selectedShipping === 'pickup' || isFreeShipping)
-    ? 0 
-    : (calculatedShippingCost !== null && !isNaN(calculatedShippingCost)
-      ? calculatedShippingCost
-      : (selectedShippingOption?.price || 0));
+  // Shipping cost comes directly from the selected dynamic option
+  const shippingCost = isFreeShipping ? 0 : (selectedShippingOption?.price || 0);
   
   const total = subtotal - discountAmount + shippingCost;
 
@@ -203,6 +229,7 @@ export default function Checkout() {
       }));
 
       // Create order and get payment config
+      const selectedOption = shippingOptions.find(o => o.id === selectedShipping);
       const result = await paymentApi.createOrder(
         orderItems,
         {
@@ -213,7 +240,7 @@ export default function Checkout() {
           address: shippingInfo.address,
           country: shippingInfo.country,
         },
-        selectedShipping,
+        selectedOption?.name || selectedShipping,
         'kkiapay' // Use KkiaPay by default
       );
 
@@ -522,7 +549,14 @@ export default function Checkout() {
                 {isCalculatingShipping && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Calcul des frais de livraison pour {shippingInfo.city}...</span>
+                    <span>Chargement des options de livraison pour {shippingInfo.city}...</span>
+                  </div>
+                )}
+
+                {!isCalculatingShipping && shippingOptions.length === 0 && (
+                  <div className="flex items-center gap-2 p-4 bg-muted rounded-lg mb-4 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Chargement des options de livraison...</span>
                   </div>
                 )}
 
@@ -533,12 +567,8 @@ export default function Checkout() {
                 >
                   {shippingOptions.map(option => {
                     const Icon = option.icon;
-                    const displayPrice = option.id === 'pickup' ? 0 : (
-                      option.id === selectedShipping && calculatedShippingCost !== null && !isNaN(calculatedShippingCost)
-                        ? calculatedShippingCost 
-                        : option.price
-                    );
-                    const isFree = displayPrice === 0 || (freeShippingApplied && option.id === selectedShipping);
+                    const displayPrice = option.price;
+                    const isFree = option.isFree || displayPrice === 0;
                     
                     return (
                       <label
@@ -546,8 +576,8 @@ export default function Checkout() {
                         className={cn(
                           "flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors",
                           selectedShipping === option.id
-                            ? "border-rose bg-rose-light"
-                            : "border-border hover:border-rose/50"
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50"
                         )}
                       >
                         <div className="flex items-center gap-3">
@@ -562,7 +592,7 @@ export default function Checkout() {
                         </div>
                         <span className="font-medium">
                           {isFree ? (
-                            <span className="text-green-600">Gratuit</span>
+                            <span className="text-green-600 font-bold">Gratuit</span>
                           ) : (
                             formatPrice(displayPrice)
                           )}
