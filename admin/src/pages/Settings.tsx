@@ -205,10 +205,22 @@ export default function Settings() {
               {t.settings.contact}
             </CardTitle>
             <CardDescription>
-              {t.settings.contactEmail}
+              Coordonnées et notifications administrateur
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="admin_email">Email administrateur (notifications commandes)</Label>
+              <Input
+                id="admin_email"
+                type="email"
+                value={(formData as any).admin_email || ''}
+                onChange={(e) => setFormData({ ...formData, admin_email: e.target.value } as any)}
+                placeholder="admin@bardahl.com"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Reçoit les alertes de nouvelles commandes</p>
+            </div>
+
             <div>
               <Label htmlFor="contact_email">{t.settings.contactEmail}</Label>
               <Input
@@ -227,7 +239,7 @@ export default function Settings() {
                 type="tel"
                 value={formData.contact_phone || ''}
                 onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                placeholder="+212 6 XX XX XX XX"
+                placeholder="+229 XX XX XX XX"
               />
             </div>
 
@@ -238,7 +250,7 @@ export default function Settings() {
                 type="tel"
                 value={formData.whatsapp_number || ''}
                 onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
-                placeholder="+212 6 XX XX XX XX"
+                placeholder="+229 XX XX XX XX"
               />
             </div>
           </CardContent>

@@ -47,11 +47,18 @@ serve(async (req) => {
 
     // Dynamic shipping calculation from DB
     let shippingCost = 0;
-    if (shippingMethod !== "pickup") {
+    const isPickup = shippingMethod && (
+      shippingMethod.toLowerCase().includes('pickup') ||
+      shippingMethod.toLowerCase().includes('retrait') ||
+      shippingMethod.toLowerCase().includes('boutique') ||
+      shippingMethod === '0'
+    );
+
+    if (!isPickup) {
       const city = shipping.city || "";
       const country = shipping.country || "Bénin";
 
-      // Find matching shipping zone
+      // Find matching shipping zone by city or country
       const { data: zones } = await supabase
         .from("shipping_zones")
         .select("id, name, cities, countries")
@@ -62,7 +69,7 @@ serve(async (req) => {
         for (const zone of zones) {
           const zoneCountries = (zone.countries as string[]) || [];
           const zoneCities = (zone.cities as string[]) || [];
-          const countryMatch = zoneCountries.some(
+          const countryMatch = zoneCountries.length === 0 || zoneCountries.some(
             c => c.toLowerCase() === country.toLowerCase()
           );
           const cityMatch = zoneCities.length === 0 || zoneCities.some(
@@ -73,23 +80,47 @@ serve(async (req) => {
             break;
           }
         }
+        // Fallback: match by country only
+        if (!matchedZoneId) {
+          for (const zone of zones) {
+            const zoneCountries = (zone.countries as string[]) || [];
+            if (zoneCountries.some(c => c.toLowerCase() === country.toLowerCase())) {
+              matchedZoneId = zone.id;
+              break;
+            }
+          }
+        }
+        // Last fallback: default zone (name contains "default" or "bénin")
+        if (!matchedZoneId) {
+          const defaultZone = zones.find(z =>
+            z.name.toLowerCase().includes('default') ||
+            z.name.toLowerCase().includes('bénin') ||
+            z.name.toLowerCase().includes('benin')
+          );
+          if (defaultZone) matchedZoneId = defaultZone.id;
+        }
       }
 
       if (matchedZoneId) {
+        // Try to match by shipping method name
         const { data: rates } = await supabase
           .from("shipping_rates")
-          .select("price, free_shipping_threshold, min_order_amount")
+          .select("name, price, free_shipping_threshold, min_order_amount")
           .eq("shipping_zone_id", matchedZoneId)
           .eq("is_active", true)
           .order("price", { ascending: true });
 
         if (rates && rates.length > 0) {
-          const rate = rates[0];
-          const threshold = rate.free_shipping_threshold;
+          // Try to match the selected shipping method by name
+          const matchedRate = rates.find(r =>
+            shippingMethod && r.name.toLowerCase().includes(shippingMethod.toLowerCase().split(' ')[0])
+          ) || rates[0];
+
+          const threshold = matchedRate.free_shipping_threshold;
           if (threshold && subtotal >= threshold) {
             shippingCost = 0;
           } else {
-            shippingCost = rate.price;
+            shippingCost = matchedRate.price;
           }
         }
       } else {
@@ -100,7 +131,7 @@ serve(async (req) => {
           .eq("is_active", true)
           .order("price", { ascending: true })
           .limit(1);
-        shippingCost = fallbackRates?.[0]?.price ?? 2000;
+        shippingCost = fallbackRates?.[0]?.price ?? 1000;
       }
     }
 
@@ -207,10 +238,6 @@ serve(async (req) => {
       "Cameroun": "CM", "Congo": "CG",
     };
     const countryCode = countryCodeMap[shipping.country] || "BJ";
-
-    // Log pour debug
-    console.log("Country received:", shipping.country);
-    console.log("Country code mapped:", countryCode);
 
     const frontendUrl = "https://bardahl.maxiimarket.com";
     const customerData: Record<string, string> = {

@@ -6,6 +6,7 @@ import { formatPrice, formatDateShort } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -25,6 +26,7 @@ const ORDER_STATUSES = [
 export default function Orders() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
 
   const { data: orders, isLoading } = useQuery({
@@ -49,15 +51,14 @@ export default function Orders() {
       toast.success('Statut mis à jour');
     },
     onError: (error: any) => {
-      console.error('Update status error:', error);
-      toast.error('Erreur lors de la mise à jour', {
-        description: error.message || 'Impossible de mettre à jour le statut'
-      });
+      toast.error('Erreur lors de la mise à jour', { description: error.message });
     },
   });
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Delete order items first
+      await supabase.from('order_items').delete().eq('order_id', id);
       const { error } = await supabase.from('orders').delete().eq('id', id);
       if (error) throw error;
     },
@@ -66,10 +67,25 @@ export default function Orders() {
       toast.success('Commande supprimée');
     },
     onError: (error: any) => {
-      console.error('Delete order error:', error);
-      toast.error('Erreur lors de la suppression', {
-        description: error.message || 'Impossible de supprimer la commande'
-      });
+      toast.error('Erreur lors de la suppression', { description: error.message });
+    },
+  });
+
+  const deleteBulkMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      for (const id of ids) {
+        await supabase.from('order_items').delete().eq('order_id', id);
+      }
+      const { error } = await supabase.from('orders').delete().in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setSelectedIds(new Set());
+      toast.success('Commandes supprimées');
+    },
+    onError: (error: any) => {
+      toast.error('Erreur lors de la suppression', { description: error.message });
     },
   });
 
@@ -85,12 +101,63 @@ export default function Orders() {
     a.click();
   };
 
+  const allIds = orders?.map(o => o.id) || [];
+  const allSelected = allIds.length > 0 && allIds.every(id => selectedIds.has(id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allIds));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Commandes</h1>
-        <Button variant="outline" onClick={exportCSV}><Download className="h-4 w-4 mr-2" />Exporter CSV</Button>
+        <div className="flex gap-2">
+          {someSelected && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer ({selectedIds.size})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Supprimer {selectedIds.size} commande(s) ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Les commandes et leurs articles seront supprimés définitivement.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => deleteBulkMutation.mutate(Array.from(selectedIds))}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="h-4 w-4 mr-2" />Exporter CSV
+          </Button>
+        </div>
       </div>
+
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -104,27 +171,48 @@ export default function Orders() {
           </SelectContent>
         </Select>
       </div>
+
       <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Commande</TableHead><TableHead>Date</TableHead><TableHead>Client</TableHead><TableHead>Total</TableHead><TableHead>Paiement</TableHead><TableHead>Statut</TableHead><TableHead className="w-20">Actions</TableHead>
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Tout sélectionner"
+                />
+              </TableHead>
+              <TableHead>Commande</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Paiement</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead className="w-24">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8">Chargement...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-8">Chargement...</TableCell></TableRow>
             ) : orders?.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Aucune commande</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Aucune commande</TableCell></TableRow>
             ) : (
               orders?.map((order) => (
-                <TableRow key={order.id}>
+                <TableRow key={order.id} className={selectedIds.has(order.id) ? 'bg-muted/50' : ''}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(order.id)}
+                      onCheckedChange={() => toggleSelect(order.id)}
+                      aria-label={`Sélectionner ${order.order_number}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{order.order_number}</TableCell>
                   <TableCell className="text-muted-foreground">{formatDateShort(order.created_at)}</TableCell>
                   <TableCell>
                     <div>
                       <p>{order.customer_name || 'N/A'}</p>
-                      <p className="text-sm text-muted-foreground">{order.customer_email}</p>
+                      <p className="text-sm text-muted-foreground">{order.customer_email || order.customer_phone}</p>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{formatPrice(order.total)}</TableCell>
@@ -140,7 +228,35 @@ export default function Orders() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" asChild><Link to={`/orders/${order.id}`}><Eye className="h-4 w-4" /></Link></Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link to={`/orders/${order.id}`}><Eye className="h-4 w-4" /></Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer la commande {order.order_number} ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Cette action est irréversible. La commande et tous ses articles seront supprimés définitivement.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteOrderMutation.mutate(order.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
