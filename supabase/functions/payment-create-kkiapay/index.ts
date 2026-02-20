@@ -6,7 +6,6 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const KKIAPAY_PUBLIC_KEY = Deno.env.get("KKIAPAY_PUBLIC_KEY");
 const KKIAPAY_PRIVATE_KEY = Deno.env.get("KKIAPAY_PRIVATE_KEY");
-const KKIAPAY_API_URL = "https://api.kkiapay.me/api/v1";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -16,9 +15,9 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   try {
-    const { items, shipping, shippingMethod } = await req.json();
+    const { items, shipping, shippingMethod, shippingCost: frontendShippingCost } = await req.json();
 
-    // Calculate totals
+    // Calculate subtotal from DB prices
     let subtotal = 0;
     const orderItems = [];
 
@@ -45,67 +44,18 @@ serve(async (req) => {
       });
     }
 
-    // Dynamic shipping calculation from DB
-    let shippingCost = 0;
-    if (shippingMethod !== "pickup") {
-      const city = shipping.city || "";
-      const country = shipping.country || "Bénin";
+    // Use frontend shipping cost if provided, otherwise calculate from DB
+    let shippingCost = typeof frontendShippingCost === 'number' ? frontendShippingCost : 0;
 
-      const { data: zones } = await supabase
-        .from("shipping_zones")
-        .select("id, name, cities, countries")
-        .eq("is_active", true);
-
-      let matchedZoneId: string | null = null;
-      if (zones) {
-        for (const zone of zones) {
-          const zoneCountries = (zone.countries as string[]) || [];
-          const zoneCities = (zone.cities as string[]) || [];
-          const countryMatch = zoneCountries.some(
-            c => c.toLowerCase() === country.toLowerCase()
-          );
-          const cityMatch = zoneCities.length === 0 || zoneCities.some(
-            c => c.toLowerCase() === city.toLowerCase()
-          );
-          if (countryMatch && cityMatch) {
-            matchedZoneId = zone.id;
-            break;
-          }
-        }
-      }
-
-      if (matchedZoneId) {
-        const { data: rates } = await supabase
-          .from("shipping_rates")
-          .select("price, free_shipping_threshold, min_order_amount")
-          .eq("shipping_zone_id", matchedZoneId)
-          .eq("is_active", true)
-          .order("price", { ascending: true });
-
-        if (rates && rates.length > 0) {
-          const rate = rates[0];
-          const threshold = rate.free_shipping_threshold;
-          if (threshold && subtotal >= threshold) {
-            shippingCost = 0;
-          } else {
-            shippingCost = rate.price;
-          }
-        }
-      } else {
-        const { data: fallbackRates } = await supabase
-          .from("shipping_rates")
-          .select("price")
-          .eq("is_active", true)
-          .order("price", { ascending: true })
-          .limit(1);
-        shippingCost = fallbackRates?.[0]?.price ?? 2000;
-      }
+    // If no explicit cost provided, calculate from DB
+    if (typeof frontendShippingCost !== 'number') {
+      shippingCost = await calculateShippingFromDB(supabase, shipping, shippingMethod, subtotal);
     }
 
     const total = subtotal + shippingCost;
 
     // Create order in DB
-    const orderNumber = `CMD-${Date.now()}`;
+    const orderNumber = `BARDHAL-${Date.now()}`;
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -182,7 +132,7 @@ serve(async (req) => {
       // Non-blocking
     }
 
-    // Create KkiaPay payment
+    // Return KkiaPay config
     if (!KKIAPAY_PUBLIC_KEY || !KKIAPAY_PRIVATE_KEY) {
       return new Response(
         JSON.stringify({
@@ -196,15 +146,8 @@ serve(async (req) => {
       );
     }
 
-    // Store transaction ID for webhook verification
-    await supabase
-      .from("orders")
-      .update({
-        payment_gateway: "kkiapay",
-      })
-      .eq("id", order.id);
+    console.log(`Sending to frontend - Total: ${total} Subtotal: ${subtotal} Shipping: ${shippingCost}`);
 
-    // Return config for frontend widget
     return new Response(
       JSON.stringify({
         success: true,
@@ -233,3 +176,65 @@ serve(async (req) => {
     );
   }
 });
+
+async function calculateShippingFromDB(supabase: any, shipping: any, shippingMethod: string, subtotal: number): Promise<number> {
+  const isPickup = shippingMethod && (
+    shippingMethod.toLowerCase().includes('récupérer') ||
+    shippingMethod.toLowerCase().includes('boutique') ||
+    shippingMethod.toLowerCase().includes('retrait') ||
+    shippingMethod.toLowerCase().includes('pickup')
+  );
+  if (isPickup) return 0;
+
+  const city = shipping.city || "";
+  const country = shipping.country || "Bénin";
+
+  const { data: zones } = await supabase
+    .from("shipping_zones")
+    .select("id, name, cities, countries")
+    .eq("is_active", true);
+
+  let matchedZoneId: string | null = null;
+  if (zones) {
+    // Match by city first
+    for (const zone of zones) {
+      const zoneCities = (zone.cities as string[]) || [];
+      if (zoneCities.length > 0 && zoneCities.some((c: string) => c.toLowerCase() === city.toLowerCase())) {
+        matchedZoneId = zone.id;
+        break;
+      }
+    }
+    // Then by country (zones with empty cities = catch-all for country)
+    if (!matchedZoneId) {
+      for (const zone of zones) {
+        const zoneCountries = (zone.countries as string[]) || [];
+        const zoneCities = (zone.cities as string[]) || [];
+        if (zoneCities.length === 0 && zoneCountries.some((c: string) => c.toLowerCase() === country.toLowerCase())) {
+          matchedZoneId = zone.id;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!matchedZoneId) return 1000; // Default fallback
+
+  const { data: rates } = await supabase
+    .from("shipping_rates")
+    .select("name, price, free_shipping_threshold")
+    .eq("shipping_zone_id", matchedZoneId)
+    .eq("is_active", true)
+    .order("price", { ascending: true });
+
+  if (!rates || rates.length === 0) return 1000;
+
+  // Match by method name
+  const matchedRate = rates.find((r: any) =>
+    shippingMethod && r.name.toLowerCase().includes(shippingMethod.toLowerCase().split(' ')[0])
+  ) || rates[0];
+
+  if (matchedRate.free_shipping_threshold && subtotal >= matchedRate.free_shipping_threshold) {
+    return 0;
+  }
+  return matchedRate.price;
+}
