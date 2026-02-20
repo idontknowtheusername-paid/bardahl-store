@@ -14,15 +14,19 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   try {
-    // Verify webhook signature
-    const signature = req.headers.get("x-kkiapay-secret");
-    if (KKIAPAY_WEBHOOK_SECRET && signature !== KKIAPAY_WEBHOOK_SECRET) {
-      console.error("Invalid webhook signature");
-      return new Response("Unauthorized", { status: 401 });
-    }
-
     const payload = await req.json();
     console.log("KkiaPay webhook received:", JSON.stringify(payload));
+
+    // Verify webhook signature - KkiaPay sends it in x-kkiapay-signature header
+    const signature = req.headers.get("x-kkiapay-signature") || req.headers.get("x-kkiapay-secret");
+    console.log("Headers - x-kkiapay-signature:", req.headers.get("x-kkiapay-signature"));
+    console.log("Headers - x-kkiapay-secret:", req.headers.get("x-kkiapay-secret"));
+    console.log("Expected secret:", KKIAPAY_WEBHOOK_SECRET);
+
+    if (KKIAPAY_WEBHOOK_SECRET && signature !== KKIAPAY_WEBHOOK_SECRET) {
+      console.error("Invalid webhook signature - received:", signature);
+      return new Response("Unauthorized", { status: 401 });
+    }
 
     const {
       transactionId,
