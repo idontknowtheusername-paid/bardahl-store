@@ -88,50 +88,6 @@ serve(async (req) => {
     }));
     await supabase.from("order_items").insert(itemsWithOrderId);
 
-    // Notify admin
-    try {
-      const { data: settings } = await supabase
-        .from("site_settings")
-        .select("admin_email")
-        .single();
-
-      const adminEmail = (settings as any)?.admin_email;
-      if (adminEmail) {
-        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: adminEmail,
-            subject: `Nouvelle commande ${orderNumber} - Bardahl`,
-            template: "new_order_admin",
-            data: {
-              orderNumber,
-              customerName: shipping.firstName,
-              customerPhone: shipping.phone,
-              customerEmail: shipping.email || "Non fourni",
-              city: shipping.city,
-              country: shipping.country || "Bénin",
-              items: orderItems.map(i => ({
-                title: i.product_title,
-                quantity: i.quantity,
-                unitPrice: i.unit_price,
-                total: i.total_price,
-              })),
-              subtotal,
-              shippingCost,
-              total,
-              shippingMethod,
-            },
-          }),
-        });
-      }
-    } catch (_emailErr) {
-      // Non-blocking
-    }
-
     // Return KkiaPay config
     if (!KKIAPAY_PUBLIC_KEY || !KKIAPAY_PRIVATE_KEY) {
       return new Response(

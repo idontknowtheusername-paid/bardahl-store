@@ -113,32 +113,85 @@ async function processWebhook(
     throw updateError;
   }
 
-  // Send confirmation email if payment successful
-  if (event === "transaction.success" && isPaymentSucces && order.customer_email) {
-    try {
-      const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-      const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      
-      await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: order.customer_email,
-          subject: `Confirmation de commande ${order.order_number} - Bardahl`,
-          template: "order_confirmation",
-          data: {
-            orderNumber: order.order_number,
-            customerName: order.customer_name,
-            total: order.total,
-            shippingAddress: order.shipping_address,
+  // Send emails if payment successful
+  if (event === "transaction.success" && isPaymentSucces) {
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Fetch order items
+    const { data: orderItems } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", order.id);
+
+    // Send client confirmation email
+    if (order.customer_email) {
+      try {
+        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            to: order.customer_email,
+            subject: `Confirmation de commande ${order.order_number} - Bardahl`,
+            template: "order_confirmation",
+            data: {
+              orderNumber: order.order_number,
+              customerName: order.customer_name,
+              total: order.total,
+              shippingAddress: order.shipping_address,
+            },
+          }),
+        });
+      } catch (_emailErr) {
+        console.error("Failed to send client confirmation email:", _emailErr);
+      }
+    }
+
+    // Send admin notification email
+    try {
+      const { data: settings } = await supabase
+        .from("site_settings")
+        .select("admin_email")
+        .single();
+
+      const adminEmail = (settings as any)?.admin_email;
+      if (adminEmail && orderItems) {
+        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: adminEmail,
+            subject: `Nouvelle commande ${order.order_number} - Bardahl`,
+            template: "new_order_admin",
+            data: {
+              orderNumber: order.order_number,
+              customerName: order.customer_name,
+              customerPhone: order.customer_phone,
+              customerEmail: order.customer_email || "Non fourni",
+              city: order.shipping_address?.city,
+              country: order.shipping_address?.country || "Bénin",
+              items: orderItems.map((i: any) => ({
+                title: i.product_title,
+                quantity: i.quantity,
+                unitPrice: i.unit_price,
+                total: i.total_price,
+              })),
+              subtotal: order.subtotal,
+              shippingCost: order.shipping_cost,
+              total: order.total,
+              shippingMethod: order.shipping_method,
+            },
+          }),
+        });
+      }
     } catch (_emailErr) {
-      console.error("Failed to send confirmation email:", _emailErr);
+      console.error("Failed to send admin notification email:", _emailErr);
     }
   }
 
