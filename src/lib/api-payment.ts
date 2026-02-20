@@ -51,7 +51,8 @@ export const paymentApi = {
     items: OrderItem[],
     shippingInfo: ShippingInfo,
     shippingMethod: string,
-    gateway: 'genius_pay' | 'kkiapay' = 'genius_pay'
+    gateway: 'genius_pay' | 'kkiapay' = 'genius_pay',
+    shippingCost?: number
   ): Promise<CreateOrderResponse> {
     const functionName = gateway === 'kkiapay' ? 'payment-create-kkiapay' : 'payment-create';
 
@@ -60,6 +61,7 @@ export const paymentApi = {
         items,
         shipping: shippingInfo,
         shippingMethod,
+        shippingCost, // Pass explicit shipping cost from frontend
       },
     });
 

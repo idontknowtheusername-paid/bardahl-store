@@ -16,7 +16,7 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   try {
-    const { items, shipping, shippingMethod } = await req.json();
+    const { items, shipping, shippingMethod, shippingCost: frontendShippingCost } = await req.json();
 
     // Calculate totals
     let subtotal = 0;
@@ -45,100 +45,80 @@ serve(async (req) => {
       });
     }
 
-    // Dynamic shipping calculation from DB
-    let shippingCost = 0;
-    const isPickup = shippingMethod && (
-      shippingMethod.toLowerCase().includes('pickup') ||
-      shippingMethod.toLowerCase().includes('retrait') ||
-      shippingMethod.toLowerCase().includes('boutique') ||
-      shippingMethod === '0'
-    );
+    // Use frontend shipping cost if provided, otherwise calculate from DB
+    let shippingCost = typeof frontendShippingCost === 'number' ? frontendShippingCost : 0;
 
-    if (!isPickup) {
-      const city = shipping.city || "";
-      const country = shipping.country || "Bénin";
+    if (typeof frontendShippingCost !== 'number') {
+      const isPickup = shippingMethod && (
+        shippingMethod.toLowerCase().includes('récupérer') ||
+        shippingMethod.toLowerCase().includes('boutique') ||
+        shippingMethod.toLowerCase().includes('retrait') ||
+        shippingMethod.toLowerCase().includes('pickup')
+      );
 
-      // Find matching shipping zone by city or country
-      const { data: zones } = await supabase
-        .from("shipping_zones")
-        .select("id, name, cities, countries")
-        .eq("is_active", true);
+      if (!isPickup) {
+        const city = shipping.city || "";
+        const country = shipping.country || "Bénin";
 
-      let matchedZoneId: string | null = null;
-      if (zones) {
-        for (const zone of zones) {
-          const zoneCountries = (zone.countries as string[]) || [];
-          const zoneCities = (zone.cities as string[]) || [];
-          const countryMatch = zoneCountries.length === 0 || zoneCountries.some(
-            c => c.toLowerCase() === country.toLowerCase()
-          );
-          const cityMatch = zoneCities.length === 0 || zoneCities.some(
-            c => c.toLowerCase() === city.toLowerCase()
-          );
-          if (countryMatch && cityMatch) {
-            matchedZoneId = zone.id;
-            break;
-          }
-        }
-        // Fallback: match by country only
-        if (!matchedZoneId) {
+        const { data: zones } = await supabase
+          .from("shipping_zones")
+          .select("id, name, cities, countries")
+          .eq("is_active", true);
+
+        let matchedZoneId: string | null = null;
+        if (zones) {
           for (const zone of zones) {
-            const zoneCountries = (zone.countries as string[]) || [];
-            if (zoneCountries.some(c => c.toLowerCase() === country.toLowerCase())) {
+            const zoneCities = (zone.cities as string[]) || [];
+            if (zoneCities.length > 0 && zoneCities.some(
+              (c: string) => c.toLowerCase() === city.toLowerCase()
+            )) {
               matchedZoneId = zone.id;
               break;
             }
           }
-        }
-        // Last fallback: default zone (name contains "default" or "bénin")
-        if (!matchedZoneId) {
-          const defaultZone = zones.find(z =>
-            z.name.toLowerCase().includes('default') ||
-            z.name.toLowerCase().includes('bénin') ||
-            z.name.toLowerCase().includes('benin')
-          );
-          if (defaultZone) matchedZoneId = defaultZone.id;
-        }
-      }
-
-      if (matchedZoneId) {
-        // Try to match by shipping method name
-        const { data: rates } = await supabase
-          .from("shipping_rates")
-          .select("name, price, free_shipping_threshold, min_order_amount")
-          .eq("shipping_zone_id", matchedZoneId)
-          .eq("is_active", true)
-          .order("price", { ascending: true });
-
-        if (rates && rates.length > 0) {
-          // Try to match the selected shipping method by name
-          const matchedRate = rates.find(r =>
-            shippingMethod && r.name.toLowerCase().includes(shippingMethod.toLowerCase().split(' ')[0])
-          ) || rates[0];
-
-          const threshold = matchedRate.free_shipping_threshold;
-          if (threshold && subtotal >= threshold) {
-            shippingCost = 0;
-          } else {
-            shippingCost = matchedRate.price;
+          if (!matchedZoneId) {
+            for (const zone of zones) {
+              const zoneCountries = (zone.countries as string[]) || [];
+              const zoneCities = (zone.cities as string[]) || [];
+              if (zoneCities.length === 0 && zoneCountries.some(
+                (c: string) => c.toLowerCase() === country.toLowerCase()
+              )) {
+                matchedZoneId = zone.id;
+                break;
+              }
+            }
           }
         }
-      } else {
-        // Fallback: get cheapest active rate
-        const { data: fallbackRates } = await supabase
-          .from("shipping_rates")
-          .select("price")
-          .eq("is_active", true)
-          .order("price", { ascending: true })
-          .limit(1);
-        shippingCost = fallbackRates?.[0]?.price ?? 1000;
+
+        if (matchedZoneId) {
+          const { data: rates } = await supabase
+            .from("shipping_rates")
+            .select("name, price, free_shipping_threshold")
+            .eq("shipping_zone_id", matchedZoneId)
+            .eq("is_active", true)
+            .order("price", { ascending: true });
+
+          if (rates && rates.length > 0) {
+            const matchedRate = rates.find((r: any) =>
+              shippingMethod && r.name.toLowerCase().includes(shippingMethod.toLowerCase().split(' ')[0])
+            ) || rates[0];
+
+            if (matchedRate.free_shipping_threshold && subtotal >= matchedRate.free_shipping_threshold) {
+              shippingCost = 0;
+            } else {
+              shippingCost = matchedRate.price;
+            }
+          }
+        } else {
+          shippingCost = 1000;
+        }
       }
     }
 
     const total = subtotal + shippingCost;
 
     // Create order in DB
-    const orderNumber = `CMD-${Date.now()}`;
+    const orderNumber = `BARDHAL-${Date.now()}`;
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({

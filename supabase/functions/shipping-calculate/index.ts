@@ -44,16 +44,24 @@ serve(async (req) => {
 
     if (zonesError) throw zonesError;
 
-    // Find matching zone by city or country
+    // Find matching zone - prioritize city match over country match
     let matchingZone = zones?.find(zone => {
-      const cityMatch = zone.cities?.some(
+      const zoneCities = zone.cities || [];
+      return zoneCities.length > 0 && zoneCities.some(
         (c: string) => c.toLowerCase() === city.toLowerCase()
       );
-      const countryMatch = zone.countries?.some(
-        (c: string) => c.toLowerCase() === country.toLowerCase()
-      );
-      return cityMatch || countryMatch;
     });
+
+    // Fallback: match by country (zones with empty cities = catch-all)
+    if (!matchingZone) {
+      matchingZone = zones?.find(zone => {
+        const zoneCities = zone.cities || [];
+        const countryMatch = zone.countries?.some(
+          (c: string) => c.toLowerCase() === country.toLowerCase()
+        );
+        return zoneCities.length === 0 && countryMatch;
+      });
+    }
 
     // Fallback to default zone
     if (!matchingZone) {

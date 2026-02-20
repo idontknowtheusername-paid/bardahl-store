@@ -29,6 +29,8 @@ interface ShippingOption {
 const iconMap: Record<string, typeof Truck> = {
   pickup: Store,
   retrait: Store,
+  récupérer: Store,
+  boutique: Store,
   express: Zap,
 };
 
@@ -39,6 +41,23 @@ function getIcon(name: string): typeof Truck {
   }
   return Truck;
 }
+
+// Country → city mapping
+const countryCities: Record<string, string[]> = {
+  'Bénin': ['Cotonou', 'Porto-Novo', 'Parakou', 'Abomey-Calavi'],
+  'France': ['Paris', 'Lyon', 'Marseille', 'Toulouse'],
+};
+
+const availableCountries = [
+  'Bénin',
+  'France',
+  "Côte d'Ivoire",
+  'Sénégal',
+  'Togo',
+  'Mali',
+  'Burkina Faso',
+  'Niger',
+];
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -65,16 +84,29 @@ export default function Checkout() {
   const [subscribeToBlog, setSubscribeToBlog] = useState(true);
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
 
-  // Fetch dynamic shipping rates from DB when city is entered and delivery step is reached
+  // Get cities for selected country
+  const citiesForCountry = countryCities[shippingInfo.country] || [];
+  const showCitySelect = citiesForCountry.length > 0;
+  const hasOtherCity = shippingInfo.city === '__other__';
+
+  // Reset city when country changes
+  useEffect(() => {
+    setShippingInfo(prev => ({ ...prev, city: '' }));
+    setShippingOptions([]);
+    setSelectedShipping('');
+  }, [shippingInfo.country]);
+
+  // Fetch dynamic shipping rates from DB when city/country is set and delivery step is reached
   useEffect(() => {
     const loadShippingOptions = async () => {
-      if (!shippingInfo.city || currentStep !== 'delivery') return;
+      const city = hasOtherCity ? 'Autre' : shippingInfo.city;
+      if ((!city && showCitySelect) || currentStep !== 'delivery') return;
 
       setIsCalculatingShipping(true);
       try {
         const { data, error } = await supabase.functions.invoke('shipping-calculate', {
           body: {
-            city: shippingInfo.city,
+            city: city || '',
             country: shippingInfo.country || 'Bénin',
             subtotal,
           },
@@ -91,7 +123,6 @@ export default function Checkout() {
             icon: getIcon(rate.name),
           }));
           setShippingOptions(options);
-          // Auto-select first option
           if (!selectedShipping || !options.find(o => o.id === selectedShipping)) {
             setSelectedShipping(options[0].id);
           }
@@ -170,8 +201,8 @@ export default function Checkout() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate required fields only (email is now optional)
-    if (!shippingInfo.firstName || !shippingInfo.phone || !shippingInfo.city) {
+    const effectiveCity = hasOtherCity ? 'Autre' : shippingInfo.city;
+    if (!shippingInfo.firstName || !shippingInfo.phone || (!effectiveCity && showCitySelect)) {
       toast({
         title: "Formulaire incomplet",
         description: "Veuillez remplir tous les champs obligatoires.",
@@ -203,7 +234,6 @@ export default function Checkout() {
       // Subscribe to blog if checked
       if (subscribeToBlog && shippingInfo.email) {
         try {
-          const { supabase } = await import('@/integrations/supabase/client');
           await (supabase as any)
             .from('blog_subscribers')
             .upsert({
@@ -213,9 +243,8 @@ export default function Checkout() {
               onConflict: 'email',
               ignoreDuplicates: false
             });
-        } catch (error) {
-          // Don't block checkout if blog subscription fails
-          // Don't block checkout if blog subscription fails
+        } catch (_) {
+          // Don't block checkout
         }
       }
 
@@ -228,24 +257,26 @@ export default function Checkout() {
         cupSize: item.cupSize,
       }));
 
-      // Create order and get payment config
-      const selectedOption = shippingOptions.find(o => o.id === selectedShipping);
+      const effectiveCity = hasOtherCity ? 'Autre' : shippingInfo.city;
+
+      // Create order and get payment config - pass shippingCost explicitly
       const result = await paymentApi.createOrder(
         orderItems,
         {
           firstName: shippingInfo.firstName,
           email: shippingInfo.email,
           phone: shippingInfo.phone,
-          city: shippingInfo.city,
+          city: effectiveCity,
           address: shippingInfo.address,
           country: shippingInfo.country,
         },
-        selectedOption?.name || selectedShipping,
-        'kkiapay' // Use KkiaPay by default
+        selectedShippingOption?.name || selectedShipping,
+        'kkiapay',
+        shippingCost // Pass the calculated shipping cost
       );
 
       if (result.success && result.payment_method === 'kkiapay' && result.kkiapay_config) {
-      // Save order info
+        // Save order info
         localStorage.setItem('bardahl-pending-order', JSON.stringify({
           orderNumber: result.order_number,
           orderId: result.order_id,
@@ -256,33 +287,23 @@ export default function Checkout() {
         const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
 
         addSuccessListener((response: any) => {
-          console.log('Payment success:', response);
-
           // Update order with transaction ID
           const updateOrderWithTransaction = async () => {
             try {
-              const { supabase } = await import('@/integrations/supabase/client');
               await (supabase as any)
                 .from('orders')
                 .update({ payment_id: response.transactionId })
                 .eq('id', result.order_id);
-            } catch (err) {
-              console.error('Failed to update order with transaction ID:', err);
-            }
+            } catch (_) {}
           };
-
           updateOrderWithTransaction();
 
-          // Clear cart
           clearCart();
           localStorage.removeItem('bardahl-checkout-shipping');
-
-          // Redirect to confirmation
           navigate(`/confirmation/${result.order_number}`);
         });
 
-        addFailedListener((error: any) => {
-          console.error('Payment failed:', error);
+        addFailedListener((_error: any) => {
           toast({
             title: "Paiement échoué",
             description: "Le paiement n'a pas pu être effectué. Veuillez réessayer.",
@@ -291,6 +312,9 @@ export default function Checkout() {
           setIsProcessing(false);
         });
 
+        // Generate unique BARDHAL order ID
+        const bardhalOrderId = `BARDHAL-${result.order_number}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
         openKkiapayWidget({
           amount: result.kkiapay_config.amount,
           key: result.kkiapay_config.public_key,
@@ -298,6 +322,8 @@ export default function Checkout() {
           phone: shippingInfo.phone,
           name: shippingInfo.firstName,
           email: shippingInfo.email || undefined,
+          data: bardhalOrderId,
+          description: `Commande BARDHAL OIL - ${items.length} article(s)`,
         });
       } else if (result.success && result.payment_url) {
         // GeniusPay fallback
@@ -319,11 +345,8 @@ export default function Checkout() {
           paymentApi.redirectToPayment(result.payment_url!);
         }, 1000);
       } else if (result.success && (result as any).payment_error) {
-        // Payment gateway failed but order was created
         const errorDetails = (result as any).error_details || '';
         
-        
-        // Save order info
         localStorage.setItem('bardahl-pending-order', JSON.stringify({
           orderNumber: result.order_number,
           orderId: result.order_id,
@@ -343,7 +366,6 @@ export default function Checkout() {
         throw new Error(result.message || 'Échec de la création de la commande');
       }
     } catch (error) {
-      
       toast({
         title: "Erreur",
         description: error instanceof Error ? error.message : "Une erreur est survenue lors du paiement",
@@ -463,52 +485,70 @@ export default function Checkout() {
                   </div>
                 </div>
 
+                {/* Country FIRST, then City */}
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="city">Ville *</Label>
-                    <select
-                      id="city"
-                      value={shippingInfo.city}
-                      onChange={(e) =>
-                        setShippingInfo(prev => ({ ...prev, city: e.target.value }))
-                      }
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      required
-                    >
-                      <option value="">Sélectionnez votre ville</option>
-                      <option value="Cotonou">Cotonou</option>
-                      <option value="Porto-Novo">Porto-Novo</option>
-                      <option value="Parakou">Parakou</option>
-                      <option value="Abomey-Calavi">Abomey-Calavi</option>
-                      <option value="Djougou">Djougou</option>
-                      <option value="Bohicon">Bohicon</option>
-                      <option value="Natitingou">Natitingou</option>
-                      <option value="Lokossa">Lokossa</option>
-                      <option value="Ouidah">Ouidah</option>
-                      <option value="Kandi">Kandi</option>
-                    </select>
-                  </div>
                   <div>
                     <Label htmlFor="country">Pays *</Label>
                     <select
                       id="country"
                       value={shippingInfo.country}
                       onChange={(e) =>
-                        setShippingInfo(prev => ({ ...prev, country: e.target.value }))
+                        setShippingInfo(prev => ({ ...prev, country: e.target.value, city: '' }))
                       }
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       required
                     >
-                      <option value="Bénin">Bénin</option>
-                      <option value="Côte d'Ivoire">Côte d'Ivoire</option>
-                      <option value="Sénégal">Sénégal</option>
-                      <option value="Togo">Togo</option>
-                      <option value="Mali">Mali</option>
-                      <option value="Burkina Faso">Burkina Faso</option>
-                      <option value="Niger">Niger</option>
+                      {availableCountries.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                     </select>
                   </div>
+                  <div>
+                    <Label htmlFor="city">Ville *</Label>
+                    {showCitySelect ? (
+                      <select
+                        id="city"
+                        value={shippingInfo.city}
+                        onChange={(e) =>
+                          setShippingInfo(prev => ({ ...prev, city: e.target.value }))
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        required
+                      >
+                        <option value="">Sélectionnez votre ville</option>
+                        {citiesForCountry.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                        <option value="__other__">Autre ville</option>
+                      </select>
+                    ) : (
+                      <Input
+                        id="city"
+                        value={shippingInfo.city}
+                        onChange={(e) =>
+                          setShippingInfo(prev => ({ ...prev, city: e.target.value }))
+                        }
+                        placeholder="Votre ville"
+                        required
+                      />
+                    )}
+                  </div>
                 </div>
+
+                {/* Show text input if "Autre ville" selected */}
+                {hasOtherCity && (
+                  <div>
+                    <Label htmlFor="cityOther">Précisez votre ville *</Label>
+                    <Input
+                      id="cityOther"
+                      value={shippingInfo.address.split('|')[1] || ''}
+                      onChange={(e) =>
+                        setShippingInfo(prev => ({ ...prev, address: prev.address.split('|')[0] + (e.target.value ? '' : '') }))
+                      }
+                      placeholder="Nom de votre ville"
+                    />
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="address">Adresse (optionnel)</Label>
@@ -549,7 +589,7 @@ export default function Checkout() {
                 {isCalculatingShipping && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Chargement des options de livraison pour {shippingInfo.city}...</span>
+                    <span>Chargement des options de livraison...</span>
                   </div>
                 )}
 
@@ -568,7 +608,7 @@ export default function Checkout() {
                   {shippingOptions.map(option => {
                     const Icon = option.icon;
                     const displayPrice = option.price;
-                    const isFree = option.isFree || displayPrice === 0;
+                    const isFreeOpt = option.isFree || displayPrice === 0;
                     
                     return (
                       <label
@@ -591,7 +631,7 @@ export default function Checkout() {
                           </div>
                         </div>
                         <span className="font-medium">
-                          {isFree ? (
+                          {isFreeOpt ? (
                             <span className="text-green-600 font-bold">Gratuit</span>
                           ) : (
                             formatPrice(displayPrice)
@@ -633,7 +673,7 @@ export default function Checkout() {
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {shippingInfo.firstName}<br />
-                    {shippingInfo.city}, {shippingInfo.country}<br />
+                    {shippingInfo.country} — {hasOtherCity ? 'Autre ville' : shippingInfo.city}<br />
                     {shippingInfo.address && <>{shippingInfo.address}<br /></>}
                     {shippingInfo.phone}
                   </p>
@@ -651,7 +691,7 @@ export default function Checkout() {
                     </button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {selectedShippingOption?.name} - {formatPrice(shippingCost)}
+                    {selectedShippingOption?.name} — {shippingCost === 0 ? 'Gratuit' : formatPrice(shippingCost)}
                   </p>
                 </div>
 
@@ -753,7 +793,7 @@ export default function Checkout() {
                         id="promo-code"
                         value={promoCodeInput}
                         onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                        placeholder="SUMMER2024"
+                        placeholder="BARDHAL2026"
                         className="flex-1"
                       />
                       <Button
