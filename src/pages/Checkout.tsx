@@ -80,7 +80,7 @@ export default function Checkout() {
     country: 'Bénin',
   });
   const [selectedShipping, setSelectedShipping] = useState('');
-  const [acceptCGV, setAcceptCGV] = useState(true);
+  const [acceptCGV, setAcceptCGV] = useState(false);
   const [subscribeToBlog, setSubscribeToBlog] = useState(true);
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
 
@@ -201,7 +201,7 @@ export default function Checkout() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const effectiveCity = hasOtherCity ? 'Autre' : shippingInfo.city;
+    const effectiveCity = hasOtherCity ? ((shippingInfo as any)._customCity || 'Autre') : shippingInfo.city;
     if (!shippingInfo.firstName || !shippingInfo.phone || (!effectiveCity && showCitySelect)) {
       toast({
         title: "Formulaire incomplet",
@@ -257,7 +257,7 @@ export default function Checkout() {
         cupSize: item.cupSize,
       }));
 
-      const effectiveCity = hasOtherCity ? 'Autre' : shippingInfo.city;
+      const effectiveCity = hasOtherCity ? ((shippingInfo as any)._customCity || 'Autre') : shippingInfo.city;
 
       // Create order and get payment config - pass shippingCost explicitly
       const result = await paymentApi.createOrder(
@@ -541,11 +541,12 @@ export default function Checkout() {
                     <Label htmlFor="cityOther">Précisez votre ville *</Label>
                     <Input
                       id="cityOther"
-                      value={shippingInfo.address.split('|')[1] || ''}
+                      value={shippingInfo.city === '__other__' ? (shippingInfo as any)._customCity || '' : ''}
                       onChange={(e) =>
-                        setShippingInfo(prev => ({ ...prev, address: prev.address.split('|')[0] + (e.target.value ? '' : '') }))
+                        setShippingInfo(prev => ({ ...prev, _customCity: e.target.value } as any))
                       }
                       placeholder="Nom de votre ville"
+                      required
                     />
                   </div>
                 )}

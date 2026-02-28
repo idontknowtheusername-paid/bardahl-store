@@ -252,8 +252,10 @@ export type Database = {
           id: string
           notes: string | null
           order_number: string
+          paid_at: string | null
           payment_gateway: string | null
           payment_gateway_id: string | null
+          payment_gateway_response: Json | null
           payment_id: string | null
           payment_status: string | null
           payment_transaction_id: string | null
@@ -280,8 +282,10 @@ export type Database = {
           id?: string
           notes?: string | null
           order_number: string
+          paid_at?: string | null
           payment_gateway?: string | null
           payment_gateway_id?: string | null
+          payment_gateway_response?: Json | null
           payment_id?: string | null
           payment_status?: string | null
           payment_transaction_id?: string | null
@@ -308,8 +312,10 @@ export type Database = {
           id?: string
           notes?: string | null
           order_number?: string
+          paid_at?: string | null
           payment_gateway?: string | null
           payment_gateway_id?: string | null
+          payment_gateway_response?: Json | null
           payment_id?: string | null
           payment_status?: string | null
           payment_transaction_id?: string | null
@@ -941,7 +947,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_site_settings: {
+        Row: {
+          announcement_bar: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          currency: string | null
+          facebook_url: string | null
+          id: string | null
+          instagram_url: string | null
+          maintenance_mode: boolean | null
+          minimum_order_amount: number | null
+          site_description: string | null
+          site_name: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
+          updated_at: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          announcement_bar?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          currency?: string | null
+          facebook_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          maintenance_mode?: boolean | null
+          minimum_order_amount?: number | null
+          site_description?: string | null
+          site_name?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          announcement_bar?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          currency?: string | null
+          facebook_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          maintenance_mode?: boolean | null
+          minimum_order_amount?: number | null
+          site_description?: string | null
+          site_name?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
