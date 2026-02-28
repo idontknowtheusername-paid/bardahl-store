@@ -105,13 +105,13 @@ export const shippingApi = {
 
       if (error) {
         console.warn('Shipping calculation failed:', error);
-        return { shippingCost: 2000, freeShipping: false, error: true };
+        return { shippingCost: 0, freeShipping: false, error: true };
       }
 
       return data;
     } catch (e) {
       console.warn('Shipping calculation error:', e);
-      return { shippingCost: 2000, freeShipping: false, error: true };
+      return { shippingCost: 0, freeShipping: false, error: true };
     }
   },
 };
