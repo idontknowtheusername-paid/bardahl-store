@@ -27,7 +27,7 @@ export function HeroSection() {
         </div>
 
         <div className="container relative z-10 py-14 md:py-16">
-          <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left animate-slide-up">
+          <div className="max-w-xl mx-auto text-center animate-slide-up">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-5 backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
