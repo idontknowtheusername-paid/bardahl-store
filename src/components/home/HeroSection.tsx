@@ -41,7 +41,7 @@ export function HeroSection() {
             </h1>
 
             {/* Description */}
-            <p className="text-white/80 text-base md:text-lg leading-relaxed mb-7 max-w-md mx-auto md:mx-0">
+            <p className="text-white/80 text-base md:text-lg leading-relaxed mb-7 max-w-md mx-auto">
               Huiles moteur, additifs et produits d'entretien automobile pour protéger votre moteur durablement.
             </p>
 
