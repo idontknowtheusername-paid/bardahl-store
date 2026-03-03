@@ -46,7 +46,7 @@ export function HeroSection() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center md:justify-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center">
               <Button
                 size="lg"
                 onClick={() => setModalOpen(true)}
