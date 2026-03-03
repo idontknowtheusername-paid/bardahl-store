@@ -33,6 +33,7 @@ import MentionsLegales from "./pages/legal/MentionsLegales";
 import CGV from "./pages/legal/CGV";
 import PolitiqueConfidentialite from "./pages/legal/PolitiqueConfidentialite";
 import LivraisonRetours from "./pages/legal/LivraisonRetours";
+import MarketingPlan from "./pages/MarketingPlan";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
