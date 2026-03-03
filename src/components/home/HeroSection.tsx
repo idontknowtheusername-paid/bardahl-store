@@ -27,7 +27,7 @@ export function HeroSection() {
         </div>
 
         <div className="container relative z-10 py-14 md:py-16">
-          <div className="max-w-xl mx-auto md:mx-0 text-center md:text-left animate-slide-up">
+          <div className="max-w-xl mx-auto text-center animate-slide-up">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-5 backdrop-blur-sm">
               <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
@@ -41,12 +41,12 @@ export function HeroSection() {
             </h1>
 
             {/* Description */}
-            <p className="text-white/80 text-base md:text-lg leading-relaxed mb-7 max-w-md mx-auto md:mx-0">
+            <p className="text-white/80 text-base md:text-lg leading-relaxed mb-7 max-w-md mx-auto">
               Huiles moteur, additifs et produits d'entretien automobile pour protéger votre moteur durablement.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center md:justify-start">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center">
               <Button
                 size="lg"
                 onClick={() => setModalOpen(true)}
@@ -68,7 +68,7 @@ export function HeroSection() {
             </div>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+            <div className="flex flex-wrap gap-4 justify-center">
               <div className="flex items-center gap-1.5 text-white/60 text-xs">
                 <Truck className="h-3.5 w-3.5 text-primary" />
                 <span>Livraison au Bénin</span>
