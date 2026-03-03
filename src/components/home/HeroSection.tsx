@@ -68,7 +68,7 @@ export function HeroSection() {
             </div>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+            <div className="flex flex-wrap gap-4 justify-center">
               <div className="flex items-center gap-1.5 text-white/60 text-xs">
                 <Truck className="h-3.5 w-3.5 text-primary" />
                 <span>Livraison au Bénin</span>
