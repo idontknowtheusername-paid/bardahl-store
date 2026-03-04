@@ -302,7 +302,7 @@ export default function Checkout() {
           const createReminder = async () => {
             try {
               const oilItems = items.filter(item => 
-                item.product?.productType === 'huile-moteur' || 
+                item.product?.viscosity || 
                 item.product?.name?.toLowerCase().includes('huile')
               );
               if (oilItems.length > 0 && shippingInfo.email) {
