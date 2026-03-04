@@ -122,6 +122,59 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           admin_reply: string | null
@@ -184,6 +237,81 @@ export type Database = {
           status?: string | null
         }
         Relationships: []
+      }
+      oil_change_reminders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          is_active: boolean
+          last_purchase_date: string
+          next_reminder_date: string
+          order_id: string | null
+          product_id: string | null
+          product_title: string | null
+          reminder_count: number
+          reminder_interval_months: number
+          updated_at: string
+          vehicle_brand: string | null
+          vehicle_engine: string | null
+          vehicle_model: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          is_active?: boolean
+          last_purchase_date?: string
+          next_reminder_date?: string
+          order_id?: string | null
+          product_id?: string | null
+          product_title?: string | null
+          reminder_count?: number
+          reminder_interval_months?: number
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_engine?: string | null
+          vehicle_model?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          is_active?: boolean
+          last_purchase_date?: string
+          next_reminder_date?: string
+          order_id?: string | null
+          product_id?: string | null
+          product_title?: string | null
+          reminder_count?: number
+          reminder_interval_months?: number
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_engine?: string | null
+          vehicle_model?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oil_change_reminders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oil_change_reminders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
