@@ -80,6 +80,7 @@ const App = () => (
                   </Routes>
                 </Layout>
                 <WhatsAppButton />
+                <BardahlChat />
               </CartProvider>
             </BrowserRouter>
           </TooltipProvider>
