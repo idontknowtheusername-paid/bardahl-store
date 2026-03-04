@@ -302,18 +302,18 @@ export default function Checkout() {
           const createReminder = async () => {
             try {
               const oilItems = items.filter(item => 
-                item.product_type === 'huile-moteur' || 
-                item.title?.toLowerCase().includes('huile')
+                item.product?.productType === 'huile-moteur' || 
+                item.product?.name?.toLowerCase().includes('huile')
               );
               if (oilItems.length > 0 && shippingInfo.email) {
                 await (supabase as any)
                   .from('oil_change_reminders')
                   .insert({
                     customer_email: shippingInfo.email,
-                    customer_name: `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
+                    customer_name: shippingInfo.firstName,
                     customer_phone: shippingInfo.phone,
-                    product_title: oilItems[0].title,
-                    product_id: oilItems[0].id,
+                    product_title: oilItems[0].product?.name,
+                    product_id: oilItems[0].product?.id,
                     order_id: result.order_id,
                     reminder_interval_months: 6,
                     last_purchase_date: new Date().toISOString(),
