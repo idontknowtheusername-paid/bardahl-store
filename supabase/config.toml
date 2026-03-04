@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.oil-change-reminder]
 verify_jwt = false
+
+[functions.blog-generate]
+verify_jwt = false
+
+[functions.blog-auto-publish]
+verify_jwt = false

@@ -49,8 +49,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/promo-codes', label: t.nav.promoCodes, icon: Percent },
     { href: '/blog', label: t.nav.blog, icon: FileText },
     { href: '/media', label: t.nav.media, icon: Image },
-    { href: '/newsletter', label: t.nav.newsletter, icon: Mail },
-    { href: '/messages', label: t.nav.messages, icon: MessageSquare },
+    // { href: '/newsletter', label: t.nav.newsletter, icon: Mail },
+    // { href: '/messages', label: t.nav.messages, icon: MessageSquare },
     { href: '/shipping', label: t.nav.shipping, icon: Truck },
     { href: '/settings', label: t.nav.settings, icon: Settings },
   ];

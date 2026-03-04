@@ -234,7 +234,8 @@ export default function Products() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+                              const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || '';
+                              const frontendUrl = import.meta.env.VITE_FRONTEND_URL || `https://id-preview--${projectId}.lovable.app`;
                               window.open(`${frontendUrl}/produits/${product.slug}`, '_blank');
                             }}
                           >
