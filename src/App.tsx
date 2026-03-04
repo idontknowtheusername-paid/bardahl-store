@@ -10,6 +10,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BardahlChat } from "@/components/chat/BardahlChat";
 
 // Pages
 import Index from "./pages/Index";
