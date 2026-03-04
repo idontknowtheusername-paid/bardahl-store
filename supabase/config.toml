@@ -1,1 +1,7 @@
 project_id = "ybjvncrqhcrsoijtxawp"
+
+[functions.bardahl-assistant]
+verify_jwt = false
+
+[functions.oil-change-reminder]
+verify_jwt = false

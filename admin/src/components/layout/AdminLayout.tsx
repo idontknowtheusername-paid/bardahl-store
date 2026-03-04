@@ -23,6 +23,7 @@ import {
   FileText,
   Receipt,
   Users as UsersIcon,
+  Bell,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -43,6 +44,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/orders', label: t.nav.orders, icon: ShoppingCart },
     { href: '/invoices', label: 'Factures', icon: Receipt },
     { href: '/customers', label: t.nav.customers, icon: UsersIcon },
+    { href: '/reminders', label: 'Rappels vidange', icon: Bell },
     { href: '/users', label: t.nav.users, icon: UsersIcon },
     { href: '/promo-codes', label: t.nav.promoCodes, icon: Percent },
     { href: '/blog', label: t.nav.blog, icon: FileText },

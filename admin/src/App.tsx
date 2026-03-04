@@ -23,6 +23,7 @@ import Settings from '@/pages/Settings';
 import BlogPosts from '@/pages/BlogPosts';
 import Users from '@/pages/Users';
 import Invoices from '@/pages/Invoices';
+import Reminders from '@/pages/Reminders';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,6 +64,7 @@ function App() {
                         <Route path="/blog" element={<BlogPosts />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/invoices" element={<Invoices />} />
+                        <Route path="/reminders" element={<Reminders />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </AdminLayout>
