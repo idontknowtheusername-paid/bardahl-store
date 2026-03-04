@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
+type QuickAction = { label: string; msg?: string; isWhatsApp?: boolean };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
 
@@ -81,13 +82,14 @@ async function streamChat({
 
 const WELCOME_MSG: Msg = {
   role: 'assistant',
-  content: "Bonjour ! 👋 Je suis l'assistant Bardahl. Je peux vous aider à :\n\n🛢️ **Trouver l'huile adaptée** à votre véhicule\n🔧 **Conseils d'entretien** et vidange\n📦 **Informations produits** Bardahl\n\nQuelle est votre marque et modèle de véhicule ?",
+  content: "Bonjour ! 👋 Je suis l'assistant Bardahl.\n\nComment puis-je vous aider aujourd'hui ?",
 };
 
-const QUICK_ACTIONS = [
+const QUICK_ACTIONS: QuickAction[] = [
   { label: '🚗 Trouver mon huile', msg: "J'aimerais trouver l'huile adaptée à mon véhicule" },
   { label: '🔧 Conseil vidange', msg: 'Quand dois-je faire ma vidange ?' },
   { label: '📦 Voir les produits', msg: 'Quels produits Bardahl avez-vous ?' },
+  { label: '💬 WhatsApp', isWhatsApp: true },
 ];
 
 export function BardahlChat() {
@@ -163,7 +165,7 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center justify-center group"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center justify-center group"
         aria-label="Ouvrir l'assistant Bardahl"
       >
         <Bot className="h-7 w-7" />
@@ -177,7 +179,7 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-20 right-4 z-50 h-12 px-4 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-12 px-4 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
       >
         <Bot className="h-5 w-5" />
         <span className="text-sm font-semibold">Assistant</span>
@@ -242,7 +244,15 @@ export function BardahlChat() {
           {QUICK_ACTIONS.map((a) => (
             <button
               key={a.label}
-              onClick={() => send(a.msg)}
+              onClick={() => {
+                if (a.isWhatsApp) {
+                  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '237XXXXXXXXX';
+                  const message = encodeURIComponent("Bonjour, j'aimerais avoir plus d'informations sur vos produits");
+                  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+                } else {
+                  send(a.msg!);
+                }
+              }}
               className="text-xs px-2.5 py-1.5 rounded-full border border-border bg-background hover:bg-muted transition-colors"
             >
               {a.label}

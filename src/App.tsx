@@ -9,7 +9,6 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BardahlChat } from "@/components/chat/BardahlChat";
 
 // Pages
@@ -79,7 +78,6 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Layout>
-                <WhatsAppButton />
                 <BardahlChat />
               </CartProvider>
             </BrowserRouter>
