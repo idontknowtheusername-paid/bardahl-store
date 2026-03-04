@@ -64,6 +64,7 @@ function App() {
                         <Route path="/blog" element={<BlogPosts />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/invoices" element={<Invoices />} />
+                        <Route path="/reminders" element={<Reminders />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </AdminLayout>
