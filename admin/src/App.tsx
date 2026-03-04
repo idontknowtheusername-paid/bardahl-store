@@ -23,6 +23,7 @@ import Settings from '@/pages/Settings';
 import BlogPosts from '@/pages/BlogPosts';
 import Users from '@/pages/Users';
 import Invoices from '@/pages/Invoices';
+import Reminders from '@/pages/Reminders';
 
 const queryClient = new QueryClient({
   defaultOptions: {
