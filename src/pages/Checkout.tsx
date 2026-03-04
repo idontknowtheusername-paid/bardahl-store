@@ -298,6 +298,32 @@ export default function Checkout() {
           };
           updateOrderWithTransaction();
 
+          // Create oil change reminder for the customer
+          const createReminder = async () => {
+            try {
+              const oilItems = items.filter(item => 
+                item.product_type === 'huile-moteur' || 
+                item.title?.toLowerCase().includes('huile')
+              );
+              if (oilItems.length > 0 && shippingInfo.email) {
+                await (supabase as any)
+                  .from('oil_change_reminders')
+                  .insert({
+                    customer_email: shippingInfo.email,
+                    customer_name: `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
+                    customer_phone: shippingInfo.phone,
+                    product_title: oilItems[0].title,
+                    product_id: oilItems[0].id,
+                    order_id: result.order_id,
+                    reminder_interval_months: 6,
+                    last_purchase_date: new Date().toISOString(),
+                    next_reminder_date: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000).toISOString(),
+                  });
+              }
+            } catch (_) {}
+          };
+          createReminder();
+
           clearCart();
           localStorage.removeItem('bardahl-checkout-shipping');
           navigate(`/confirmation/${result.order_number}`);
