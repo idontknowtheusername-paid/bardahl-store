@@ -23,6 +23,7 @@ import {
   FileText,
   Receipt,
   Users as UsersIcon,
+  Bell,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
