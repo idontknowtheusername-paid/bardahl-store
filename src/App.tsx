@@ -54,6 +54,7 @@ const App = () => (
             <Sonner position="bottom-right" />
             <BrowserRouter>
               <ScrollToTop />
+              <CustomerAuthProvider>
               <CartProvider>
                 <Layout>
                   <Routes>
