@@ -1,7 +1,7 @@
 import type { TranslationKeys } from './types';
 
 export const fr: TranslationKeys = {
-  freeShipping: "Livraison gratuite dès 50 000 FCFA d'achat",
+  freeShipping: "Livraison rapide partout au Bénin 🚚",
   search: 'Rechercher',
   searchPlaceholder: 'Rechercher par nom, référence...',
   searchResults: 'résultat(s)',
@@ -38,7 +38,7 @@ export const fr: TranslationKeys = {
   certifications: 'Certifications & Partenaires',
   certDescription: 'Des standards de qualité reconnus mondialement',
   stayInformed: 'Restez informé',
-  newsletterDesc: "Inscrivez-vous pour recevoir nos conseils d'entretien, promotions exclusives et nouveautés Bardahl.",
+  newsletterDesc: "Inscrivez-vous pour recevoir nos conseils d'entretien, promotions exclusives et nouveautés.",
   emailPlaceholder: 'Votre adresse email',
   subscribe: "S'inscrire",
   subscribing: 'Inscription...',
@@ -141,18 +141,18 @@ export const fr: TranslationKeys = {
   footerProducts: 'Produits',
   footerInfo: 'Infos',
   footerLegal: 'Légal',
-  footerAbout: 'À propos de Bardahl',
-  footerTechnologies: 'Nos technologies',
+  footerAbout: 'À propos',
+  footerTechnologies: 'Conseils auto',
   footerDeliveryReturns: 'Livraison & Retours',
   footerLegalNotice: 'Mentions légales',
   footerCGV: 'CGV',
   footerPrivacy: 'Confidentialité',
   footerFAQ: 'FAQ',
-  footerDescription: 'Depuis 1939, la technologie Polar Plus et le Fullerène C60 au service de la performance de votre moteur.',
+  footerDescription: 'Entretien automobile & solutions moteur. Votre partenaire de confiance au Bénin.',
   allRightsReserved: 'Tous droits réservés.',
 
-  aboutTitle: 'À propos de Bardahl',
-  aboutDescription: 'Depuis 1939, Bardahl innove dans les lubrifiants et additifs automobiles.',
+  aboutTitle: 'À propos d\'Autopassion BJ',
+  aboutDescription: 'Votre partenaire de confiance pour l\'entretien automobile au Bénin.',
   contactTitle: 'Contactez-nous',
   contactDescription: 'Notre équipe est à votre écoute pour répondre à vos questions.',
   faqTitle: 'Questions fréquentes',
@@ -165,5 +165,5 @@ export const fr: TranslationKeys = {
   changeCurrency: 'Changer la devise',
 
   catalogTitle: 'Nos Gammes',
-  catalogDescription: 'Découvrez notre gamme complète de lubrifiants, additifs et produits d\'entretien automobile Bardahl.',
+  catalogDescription: 'Découvrez notre gamme complète de lubrifiants, additifs et produits d\'entretien automobile.',
 };

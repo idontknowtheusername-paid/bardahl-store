@@ -10,55 +10,60 @@
 
 @layer base {
   :root {
-    /* Bardahl Design System */
+    /* Autopassion BJ Design System */
     --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    --foreground: 220 26% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card-foreground: 220 26% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 220 26% 14%;
 
-    /* Bardahl Yellow #FFD000 → HSL(49, 100%, 50%) */
-    --primary: 49 100% 50%;
-    --primary-foreground: 0 0% 8%;
+    /* Bleu Autopassion #2F6FB5 → HSL(211, 59%, 45%) */
+    --primary: 211 59% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 12%;
+    /* Gris foncé #1F2937 */
+    --secondary: 220 26% 17%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 45 10% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 220 10% 40%;
 
-    --accent: 49 100% 50%;
-    --accent-foreground: 0 0% 8%;
+    /* Orange Autopassion #F59E0B → HSL(38, 92%, 50%) */
+    --accent: 38 92% 50%;
+    --accent-foreground: 220 26% 14%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 49 100% 50%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 211 59% 45%;
 
     --radius: 0.5rem;
 
-    /* Bardahl custom tokens */
-    --bardahl-yellow: 49 100% 50%;
-    --bardahl-yellow-light: 49 100% 90%;
-    --bardahl-yellow-dark: 49 100% 40%;
-    --bardahl-black: 0 0% 8%;
-    --bardahl-gray: 0 0% 45%;
-    --bardahl-light: 45 20% 97%;
+    /* Autopassion custom tokens */
+    --auto-blue: 211 59% 45%;
+    --auto-blue-light: 211 59% 92%;
+    --auto-blue-dark: 211 59% 35%;
+    --auto-orange: 38 92% 50%;
+    --auto-orange-light: 38 92% 90%;
+    --auto-orange-dark: 38 92% 40%;
+    --auto-dark: 220 26% 14%;
+    --auto-gray: 220 10% 45%;
+    --auto-light: 210 20% 97%;
 
     /* Typography */
     --font-display: 'Karla', system-ui, sans-serif;
     --font-body: 'Karla', system-ui, sans-serif;
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -2px hsl(0 0% 0% / 0.08);
-    --shadow-medium: 0 8px 30px -4px hsl(0 0% 0% / 0.12);
+    --shadow-soft: 0 4px 20px -2px hsl(211 59% 45% / 0.08);
+    --shadow-medium: 0 8px 30px -4px hsl(211 59% 45% / 0.12);
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.06);
-    --shadow-hover: 0 12px 40px -8px hsl(0 0% 0% / 0.15);
+    --shadow-hover: 0 12px 40px -8px hsl(211 59% 45% / 0.18);
 
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,40 +77,41 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 49 100% 50%;
+    --sidebar-ring: 211 59% 45%;
   }
 
   .dark {
-    --background: 0 0% 6%;
+    --background: 220 26% 6%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 10%;
+    --card: 220 26% 10%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 10%;
+    --popover: 220 26% 10%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 49 100% 50%;
-    --primary-foreground: 0 0% 8%;
+    --primary: 211 59% 50%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 85%;
-    --secondary-foreground: 0 0% 8%;
+    --secondary-foreground: 220 26% 14%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 49 100% 45%;
-    --accent-foreground: 0 0% 8%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 220 26% 14%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 49 100% 50%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 211 59% 50%;
 
-    --bardahl-yellow-light: 49 50% 20%;
-    --bardahl-light: 0 0% 10%;
+    --auto-blue-light: 211 40% 20%;
+    --auto-orange-light: 38 50% 20%;
+    --auto-light: 220 20% 10%;
   }
 }
 
