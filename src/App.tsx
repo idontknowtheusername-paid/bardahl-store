@@ -83,6 +83,8 @@ const App = () => (
                     <Route path="/livraison-retours" element={<LivraisonRetours />} />
                     <Route path="/diagnostic" element={<Diagnostic />} />
                     <Route path="/entretien" element={<Entretien />} />
+                    <Route path="/connexion" element={<CustomerAuth />} />
+                    <Route path="/mon-espace" element={<MonEspace />} />
                     <Route path="/marketing-plan" element={<MarketingPlan />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
@@ -90,6 +92,7 @@ const App = () => (
                 <FloatingActions />
                 <BardahlChat />
               </CartProvider>
+              </CustomerAuthProvider>
             </BrowserRouter>
           </TooltipProvider>
         </CurrencyProvider>
