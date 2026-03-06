@@ -94,8 +94,14 @@ export default function VehicleDetail() {
 
   useEffect(() => { if (isAuthenticated && id) fetchData(); }, [isAuthenticated, id]);
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/connexion');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
   if (authLoading) return <div className="min-h-[50vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  if (!isAuthenticated) { navigate('/connexion'); return null; }
+  if (!isAuthenticated) return null;
   if (!vehicle) return <div className="container py-20 text-center"><p>Véhicule non trouvé.</p><Button asChild className="mt-4"><Link to="/mon-espace">Retour</Link></Button></div>;
 
   const handleAddMaintenance = async (e: React.FormEvent) => {

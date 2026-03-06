@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight } from 'lucide-react';
@@ -20,6 +20,12 @@ export default function MonEspace() {
   const [fuelType, setFuelType] = useState('');
   const [mileage, setMileage] = useState('');
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/connexion');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
   if (authLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -29,7 +35,6 @@ export default function MonEspace() {
   }
 
   if (!isAuthenticated) {
-    navigate('/connexion');
     return null;
   }
 
@@ -70,20 +75,20 @@ export default function MonEspace() {
       </Helmet>
 
       <div className="min-h-[70vh] bg-muted/30">
-        <section className="bg-secondary text-secondary-foreground py-10 md:py-14">
+        <section className="bg-secondary text-secondary-foreground py-8 md:py-14">
           <div className="container">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mb-1 truncate">
                   Bonjour, {profile?.full_name} 👋
                 </h1>
-                <p className="text-secondary-foreground/70 text-sm">
-                  <User className="inline h-3.5 w-3.5 mr-1" />{profile?.phone}
-                  {profile?.email && <span className="ml-3">{profile.email}</span>}
+                <p className="text-secondary-foreground/70 text-xs sm:text-sm flex flex-wrap items-center gap-1">
+                  <User className="inline h-3.5 w-3.5 shrink-0" /><span>{profile?.phone}</span>
+                  {profile?.email && <span className="ml-2 truncate">{profile.email}</span>}
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="border-white/20 text-white hover:bg-white/10 gap-1.5">
-                <LogOut className="h-3.5 w-3.5" /> Déconnexion
+              <Button variant="outline" size="sm" onClick={handleLogout} className="border-white/20 text-white hover:bg-white/10 gap-1.5 self-start sm:self-center shrink-0">
+                <LogOut className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Déconnexion</span><span className="sm:hidden">Sortir</span>
               </Button>
             </div>
           </div>

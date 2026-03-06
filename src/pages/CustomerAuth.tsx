@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Car, Phone, KeyRound, User, Mail, CreditCard, Loader2, Eye, EyeOff } from 'lucide-react';
@@ -24,8 +24,13 @@ export default function CustomerAuth() {
   const [regPassword, setRegPassword] = useState('');
   const [licensePlate, setLicensePlate] = useState('');
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/mon-espace');
+    }
+  }, [isAuthenticated, navigate]);
+
   if (isAuthenticated) {
-    navigate('/mon-espace');
     return null;
   }
 
