@@ -460,9 +460,12 @@ export default function ProductDetail() {
           </div>
         </div>
 
+        {/* Recommended Products - "Souvent achetés ensemble" */}
+        <RecommendedProducts currentProduct={product} />
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section className="mt-16 md:mt-24">
+          <section className="mt-12 md:mt-16">
             <h2 className="text-2xl md:text-3xl font-bold mb-8">Vous aimerez aussi</h2>
             <Carousel opts={{ align: "start", loop: true }} className="w-full">
               <CarouselContent className="-ml-2 md:-ml-4">
@@ -489,5 +492,91 @@ export default function ProductDetail() {
         )}
       </div>
     </div>
+  );
+}
+
+// Recommended products component - "Souvent achetés ensemble"
+function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
+  const [recommended, setRecommended] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      // Get products of same product_type or complementary types
+      const complementaryTypes: Record<string, string[]> = {
+        'huile-moteur': ['additif', 'nettoyant-moteur', 'filtre'],
+        'additif': ['huile-moteur', 'nettoyant-injecteur'],
+        'nettoyant-moteur': ['huile-moteur', 'additif'],
+        'nettoyant-injecteur': ['additif', 'huile-moteur'],
+        'liquide-refroidissement': ['nettoyant-moteur'],
+      };
+
+      const currentType = currentProduct.style || currentProduct.composition || '';
+      const relatedTypes = complementaryTypes[currentType] || [];
+
+      const { data } = await supabase
+        .from('products')
+        .select('id, title, slug, price, compare_at_price, is_new, product_type')
+        .eq('is_active', true)
+        .neq('id', currentProduct.id)
+        .limit(8);
+
+      if (data && data.length > 0) {
+        // Get images for these products
+        const ids = data.map(p => p.id);
+        const { data: images } = await supabase
+          .from('product_images')
+          .select('product_id, image_url')
+          .in('product_id', ids)
+          .order('display_order', { ascending: true });
+
+        const imageMap = new Map<string, string>();
+        images?.forEach(img => {
+          if (!imageMap.has(img.product_id)) imageMap.set(img.product_id, img.image_url);
+        });
+
+        // Sort: complementary types first
+        const sorted = data.sort((a, b) => {
+          const aMatch = relatedTypes.includes(a.product_type || '') ? 0 : 1;
+          const bMatch = relatedTypes.includes(b.product_type || '') ? 0 : 1;
+          return aMatch - bMatch;
+        }).slice(0, 6);
+
+        setRecommended(sorted.map(p => ({
+          ...p,
+          image: imageMap.get(p.id) || '/placeholder.svg',
+        })));
+      }
+    };
+
+    fetchRecommended();
+  }, [currentProduct.id]);
+
+  if (recommended.length === 0) return null;
+
+  return (
+    <section className="mt-16 md:mt-24">
+      <h2 className="text-2xl md:text-3xl font-bold mb-2">🛒 Souvent achetés ensemble</h2>
+      <p className="text-muted-foreground text-sm mb-8">Les clients qui ont acheté ce produit prennent aussi</p>
+      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {recommended.map(p => (
+            <CarouselItem key={p.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <Link to={`/produits/${p.slug}`} className="group block">
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform" />
+                </div>
+                <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{p.title}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="font-bold text-primary">{p.price?.toLocaleString()} FCFA</span>
+                  {p.compare_at_price && <span className="text-xs text-muted-foreground line-through">{p.compare_at_price?.toLocaleString()} FCFA</span>}
+                </div>
+              </Link>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden md:flex -left-4 bg-background border-border hover:bg-muted" />
+        <CarouselNext className="hidden md:flex -right-4 bg-background border-border hover:bg-muted" />
+      </Carousel>
+    </section>
   );
 }

@@ -87,6 +87,8 @@ const App = () => (
                     <Route path="/entretien" element={<Entretien />} />
                     <Route path="/connexion" element={<CustomerAuth />} />
                     <Route path="/mon-espace" element={<MonEspace />} />
+                    <Route path="/mon-espace/vehicule/:id" element={<VehicleDetail />} />
+                    <Route path="/qr/:token" element={<QRView />} />
                     <Route path="/marketing-plan" element={<MarketingPlan />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
