@@ -7,6 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { CustomerAuthProvider } from "@/context/CustomerAuthContext";
 import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BardahlChat } from "@/components/chat/BardahlChat";
