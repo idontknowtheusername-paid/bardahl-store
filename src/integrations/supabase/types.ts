@@ -211,6 +211,89 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_vehicles: {
+        Row: {
+          brand: string | null
+          created_at: string
+          customer_id: string
+          fuel_type: string | null
+          id: string
+          license_plate: string
+          mileage: number | null
+          model: string | null
+          updated_at: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string
+          customer_id: string
+          fuel_type?: string | null
+          id?: string
+          license_plate: string
+          mileage?: number | null
+          model?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string
+          customer_id?: string
+          fuel_type?: string | null
+          id?: string
+          license_plate?: string
+          mileage?: number | null
+          model?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          city: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string | null
@@ -1142,6 +1225,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      lookup_customer_email: { Args: { identifier: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "customer"
