@@ -165,5 +165,5 @@ export const fr: TranslationKeys = {
   changeCurrency: 'Changer la devise',
 
   catalogTitle: 'Nos Gammes',
-  catalogDescription: 'Découvrez notre gamme complète de lubrifiants, additifs et produits d\'entretien automobile Bardahl.',
+  catalogDescription: 'Découvrez notre gamme complète de lubrifiants, additifs et produits d\'entretien automobile.',
 };
