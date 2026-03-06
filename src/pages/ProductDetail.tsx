@@ -412,8 +412,8 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* Add to Cart */}
-              <div className="flex gap-3 mb-8">
+              {/* Add to Cart & WhatsApp */}
+              <div className="flex gap-3 mb-4">
                 <Button
                   size="xl"
                   className="flex-1"
@@ -427,6 +427,17 @@ export default function ProductDetail() {
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full mb-8 gap-2 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                onClick={() => {
+                  const msg = encodeURIComponent(`Bonjour, je souhaite commander : ${product.name} (${formatPrice(product.price)})\n${window.location.href}`);
+                  window.open(`https://wa.me/22996786284?text=${msg}`, '_blank');
+                }}
+              >
+                <MessageCircle className="h-5 w-5" /> Commander sur WhatsApp
+              </Button>
 
               {/* Description & Details */}
               <Accordion type="single" collapsible defaultValue="description">
