@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2 } from 'lucide-react';
+import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { toast } from 'sonner';
