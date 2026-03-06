@@ -38,7 +38,7 @@ export const fr: TranslationKeys = {
   certifications: 'Certifications & Partenaires',
   certDescription: 'Des standards de qualité reconnus mondialement',
   stayInformed: 'Restez informé',
-  newsletterDesc: "Inscrivez-vous pour recevoir nos conseils d'entretien, promotions exclusives et nouveautés Bardahl.",
+  newsletterDesc: "Inscrivez-vous pour recevoir nos conseils d'entretien, promotions exclusives et nouveautés.",
   emailPlaceholder: 'Votre adresse email',
   subscribe: "S'inscrire",
   subscribing: 'Inscription...',
