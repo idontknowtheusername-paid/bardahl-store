@@ -10,6 +10,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BardahlChat } from "@/components/chat/BardahlChat";
+import { FloatingActions } from "@/components/FloatingActions";
 
 // Pages
 import Index from "./pages/Index";
@@ -34,6 +35,8 @@ import CGV from "./pages/legal/CGV";
 import PolitiqueConfidentialite from "./pages/legal/PolitiqueConfidentialite";
 import LivraisonRetours from "./pages/legal/LivraisonRetours";
 import MarketingPlan from "./pages/MarketingPlan";
+import Diagnostic from "./pages/Diagnostic";
+import Entretien from "./pages/Entretien";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -74,10 +77,13 @@ const App = () => (
                     <Route path="/cgv" element={<CGV />} />
                     <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                     <Route path="/livraison-retours" element={<LivraisonRetours />} />
+                    <Route path="/diagnostic" element={<Diagnostic />} />
+                    <Route path="/entretien" element={<Entretien />} />
                     <Route path="/marketing-plan" element={<MarketingPlan />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Layout>
+                <FloatingActions />
                 <BardahlChat />
               </CartProvider>
             </BrowserRouter>

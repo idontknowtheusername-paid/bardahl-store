@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Youtube, Linkedin } from 'lucide-react';
+import { Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 
 const socialLinks = [
-  { icon: Facebook, href: 'https://facebook.com/bardahl', label: 'Facebook' },
-  { icon: Instagram, href: 'https://instagram.com/bardahl', label: 'Instagram' },
-  { icon: Youtube, href: 'https://youtube.com/bardahl', label: 'YouTube' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/bardahl', label: 'LinkedIn' },
+  { icon: Facebook, href: 'https://facebook.com/autopassionbj', label: 'Facebook' },
+  { icon: Instagram, href: 'https://instagram.com/autopassionbj', label: 'Instagram' },
 ];
 
 export function Footer() {
@@ -14,19 +12,23 @@ export function Footer() {
 
   const footerLinks = {
     produits: [
-      { label: t.navMotorOils, href: '/collections/huiles-moteur' },
-      { label: t.navAdditives, href: '/collections/additifs' },
-      { label: t.navMaintenance, href: '/collections/entretien' },
-      { label: t.navAllProducts, href: '/collections' },
+      { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
+      { label: 'Additifs', href: '/categories/additifs' },
+      { label: 'Transmission', href: '/categories/transmission' },
+      { label: 'Entretien & nettoyage', href: '/categories/entretien' },
+      { label: 'Tous les produits', href: '/categories' },
     ],
-    informations: [
-      { label: t.footerAbout, href: '/a-propos' },
-      { label: t.footerTechnologies, href: '/blog' },
+    services: [
+      { label: 'Diagnostic auto', href: '/diagnostic' },
+      { label: 'Entretien véhicule', href: '/entretien' },
+      { label: 'Mon espace véhicule', href: '/mon-espace' },
+      { label: 'Conseils auto', href: '/blog' },
+      { label: 'FAQ', href: '/faq' },
+    ],
+    infos: [
+      { label: 'À propos', href: '/a-propos' },
       { label: t.navContact, href: '/contact' },
       { label: t.footerDeliveryReturns, href: '/livraison-retours' },
-      { label: t.footerFAQ, href: '/faq' },
-    ],
-    legal: [
       { label: t.footerLegalNotice, href: '/mentions-legales' },
       { label: t.footerCGV, href: '/cgv' },
       { label: t.footerPrivacy, href: '/politique-confidentialite' },
@@ -34,25 +36,32 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-secondary text-secondary-foreground">
       <div className="container py-12 md:py-16">
-        {/* Logo centré en haut */}
+        {/* Logo + contact info */}
         <div className="text-center mb-10">
           <Link to="/" className="inline-block mb-4">
-            <img src="/Bardahl_idiSpcDptj_1.svg" alt="Bardahl" className="h-16 w-auto mx-auto" />
+            <span className="text-accent font-extrabold text-2xl tracking-tight">AUTO</span>
+            <span className="text-primary font-extrabold text-2xl tracking-tight">PASSION</span>
+            <span className="text-secondary-foreground/50 text-xs font-bold ml-1">BJ</span>
           </Link>
-          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-2xl mx-auto">
-            {t.footerDescription}
+          <p className="text-secondary-foreground/60 text-sm leading-relaxed max-w-md mx-auto mb-4">
+            Entretien automobile & solutions moteur. Votre partenaire de confiance pour la performance de votre véhicule au Bénin.
           </p>
+          <div className="flex flex-wrap gap-4 justify-center text-xs text-secondary-foreground/50">
+            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> 01 BP 369 Parakou</span>
+            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> 96 78 62 84 / 62 21 67 66</span>
+            <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> contact@autopassionbj.com</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-10">
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerProducts}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-accent">Produits</h3>
             <ul className="space-y-2.5">
               {footerLinks.produits.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -61,11 +70,11 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerInfo}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-accent">Services</h3>
             <ul className="space-y-2.5">
-              {footerLinks.informations.map(link => (
+              {footerLinks.services.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -74,11 +83,11 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-secondary">{t.footerLegal}</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-accent">Informations</h3>
             <ul className="space-y-2.5">
-              {footerLinks.legal.map(link => (
+              {footerLinks.infos.map(link => (
                 <li key={link.href}>
-                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-secondary transition-colors">
+                  <Link to={link.href} className="text-sm text-secondary-foreground/60 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -87,18 +96,32 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-primary-foreground/20">
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-secondary-foreground/10">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             {socialLinks.map(({ icon: Icon, href, label }) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center text-primary-foreground/70 hover:bg-secondary hover:text-secondary-foreground transition-all duration-300"
+                className="w-10 h-10 rounded-full bg-secondary-foreground/10 flex items-center justify-center text-secondary-foreground/60 hover:bg-accent hover:text-accent-foreground transition-all duration-300"
                 aria-label={label}>
                 <Icon className="h-4 w-4" />
               </a>
             ))}
           </div>
-          <p className="text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} Bardahl. {t.allRightsReserved}
+          <div className="text-center md:text-right">
+            <p className="text-xs text-secondary-foreground/40">
+              © {new Date().getFullYear()} ETS Autopassion BJ. {t.allRightsReserved}
+            </p>
+            <p className="text-[10px] text-secondary-foreground/30 mt-1">
+              N°RCCM RB/PKO/17 A 4167 • N°IFU: 2201501541800
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="border-t border-secondary-foreground/10">
+        <div className="container py-3">
+          <p className="text-[10px] text-secondary-foreground/30 text-center">
+            Bardahl est une marque déposée appartenant à ses propriétaires respectifs. Autopassion BJ est un distributeur indépendant et n'est pas le site officiel de la marque.
           </p>
         </div>
       </div>

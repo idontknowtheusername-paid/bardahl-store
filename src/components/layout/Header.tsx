@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, Truck, ChevronDown, Globe } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Truck, ChevronDown, Globe, Car, Wrench, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -20,17 +20,28 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showProductsMenu, setShowProductsMenu] = useState(false);
   const navigate = useNavigate();
 
   const currentLang = languages.find(l => l.code === language);
 
+  const productCategories = [
+    { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
+    { label: 'Huiles boîtes & transmission', href: '/categories/transmission' },
+    { label: 'Additifs', href: '/categories/additifs' },
+    { label: 'Liquide de refroidissement & lave-glace', href: '/categories/liquides' },
+    { label: 'Purifiant & désodorisant', href: '/categories/entretien' },
+    { label: 'Spécial atelier', href: '/categories/graisses' },
+  ];
+
   const navLinks = [
-    { label: t.navMotorOils, href: '/collections/huiles-moteur' },
-    { label: t.navAdditives, href: '/collections/additifs' },
-    { label: t.navMaintenance, href: '/collections/entretien' },
-    { label: t.navAllProducts, href: '/collections' },
-    { label: t.navAdvice, href: '/blog' },
-    { label: t.navContact, href: '/contact' },
+    { label: 'Accueil', href: '/' },
+    { label: 'Diagnostic auto', href: '/diagnostic', icon: Stethoscope },
+    { label: 'Entretien véhicule', href: '/entretien', icon: Wrench },
+    { label: 'Produits', href: '/categories', hasSubmenu: true },
+    { label: 'Conseils auto', href: '/blog' },
+    { label: 'Mon espace', href: '/mon-espace', icon: Car },
+    { label: 'Contact', href: '/contact' },
   ];
 
   const handleSearch = (query: string) => {
@@ -48,7 +59,7 @@ export function Header() {
       setIsSearchOpen(false);
       setSearchQuery('');
       setSearchResults([]);
-      navigate(`/collections?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/categories?search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -61,17 +72,15 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Promo Bar avec sélecteur de langue */}
+      {/* Promo Bar */}
       <div className="bg-primary text-primary-foreground">
         <div className="container">
           <div className="flex items-center justify-between sm:justify-center py-2 text-sm relative">
-            {/* Message de promotion à gauche sur mobile, centré sur desktop */}
             <div className="flex items-center gap-2 font-semibold">
               <Truck className="h-4 w-4" />
               <span>{t.freeShipping}</span>
             </div>
 
-            {/* Sélecteur de langue à droite sur mobile, positionné absolument sur desktop */}
             <div className="sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2">
               <div className="relative">
                 <Button
@@ -89,7 +98,6 @@ export function Header() {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
                     <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[180px]">
-                      {/* Languages */}
                       <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
                         <Globe className="h-3 w-3 inline mr-1" />
                         Language
@@ -98,17 +106,13 @@ export function Header() {
                         <button
                           key={lang.code}
                           onClick={() => { setLanguage(lang.code); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted flex items-center gap-2 ${language === lang.code ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'
-                            }`}
+                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted flex items-center gap-2 ${language === lang.code ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
                         >
                           <span>{lang.flag}</span>
                           <span>{lang.name}</span>
                         </button>
                       ))}
-
                       <div className="border-t border-border my-2" />
-
-                      {/* Currency */}
                       <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
                         {t.currency}
                       </p>
@@ -116,8 +120,7 @@ export function Header() {
                         <button
                           key={c}
                           onClick={() => { setCurrency(c); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted ${currency === c ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'
-                            }`}
+                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted ${currency === c ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
                         >
                           {c === 'EUR' ? '€ Euro' : 'FCFA Franc CFA'}
                         </button>
@@ -138,49 +141,79 @@ export function Header() {
             {/* Mobile Menu */}
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-primary">
+                <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20">
                 <SheetHeader>
                   <SheetTitle className="text-left">
-                    <span className="text-primary font-bold text-xl tracking-tight">BARDAHL</span>
+                    <span className="text-accent font-extrabold text-xl tracking-tight">AUTO</span>
+                    <span className="text-primary font-extrabold text-xl tracking-tight">PASSION</span>
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="mt-8 flex flex-col gap-1">
-                  {navLinks.map(({ label, href }) => (
-                    <Link key={href} to={href} onClick={() => setIsMenuOpen(false)}
-                      className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide">
-                      {label}
-                    </Link>
+                  {navLinks.map(({ label, href, hasSubmenu }) => (
+                    <div key={href}>
+                      <Link to={href} onClick={() => !hasSubmenu && setIsMenuOpen(false)}
+                        className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                        {label}
+                      </Link>
+                      {hasSubmenu && (
+                        <div className="pl-6 flex flex-col gap-0.5">
+                          {productCategories.map(cat => (
+                            <Link key={cat.href} to={cat.href} onClick={() => setIsMenuOpen(false)}
+                              className="px-3 py-2 rounded text-xs text-secondary-foreground/70 hover:text-primary transition-colors">
+                              {cat.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </nav>
               </SheetContent>
             </Sheet>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl md:text-3xl grayscale">💧</span>
-              <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">BARDAHL</span>
+            <Link to="/" className="flex items-center gap-1">
+              <span className="text-accent font-extrabold text-xl md:text-2xl tracking-tight">AUTO</span>
+              <span className="text-primary font-extrabold text-xl md:text-2xl tracking-tight">PASSION</span>
+              <span className="text-secondary-foreground/50 text-[10px] font-bold ml-1 hidden sm:inline">BJ</span>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
-              {navLinks.map(({ label, href }) => (
-                <Link key={href} to={href}
-                  className="text-xs xl:text-sm font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-primary transition-colors whitespace-nowrap">
-                  {label}
-                </Link>
+            <nav className="hidden lg:flex items-center gap-3 xl:gap-5">
+              {navLinks.map(({ label, href, hasSubmenu }) => (
+                <div key={href} className="relative"
+                  onMouseEnter={() => hasSubmenu && setShowProductsMenu(true)}
+                  onMouseLeave={() => hasSubmenu && setShowProductsMenu(false)}
+                >
+                  <Link to={href}
+                    className="text-xs xl:text-sm font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-accent transition-colors whitespace-nowrap flex items-center gap-1">
+                    {label}
+                    {hasSubmenu && <ChevronDown className="h-3 w-3" />}
+                  </Link>
+                  {hasSubmenu && showProductsMenu && (
+                    <div className="absolute top-full left-0 mt-2 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[260px] z-50">
+                      {productCategories.map(cat => (
+                        <Link key={cat.href} to={cat.href}
+                          onClick={() => setShowProductsMenu(false)}
+                          className="block px-3 py-2 rounded text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors">
+                          {cat.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </nav>
 
             {/* Actions */}
             <div className="flex items-center gap-1">
-              {/* Search */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-primary">
+                  <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">
                     <Search className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
@@ -218,12 +251,11 @@ export function Header() {
                 </SheetContent>
               </Sheet>
 
-              {/* Cart */}
-              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-primary"
+              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent"
                 onClick={() => setIsCartOpen(true)}>
                 <ShoppingBag className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold animate-scale-in">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-bold animate-scale-in">
                     {totalItems}
                   </span>
                 )}
