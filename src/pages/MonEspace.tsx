@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2 } from 'lucide-react';
+import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { toast } from 'sonner';
@@ -161,7 +161,7 @@ export default function MonEspace() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {vehicles.map(v => (
-                <div key={v.id} className="bg-card border border-border rounded-xl p-5 shadow-card hover:shadow-md transition-shadow">
+                <Link key={v.id} to={`/mon-espace/vehicule/${v.id}`} className="bg-card border border-border rounded-xl p-5 shadow-card hover:shadow-md hover:border-primary/30 transition-all block">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full mb-2">
@@ -171,16 +171,20 @@ export default function MonEspace() {
                         {v.brand && v.model ? `${v.brand} ${v.model}` : 'Véhicule'}
                       </h3>
                     </div>
-                    <button onClick={() => handleDelete(v.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button onClick={(e) => { e.preventDefault(); handleDelete(v.id); }} className="text-muted-foreground hover:text-destructive transition-colors p-1">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                     {v.year && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {v.year}</span>}
                     {v.fuel_type && <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {v.fuel_type}</span>}
                     {v.mileage && <span className="flex items-center gap-1"><Gauge className="h-3 w-3" /> {v.mileage.toLocaleString()} km</span>}
                   </div>
-                </div>
+                  <p className="text-xs text-primary mt-3 font-medium">Voir carnet d'entretien →</p>
+                </Link>
               ))}
             </div>
           )}
