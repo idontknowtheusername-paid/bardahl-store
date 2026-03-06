@@ -151,8 +151,8 @@ export const fr: TranslationKeys = {
   footerDescription: 'Entretien automobile & solutions moteur. Votre partenaire de confiance au Bénin.',
   allRightsReserved: 'Tous droits réservés.',
 
-  aboutTitle: 'À propos de Bardahl',
-  aboutDescription: 'Depuis 1939, Bardahl innove dans les lubrifiants et additifs automobiles.',
+  aboutTitle: 'À propos d\'Autopassion BJ',
+  aboutDescription: 'Votre partenaire de confiance pour l\'entretien automobile au Bénin.',
   contactTitle: 'Contactez-nous',
   contactDescription: 'Notre équipe est à votre écoute pour répondre à vos questions.',
   faqTitle: 'Questions fréquentes',
