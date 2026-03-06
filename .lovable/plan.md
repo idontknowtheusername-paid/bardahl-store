@@ -1,183 +1,274 @@
+# Plan d'implémentation — Autopassion BJ
 
-# Plan Complet - Livraison Dynamique, Blog Fix, Factures, Avis Produits & Hero Optimisé
-
-## Analyse de l'existant
-
-### Problèmes identifiés :
-
-1. **Livraison hardcodée** : `CartModal.tsx` calcule le seuil à `59 * 655.957 FCFA` (ancien système lingerie), `Cart.tsx` utilise un seuil à `50 000 FCFA` et `5.90€`, `payment-create` a `const shippingCost = 2000` en dur.
-2. **Blog - Edge Function non-2xx** : `blog-generate` référence des tables `blog_categories` et `blog_post_categories` qui n'existent **pas** en base. Il utilise aussi `blog_generation_log` qui n'existe pas non plus. Le prompt parle de "lingerie" (ancien site). C'est pour ça que ça crash.
-3. **Facturation admin** : La page n'existe pas encore. À créer.
-4. **Email admin sur nouvelle commande** : `payment-create` et `payment-webhook` n'envoient pas de mail à l'admin.
-5. **Avis produits** : Pas de table `product_reviews` en base, pas de composant frontend.
-6. **Hero** : Image 404 (Unsplash cassée), hauteur `70vh` sous-optimale pour un store (recommandé : `60-80vh` avec contenu dense), pas d'indicateur de confiance.
-7. **`send-email`** : Requiert que l'appelant soit authentifié admin — bloquant pour l'envoi automatique depuis `payment-webhook` (qui tourne en service role, pas en user).
+## Vue d'ensemble
+Transformer la plateforme e-commerce Bardahl actuelle en **Autopassion BJ** : plateforme automobile digitale complète (e-commerce + diagnostic IA + carnet d'entretien + CRM + espace client véhicule).
 
 ---
 
-## Plan Technique Détaillé
+## PHASE 1 — Rebranding & Restructuration UI
 
-### 1. Base de données - Migration SQL
+### 1.1 Identité visuelle Autopassion
+- [ ] Mettre à jour `index.css` et `tailwind.config.ts` avec la nouvelle palette :
+  - Bleu principal : `#2F6FB5`
+  - Orange accent : `#F59E0B`
+  - Gris foncé : `#1F2937`
+  - Blanc : `#FFFFFF`
+- [ ] Remplacer le logo Bardahl par le logo/nom Autopassion BJ
+- [ ] Mettre à jour `site_settings` en BDD (site_name, description, etc.)
+- [ ] Mettre à jour les meta SEO (title, description, OG tags)
 
-**Tables à créer :**
-- `product_reviews` : `id, product_id, author_name, rating (1-5), comment, is_approved (default true), created_at`
-- Ajout de `admin_email` dans `site_settings`
-
-**Pas de `blog_categories` ni `blog_post_categories`** : on simplifie le blog pour utiliser uniquement les tags déjà présents dans `blog_posts`.
-
-RLS pour `product_reviews` :
-- SELECT public : `is_approved = true`
-- INSERT public : `true` (avec rate limiting géré applicativement)
-- Admin : ALL
-
----
-
-### 2. Livraison Dynamique
-
-#### `CartModal.tsx`
-- Supprimer le `FREE_SHIPPING_THRESHOLD` hardcodé
-- Créer un hook `useShippingThreshold` qui lit le `free_shipping_threshold` depuis la première zone active en base via Supabase directement (table `shipping_rates`)
-- Afficher la barre de progression dynamiquement avec la valeur DB
-- Fallback : si pas de DB → ne pas afficher la barre ou afficher un message générique
-
-#### `Cart.tsx`
-- Supprimer les valeurs `80`, `5.90` hardcodées
-- Indiquer que la livraison sera calculée au checkout (idem CartModal)
-
-#### `payment-create` (Edge Function)
-- Remplacer `const shippingCost = 2000` par une vraie requête aux tables `shipping_zones` / `shipping_rates` selon la ville et le pays du client
-- Utiliser le même algorithme que `shipping-calculate` (déjà bien implémenté)
-
-#### Hook `useShippingSettings`
-- Nouveau hook `src/hooks/use-shipping-settings.ts`
-- Lit la table `shipping_rates` pour trouver le `free_shipping_threshold` minimum actif
-- Utilisé par CartModal et Cart
-
----
-
-### 3. Fix Blog - Edge Function
-
-**Problèmes à corriger dans `blog-generate/index.ts` :**
-- Supprimer les références à `blog_categories`, `blog_post_categories`, `blog_generation_log` (tables inexistantes)
-- Mettre à jour le prompt pour parler de **Bardahl** (lubrifiants, entretien auto) au lieu de lingerie/beauté féminine
-- Générer un article directement sans catégorie externe (utiliser les tags)
-
-**Mise à jour `BlogPosts.tsx` (admin) :**
-- Corriger le lien "Voir sur le site" qui pointe sur `cannesh-lingerie-suite.vercel.app` → pointer sur le vrai domaine Bardahl
-- Conserver la fonctionnalité de génération
-
----
-
-### 4. Fix `send-email` - Envoi interne
-
-Le problème : `send-email` vérifie que l'appelant est un admin authentifié. Mais `payment-webhook` l'appelle avec le **service role key**, pas un JWT user.
-
-**Solution** : Modifier `send-email` pour accepter deux modes :
-- Mode authentifié (admin depuis l'interface)
-- Mode service (appelé depuis une autre Edge Function avec le `SUPABASE_SERVICE_ROLE_KEY` comme bearer token interne)
-
-Ajouter une vérification : si le token est égal au `SUPABASE_SERVICE_ROLE_KEY`, autoriser directement.
-
----
-
-### 5. Email Admin - Nouvelle commande
-
-**Dans `payment-create`** : après création de commande en DB, envoyer un email à l'adresse admin configurée dans `site_settings`.
-
-**Nouveau template** `new_order_admin` dans `send-email` :
-- Détails complets : numéro, client, téléphone, ville, articles, total, méthode de livraison
-- Couleurs Bardahl (jaune/noir)
-
-**Dans `payment-webhook`** : idem sur confirmation de paiement, notifier l'admin.
-
----
-
-### 6. Génération de Factures - Nouvelle page admin
-
-**Nouvelle page `admin/src/pages/Invoices.tsx`** (accessible depuis la sidebar, juste après Orders) :
-
-Fonctionnalités :
-- Liste des commandes avec bouton "Générer la facture"
-- Génération d'un PDF professionnel avec le logo Bardahl, les informations de commande complètes
-- Téléchargement direct (PDF via la librairie `jsPDF` ou génération HTML→PDF côté client)
-- Envoi par email au client
-- Partage WhatsApp (lien `wa.me` avec message + lien de téléchargement)
-
-**Format de la facture :**
+### 1.2 Nouveau menu principal
+Structure cible :
 ```
-BARDAHL - FACTURE
-Logo + en-tête (jaune/noir)
-Numéro de facture (FAC-XXXXX)
-Date, Numéro de commande
-Informations client
-Tableau des articles (désignation, qté, PU, total)
-Sous-total, Livraison, Total
-Mentions légales en bas
+Accueil
+Assistance & Diagnostic auto
+Entretien véhicule
+Produits ▼
+  - Huiles moteur
+  - Huiles boîtes & transmission
+  - Additifs
+  - Liquide de refroidissement & lave-glace
+  - Purifiant & désodorisant
+  - Spécial atelier
+Accessoires & électronique voiture
+Conseils auto (Blog)
+Mon espace véhicule (connexion client)
+À propos
+Contact
+```
+- [ ] Refactorer `Header.tsx` avec le nouveau menu
+- [ ] Créer les nouvelles routes dans `App.tsx`
+- [ ] Mettre à jour `Footer.tsx`
+- [ ] Ajouter les nouvelles catégories en BDD
+
+### 1.3 Page d'accueil repensée
+- [ ] Hero section avec phrase d'accroche : « Prenez soin de votre moteur. Nous vous guidons. »
+- [ ] 3 entrées principales (CTA cards) :
+  1. **Trouver mon huile** → Sélecteur véhicule existant
+  2. **Diagnostiquer ma voiture** → Nouveau flow diagnostic
+  3. **Entretenir mon moteur** → Page entretien
+- [ ] Section confiance (Paiement sécurisé Mobile Money, Livraison rapide, Produits authentiques, Support WhatsApp)
+- [ ] Sections produits populaires, nouveautés, témoignages (existants, à adapter)
+
+### 1.4 Boutons flottants latéraux
+- [ ] Créer composant `FloatingActions.tsx` avec 3 boutons visibles partout :
+  1. Diagnostiquer ma voiture
+  2. Chat assistant
+  3. Commander sur WhatsApp
+
+---
+
+## PHASE 2 — Diagnostic auto guidé
+
+### 2.1 Flow diagnostic interactif
+- [ ] Créer page `/diagnostic` avec UI step-by-step :
+  - **Étape 1** : Sélection du symptôme (cards visuelles) :
+    - Fumée noire
+    - Perte de puissance
+    - Consommation élevée
+    - Moteur qui tremble
+    - Démarrage difficile
+    - Moteur bruyant
+  - **Étape 2** : Questions complémentaires :
+    - Diesel ou essence ?
+    - Kilométrage approximatif ?
+    - Année du véhicule ?
+  - **Étape 3** : Résultat IA (via `bardahl-assistant` edge function) :
+    - Diagnostic probable
+    - Produits recommandés (liens vers boutique)
+    - Suggestion garage partenaire (optionnel)
+    - Bouton "Acheter maintenant"
+
+### 2.2 Adapter l'edge function `bardahl-assistant`
+- [ ] Renommer le system prompt en "Autopassion"
+- [ ] Ajouter un mode "diagnostic structuré" qui accepte symptôme + infos véhicule
+- [ ] Retourner des IDs produits pour lier directement aux fiches produit
+
+---
+
+## PHASE 3 — Section Entretien véhicule
+
+### 3.1 Page `/entretien`
+- [ ] Créer page avec sous-sections (cards/grille) :
+  - Nettoyer le moteur
+  - Protéger le moteur
+  - Réduire consommation carburant
+  - Faire la vidange moteur
+  - Vidange boîte
+  - Vidange radiateur
+  - Réparer les fuites
+  - Confort & désodorisant
+- [ ] Chaque sous-section mène aux produits filtrés par catégorie correspondante
+
+---
+
+## PHASE 4 — Authentification client (Mon espace véhicule)
+
+### 4.1 Schéma BDD
+```sql
+-- Table clients (séparée de user_roles admin)
+CREATE TABLE public.customers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  auth_user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  phone text UNIQUE NOT NULL,
+  email text,
+  full_name text NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Table véhicules
+CREATE TABLE public.vehicles (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id uuid REFERENCES public.customers(id) ON DELETE CASCADE NOT NULL,
+  license_plate text UNIQUE NOT NULL,
+  brand text,
+  model text,
+  year integer,
+  fuel_type text, -- 'diesel' | 'essence'
+  mileage integer,
+  vin text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Index pour login par plaque
+CREATE INDEX idx_vehicles_license_plate ON public.vehicles(license_plate);
+CREATE INDEX idx_customers_phone ON public.customers(phone);
 ```
 
-**Note** : Utiliser `jsPDF` + `html2canvas` pour la génération PDF côté client (pas de nouvelle dépendance backend). Vérifier si déjà disponible ou ajouter aux dépendances.
+### 4.2 Logique d'authentification
+- Inscription : crée un user Supabase Auth (email = `{phone}@autopassion.local`), puis insère dans `customers`
+- Connexion par téléphone : lookup `customers.phone` → récupère email fictif → `signInWithPassword`
+- Connexion par plaque : lookup `vehicles.license_plate` → récupère `customer_id` → `customers.phone` → même flow
+- Edge function `customer-auth` pour gérer inscription/connexion
+- `src/context/CustomerAuthContext.tsx`
+- Pages : `/mon-espace/inscription`, `/mon-espace/connexion`, `/mon-espace`
+
+### 4.3 UI Mon espace véhicule
+- Dashboard client après connexion : liste véhicules, ajout véhicule, carnet d'entretien, plan de lubrification, historique commandes
 
 ---
 
-### 7. Avis Produits - Page `ProductDetail.tsx`
+## PHASE 5 — Carnet d'entretien digital
 
-**Section avis** ajoutée en bas de la page produit (avant les produits similaires) :
-- Accordion **fermé par défaut** avec titre "Avis clients (N)"
-- À l'ouverture : affiche les avis approuvés, notation étoiles
-- Formulaire intégré dans l'accordion : Nom, Note (étoiles cliquables), Commentaire, Bouton soumettre
-- Chargement depuis la table `product_reviews` (Supabase)
-- Soumission directe en DB
+### 5.1 Schéma BDD
+```sql
+CREATE TABLE public.maintenance_records (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id uuid REFERENCES public.vehicles(id) ON DELETE CASCADE NOT NULL,
+  maintenance_type text NOT NULL,
+  last_date timestamptz,
+  next_date timestamptz,
+  mileage_at_service integer,
+  notes text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.lubrication_plans (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id uuid REFERENCES public.vehicles(id) ON DELETE CASCADE NOT NULL,
+  oil_type_engine text,
+  oil_type_gearbox text,
+  oil_quantity_engine text,
+  oil_quantity_gearbox text,
+  change_frequency_km integer,
+  change_frequency_months integer,
+  reminder_frequency_months integer DEFAULT 6,
+  recommended_product_id uuid REFERENCES public.products(id),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE public.vehicle_qr_codes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id uuid REFERENCES public.vehicles(id) ON DELETE CASCADE NOT NULL,
+  qr_token text UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),
+  is_paid boolean DEFAULT false,
+  payment_id text,
+  created_at timestamptz DEFAULT now()
+);
+```
+
+### 5.2 Pages client
+- `/mon-espace/vehicule/:id` — Détail véhicule + entretiens + plan lubrification
+- `/qr/:token` — Page publique accessible via QR (carnet en lecture seule)
+
+### 5.3 QR Code payant (1000 FCFA)
+- Flow : clic "Générer QR" → paiement 1000 FCFA via KkiaPay/GeniusPay → `is_paid = true` → téléchargement QR
+- Le QR pointe vers `/qr/{token}`
 
 ---
 
-### 8. Hero Optimisé
+## PHASE 6 — Recommandations intelligentes
 
-**Changements :**
-- Remplacer l'image Unsplash cassée par un vrai fond Bardahl (gradient propre sans image manquante)
-- Hauteur : passer de `min-h-[70vh]` à `min-h-[65vh]` (recommandation e-commerce : 55-70vh pour laisser voir le contenu en dessous)
-- Ajouter des **trust badges** sous les CTA : "Livraison Bénin", "Paiement sécurisé", "Produits authentiques"
-- Optimiser le texte : headline plus impactante, sous-titre plus concis
-- Corriger l'animation de la flèche du bouton "Découvrir" (groupe manquant)
-- Supprimer les logs de débogage dans `ProductDetail.tsx`
+- Sur page produit : "Produits complémentaires recommandés" (basé sur catégories/product_type)
+- Recherche améliorée : suggestions temps réel, recherche par symptôme, par véhicule
+
+---
+
+## PHASE 7 — CRM Admin enrichi
+
+- Enrichir `Customers.tsx` : liste clients + véhicules, historique commandes/diagnostics/entretiens
+- Rappels multi-canal : email (Resend), WhatsApp (lien wa.me pré-rempli)
+
+---
+
+## PHASE 8 — Mentions légales & Disclaimer
+
+- Infos société : N°RCCM RB/PKO/17 A 4167, 01 BP 369 Parakou, Tél: 96786284/62216766, N°IFU: 2201501541800
+- Disclaimer diagnostic : « Le diagnostic proposé est indicatif et ne remplace pas l'avis d'un mécanicien professionnel. »
+- Disclaimer marque : « Bardahl est une marque déposée. Autopassion BJ est un distributeur indépendant. »
+
+---
+
+## PHASE 9 — WhatsApp achat direct
+
+- Bouton "Commander sur WhatsApp" sur chaque fiche produit (message pré-rempli)
+- Bouton flottant global
+
+---
+
+## PHASE 10 — Finalisation
+
+- SEO, lazy loading, sitemap
+- Préparation domaines autopassionbj.com / autopassion.bj
+- Tests complets de tous les flows
 
 ---
 
 ## Ordre d'exécution
 
-```text
-1. Migration DB (product_reviews table + admin_email in site_settings)
-2. Hook useShippingSettings
-3. CartModal.tsx + Cart.tsx (livraison dynamique)
-4. payment-create (shipping dynamique)
-5. send-email (fix mode service)
-6. blog-generate (fix tables + prompt Bardahl)
-7. BlogPosts.tsx (fix URL)
-8. New template email admin + email dans payment-create/webhook
-9. Invoices.tsx (admin) + sidebar update
-10. ProductDetail.tsx (avis + suppression logs)
-11. HeroSection.tsx (optimisation)
-```
+| Étape | Phase | Priorité |
+|-------|-------|----------|
+| 1 | Phase 1 — Rebranding & Menu | 🔴 Critique |
+| 2 | Phase 2 — Diagnostic auto | 🔴 Critique |
+| 3 | Phase 3 — Entretien véhicule | 🟡 Important |
+| 4 | Phase 4 — Auth client | 🔴 Critique |
+| 5 | Phase 5 — Carnet d'entretien + QR | 🔴 Critique |
+| 6 | Phase 6 — Recommandations | 🟡 Important |
+| 7 | Phase 7 — CRM admin | 🟡 Important |
+| 8 | Phase 8 — Mentions légales | 🟢 Facile |
+| 9 | Phase 9 — WhatsApp | 🟢 Facile |
+| 10 | Phase 10 — Finalisation | 🟡 Important |
 
-## Fichiers modifiés / créés
+## Tables BDD à créer
+- `customers` — Clients avec auth par téléphone
+- `vehicles` — Véhicules liés aux clients
+- `maintenance_records` — Entrées du carnet d'entretien
+- `lubrication_plans` — Plans de lubrification par véhicule
+- `vehicle_qr_codes` — QR codes payants
 
-**Frontend :**
-- `src/hooks/use-shipping-settings.ts` (nouveau)
-- `src/components/cart/CartModal.tsx`
-- `src/pages/Cart.tsx`
-- `src/pages/ProductDetail.tsx` (avis + nettoyage logs)
-- `src/components/home/HeroSection.tsx`
+## Edge functions à créer/modifier
+- `customer-auth` — Inscription/connexion client (téléphone ou plaque)
+- `bardahl-assistant` → renommer context en "Autopassion", ajouter mode diagnostic structuré
+- `oil-change-reminder` → adapter pour utiliser `maintenance_records`
 
-**Admin :**
-- `admin/src/pages/Invoices.tsx` (nouveau)
-- `admin/src/App.tsx` (route invoices)
-- `admin/src/components/layout/AdminLayout.tsx` (nav item)
-- `admin/src/pages/BlogPosts.tsx` (fix URL)
-- `admin/src/pages/OrderDetail.tsx` (nettoyage console.log)
-
-**Edge Functions :**
-- `supabase/functions/payment-create/index.ts` (shipping dynamique + email admin)
-- `supabase/functions/send-email/index.ts` (fix auth service + nouveau template admin)
-- `supabase/functions/blog-generate/index.ts` (fix tables + prompt Bardahl)
-
-**Migration :**
-- `supabase/migrations/xxx_product_reviews_and_admin_email.sql`
+## Fichiers principaux à créer
+- `src/context/CustomerAuthContext.tsx`
+- `src/pages/Diagnostic.tsx`
+- `src/pages/Entretien.tsx`
+- `src/pages/MonEspace/*.tsx` (connexion, inscription, dashboard, véhicule)
+- `src/pages/QRView.tsx` (page publique QR)
+- `src/components/FloatingActions.tsx`
