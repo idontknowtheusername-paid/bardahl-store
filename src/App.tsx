@@ -42,11 +42,37 @@ import CustomerAuth from "./pages/CustomerAuth";
 import MonEspace from "./pages/MonEspace";
 import VehicleDetail from "./pages/VehicleDetail";
 import QRView from "./pages/QRView";
+import Maintenance from "./pages/Maintenance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+// Mode maintenance - Mettre à true pour activer
+const MAINTENANCE_MODE = true;
+
+const App = () => {
+  // Si mode maintenance activé, afficher uniquement la page de maintenance
+  if (MAINTENANCE_MODE) {
+    return (
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <LanguageProvider>
+            <CurrencyProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner position="bottom-right" />
+                <BrowserRouter>
+                  <Maintenance />
+                </BrowserRouter>
+              </TooltipProvider>
+            </CurrencyProvider>
+          </LanguageProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    );
+  }
+
+  return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
@@ -104,5 +130,6 @@ const App = () => (
     </QueryClientProvider>
   </HelmetProvider>
 );
+};
 
 export default App;

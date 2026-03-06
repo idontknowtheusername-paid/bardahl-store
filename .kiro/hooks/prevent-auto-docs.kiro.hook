@@ -1,16 +1,15 @@
 {
-  "enabled": true,
+  "enabled": false,
   "name": "Bloquer docs auto",
   "description": "Interdit la création de fichiers .md de documentation (SUMMARY, RECAP, README supplémentaires) sauf demande explicite",
   "version": "1",
   "when": {
-    "type": "preToolUse",
-    "toolTypes": [
-      "write"
-    ]
+    "type": "preTaskExecution"
   },
   "then": {
     "type": "askAgent",
     "prompt": "STOP! Vérifie si tu essaies de créer un fichier de documentation (.md) non demandé explicitement. Fichiers interdits sans demande explicite: *SUMMARY*.md, *RECAP*.md, *NOTES*.md, README supplémentaires dans docs/, ou tout fichier .md de documentation de processus. Si l'utilisateur n'a PAS explicitement demandé ce fichier de documentation, ANNULE l'opération et réponds verbalement à la place. Si c'est un fichier technique requis (migration SQL, config, code source), ou si l'utilisateur a explicitement demandé cette documentation, AUTORISE l'opération."
-  }
+  },
+  "workspaceFolderName": "bardahl-store",
+  "shortName": "prevent-auto-docs"
 }
