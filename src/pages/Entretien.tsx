@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Wrench, Droplets, Shield, Fuel, Cog, Thermometer, Pipette, Sparkles } from 'lucide-react';
+import { Wrench, Droplets, Shield, Fuel, Cog, Thermometer, Pipette, Sparkles, ChevronRight } from 'lucide-react';
 
 const maintenanceSections = [
   {
@@ -93,10 +93,11 @@ export default function Entretien() {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Grid on desktop, list on mobile */}
       <section className="py-12 md:py-16">
         <div className="container">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {/* Desktop: grid */}
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {maintenanceSections.map((section, index) => (
               <Link
                 key={section.id}
@@ -109,6 +110,27 @@ export default function Entretien() {
                 </div>
                 <h3 className="font-bold text-base mb-2 group-hover:text-primary transition-colors">{section.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{section.description}</p>
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile: compact list */}
+          <div className="sm:hidden space-y-2">
+            {maintenanceSections.map((section, index) => (
+              <Link
+                key={section.id}
+                to={section.href}
+                className="group flex items-center gap-3 bg-card border border-border rounded-xl p-4 animate-fade-in transition-all active:scale-[0.98] hover:border-primary/30"
+                style={{ animationDelay: `${index * 40}ms` }}
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${section.color}`}>
+                  <section.icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-sm group-hover:text-primary transition-colors">{section.title}</h3>
+                  <p className="text-xs text-muted-foreground truncate">{section.description}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
               </Link>
             ))}
           </div>
