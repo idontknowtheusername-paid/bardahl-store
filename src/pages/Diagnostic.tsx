@@ -1,9 +1,18 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
+import { useProducts } from '@/hooks/use-supabase-api';
+import { ProductCard } from '@/components/product/ProductCard';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
 
@@ -16,6 +25,17 @@ const symptoms = [
   { id: 'bruit', label: 'Moteur bruyant', icon: Volume2, description: 'Bruits anormaux du moteur' },
 ];
 
+// Extract product slugs from AI response markdown links like (/produits/slug)
+function extractProductSlugs(text: string): string[] {
+  const regex = /\/produits\/([\w-]+)/g;
+  const slugs: string[] = [];
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    if (!slugs.includes(match[1])) slugs.push(match[1]);
+  }
+  return slugs;
+}
+
 export default function Diagnostic() {
   const [selectedSymptom, setSelectedSymptom] = useState<string | null>(null);
   const [step, setStep] = useState(1);
@@ -26,6 +46,17 @@ export default function Diagnostic() {
   const [diagnosticResult, setDiagnosticResult] = useState<string>('');
   const [error, setError] = useState<string>('');
   const resultRef = useRef<HTMLDivElement>(null);
+
+  // Fetch all products to match against slugs found in AI response
+  const { data: allProducts } = useProducts({ limit: 200 });
+
+  const recommendedProducts = useMemo(() => {
+    if (!diagnosticResult || !allProducts?.length) return [];
+    const slugs = extractProductSlugs(diagnosticResult);
+    return slugs
+      .map(slug => allProducts.find(p => p.slug === slug))
+      .filter(Boolean) as NonNullable<typeof allProducts>[number][];
+  }, [diagnosticResult, allProducts]);
 
   const handleStartDiagnostic = () => {
     if (!selectedSymptom) return;
@@ -264,6 +295,31 @@ Utilise des emojis et formate bien la réponse.`;
                 {diagnosticResult && (
                   <div className="prose prose-sm max-w-none dark:prose-invert [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h2]:text-base [&>h3]:text-sm">
                     <ReactMarkdown>{diagnosticResult}</ReactMarkdown>
+                  </div>
+                )}
+
+                {/* Recommended products carousel */}
+                {!isLoading && recommendedProducts.length > 0 && (
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="text-base font-bold mb-4 flex items-center gap-2">
+                      <ShoppingCart className="h-4 w-4 text-primary" />
+                      Produits recommandés
+                    </h3>
+                    <Carousel opts={{ align: 'start', loop: recommendedProducts.length > 2 }} className="w-full">
+                      <CarouselContent className="-ml-3">
+                        {recommendedProducts.map((product) => (
+                          <CarouselItem key={product.id} className="pl-3 basis-[70%] sm:basis-1/2">
+                            <ProductCard product={product} />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      {recommendedProducts.length > 2 && (
+                        <>
+                          <CarouselPrevious className="hidden sm:flex -left-3" />
+                          <CarouselNext className="hidden sm:flex -right-3" />
+                        </>
+                      )}
+                    </Carousel>
                   </div>
                 )}
 

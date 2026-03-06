@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Loader2, Minimize2, Bot, Trash2 } from 'lucide-react';
+import { X, Send, Loader2, Minimize2, Bot, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 
@@ -160,37 +160,37 @@ export function BardahlChat() {
     sessionStorage.removeItem('bardahl-chat-session');
   };
 
-  // Floating button
+  // Floating button — bottom-right, compact
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-14 w-14 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center justify-center group"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
         aria-label="Ouvrir l'assistant Bardahl"
       >
-        <Bot className="h-7 w-7" />
-        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary animate-pulse" />
+        <Bot className="h-6 w-6" />
+        <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary animate-pulse" />
       </button>
     );
   }
 
-  // Minimized
+  // Minimized pill
   if (isMinimized) {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-12 px-4 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
       >
-        <Bot className="h-5 w-5" />
-        <span className="text-sm font-semibold">Assistant</span>
+        <Bot className="h-4 w-4" />
+        <span className="text-xs font-semibold">Assistant</span>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[calc(100vh-6rem)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed bottom-4 right-2 sm:right-4 z-50 w-[calc(100vw-1rem)] sm:w-[380px] max-w-[calc(100vw-1rem)] h-[min(560px,calc(100vh-6rem))] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-secondary text-secondary-foreground shrink-0">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-secondary text-secondary-foreground shrink-0">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
           <div>
@@ -198,7 +198,7 @@ export function BardahlChat() {
             <span className="text-[10px] opacity-70">Expert huiles & entretien</span>
           </div>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={clearChat} title="Nouvelle conversation">
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
