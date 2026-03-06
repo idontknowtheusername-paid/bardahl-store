@@ -148,7 +148,7 @@ export const fr: TranslationKeys = {
   footerCGV: 'CGV',
   footerPrivacy: 'Confidentialité',
   footerFAQ: 'FAQ',
-  footerDescription: 'Depuis 1939, la technologie Polar Plus et le Fullerène C60 au service de la performance de votre moteur.',
+  footerDescription: 'Entretien automobile & solutions moteur. Votre partenaire de confiance au Bénin.',
   allRightsReserved: 'Tous droits réservés.',
 
   aboutTitle: 'À propos de Bardahl',
