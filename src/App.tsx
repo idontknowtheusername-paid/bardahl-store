@@ -38,6 +38,8 @@ import LivraisonRetours from "./pages/legal/LivraisonRetours";
 import MarketingPlan from "./pages/MarketingPlan";
 import Diagnostic from "./pages/Diagnostic";
 import Entretien from "./pages/Entretien";
+import CustomerAuth from "./pages/CustomerAuth";
+import MonEspace from "./pages/MonEspace";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
