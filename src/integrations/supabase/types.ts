@@ -294,6 +294,110 @@ export type Database = {
         }
         Relationships: []
       }
+      lubrication_plans: {
+        Row: {
+          change_frequency_km: number | null
+          change_frequency_months: number | null
+          created_at: string
+          id: string
+          oil_quantity_engine: string | null
+          oil_quantity_gearbox: string | null
+          oil_type_engine: string | null
+          oil_type_gearbox: string | null
+          recommended_product_id: string | null
+          reminder_frequency_months: number | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          change_frequency_km?: number | null
+          change_frequency_months?: number | null
+          created_at?: string
+          id?: string
+          oil_quantity_engine?: string | null
+          oil_quantity_gearbox?: string | null
+          oil_type_engine?: string | null
+          oil_type_gearbox?: string | null
+          recommended_product_id?: string | null
+          reminder_frequency_months?: number | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          change_frequency_km?: number | null
+          change_frequency_months?: number | null
+          created_at?: string
+          id?: string
+          oil_quantity_engine?: string | null
+          oil_quantity_gearbox?: string | null
+          oil_type_engine?: string | null
+          oil_type_gearbox?: string | null
+          recommended_product_id?: string | null
+          reminder_frequency_months?: number | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lubrication_plans_recommended_product_id_fkey"
+            columns: ["recommended_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lubrication_plans_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: true
+            referencedRelation: "customer_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_records: {
+        Row: {
+          created_at: string
+          id: string
+          last_date: string | null
+          maintenance_type: string
+          mileage_at_service: number | null
+          next_date: string | null
+          notes: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_date?: string | null
+          maintenance_type: string
+          mileage_at_service?: number | null
+          next_date?: string | null
+          notes?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_date?: string | null
+          maintenance_type?: string
+          mileage_at_service?: number | null
+          next_date?: string | null
+          notes?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "customer_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string | null
@@ -1156,6 +1260,41 @@ export type Database = {
           },
         ]
       }
+      vehicle_qr_codes: {
+        Row: {
+          created_at: string
+          id: string
+          is_paid: boolean | null
+          payment_id: string | null
+          qr_token: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_paid?: boolean | null
+          payment_id?: string | null
+          qr_token?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_paid?: boolean | null
+          payment_id?: string | null
+          qr_token?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_qr_codes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "customer_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       public_site_settings: {
@@ -1226,6 +1365,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       lookup_customer_email: { Args: { identifier: string }; Returns: string }
+      owns_vehicle: { Args: { _vehicle_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "customer"
