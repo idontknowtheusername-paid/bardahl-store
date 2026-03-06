@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronRight, Minus, Plus, Share2, ShoppingBag, Star, ChevronDown } from 'lucide-react';
+import { ChevronRight, Minus, Plus, Share2, ShoppingBag, Star, ChevronDown, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/format';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
