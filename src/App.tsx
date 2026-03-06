@@ -7,6 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { CustomerAuthProvider } from "@/context/CustomerAuthContext";
 import { Layout } from "@/components/layout/Layout";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BardahlChat } from "@/components/chat/BardahlChat";
@@ -37,6 +38,8 @@ import LivraisonRetours from "./pages/legal/LivraisonRetours";
 import MarketingPlan from "./pages/MarketingPlan";
 import Diagnostic from "./pages/Diagnostic";
 import Entretien from "./pages/Entretien";
+import CustomerAuth from "./pages/CustomerAuth";
+import MonEspace from "./pages/MonEspace";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +54,7 @@ const App = () => (
             <Sonner position="bottom-right" />
             <BrowserRouter>
               <ScrollToTop />
+              <CustomerAuthProvider>
               <CartProvider>
                 <Layout>
                   <Routes>
@@ -79,6 +83,8 @@ const App = () => (
                     <Route path="/livraison-retours" element={<LivraisonRetours />} />
                     <Route path="/diagnostic" element={<Diagnostic />} />
                     <Route path="/entretien" element={<Entretien />} />
+                    <Route path="/connexion" element={<CustomerAuth />} />
+                    <Route path="/mon-espace" element={<MonEspace />} />
                     <Route path="/marketing-plan" element={<MarketingPlan />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
@@ -86,6 +92,7 @@ const App = () => (
                 <FloatingActions />
                 <BardahlChat />
               </CartProvider>
+              </CustomerAuthProvider>
             </BrowserRouter>
           </TooltipProvider>
         </CurrencyProvider>
