@@ -40,6 +40,8 @@ import Diagnostic from "./pages/Diagnostic";
 import Entretien from "./pages/Entretien";
 import CustomerAuth from "./pages/CustomerAuth";
 import MonEspace from "./pages/MonEspace";
+import VehicleDetail from "./pages/VehicleDetail";
+import QRView from "./pages/QRView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
