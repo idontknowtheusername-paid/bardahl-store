@@ -1,24 +1,21 @@
 import Autoplay from 'embla-carousel-autoplay';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import { useTranslation } from '@/context/LanguageContext';
 
 const certifications = [
-  { id: 1, name: 'Polar Plus®', description: 'Technologie exclusive' },
-  { id: 2, name: 'Fullerène C60', description: 'Protection avancée' },
-  { id: 3, name: 'API Certified', description: 'Norme américaine' },
-  { id: 4, name: 'ACEA', description: 'Norme européenne' },
-  { id: 5, name: 'SAE Standards', description: 'Standards internationaux' },
-  { id: 6, name: 'ISO 9001', description: 'Qualité certifiée' },
+  { id: 1, name: 'Bardahl', description: 'Distributeur officiel' },
+  { id: 2, name: 'API Certified', description: 'Norme américaine' },
+  { id: 3, name: 'ACEA', description: 'Norme européenne' },
+  { id: 4, name: 'SAE Standards', description: 'Standards internationaux' },
+  { id: 5, name: 'Mobile Money', description: 'Paiement sécurisé' },
+  { id: 6, name: 'Livraison Bénin', description: 'Partout au pays' },
 ];
 
 export function TrustSection() {
-  const t = useTranslation();
-
   return (
     <section className="py-12 md:py-16 border-t border-border bg-muted/30">
       <div className="container">
         <div className="text-center mb-8">
-          <h3 className="text-xl md:text-2xl font-bold">Technologies & Certifications</h3>
+          <h3 className="text-xl md:text-2xl font-bold">Certifications & Confiance</h3>
           <p className="text-muted-foreground mt-2 text-sm">
             Des produits conformes aux normes internationales les plus strictes
           </p>
