@@ -69,6 +69,12 @@ export default function VehicleDetail() {
   const [planFreqKm, setPlanFreqKm] = useState('');
   const [planFreqMonths, setPlanFreqMonths] = useState('');
 
+  // Alert preferences
+  const [alertReminder, setAlertReminder] = useState<any>(null);
+  const [alertPrefs, setAlertPrefs] = useState({ midpoint: true, one_week: true, one_day: true });
+  const [alertInterval, setAlertInterval] = useState('6');
+  const [savingAlerts, setSavingAlerts] = useState(false);
+
   const vehicle = vehicles.find(v => v.id === id);
 
   const fetchData = useCallback(async () => {
