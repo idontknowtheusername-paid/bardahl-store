@@ -96,6 +96,7 @@ const QUICK_ACTIONS: QuickAction[] = [
 ];
 
 export function BardahlChat() {
+  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([WELCOME_MSG]);

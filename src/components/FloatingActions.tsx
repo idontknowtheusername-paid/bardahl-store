@@ -26,7 +26,7 @@ export function FloatingActions() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-4 md:right-6 z-40 flex flex-col-reverse items-end gap-2" style={{ marginBottom: '4rem' }}>
+    <div className="fixed bottom-6 right-4 md:right-6 z-40 flex flex-col-reverse items-end gap-2" style={{ marginBottom: '2.75rem' }}>
       {actions.map((action) => {
         const content = (
           <>
