@@ -279,12 +279,15 @@ export default function VehicleDetail() {
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
             <Tabs defaultValue="entretien" className="w-full">
-              <TabsList className="w-full grid grid-cols-3 mb-5">
+              <TabsList className="w-full grid grid-cols-4 mb-5">
                 <TabsTrigger value="entretien" className="gap-1.5 text-xs sm:text-sm">
                   <ClipboardList className="h-4 w-4 hidden sm:block" /> Entretien
                 </TabsTrigger>
                 <TabsTrigger value="lubrification" className="gap-1.5 text-xs sm:text-sm">
                   <Droplets className="h-4 w-4 hidden sm:block" /> Lubrification
+                </TabsTrigger>
+                <TabsTrigger value="alertes" className="gap-1.5 text-xs sm:text-sm">
+                  <Bell className="h-4 w-4 hidden sm:block" /> Alertes
                 </TabsTrigger>
                 <TabsTrigger value="qrcode" className="gap-1.5 text-xs sm:text-sm">
                   <QrCode className="h-4 w-4 hidden sm:block" /> QR Code
