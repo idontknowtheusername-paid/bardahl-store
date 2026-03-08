@@ -1,0 +1,2 @@
+UPDATE blog_posts SET featured_image = 'https://image.pollinations.ai/prompt/motor%20oil%20viscosity%20different%20grades%20bottles%20automotive?width=800&height=500&seed=1001&nologo=true' WHERE id = '441aab93-6273-4bd0-b05d-f4a6c0cfcc13';
+UPDATE blog_posts SET featured_image = 'https://image.pollinations.ai/prompt/motor%20oil%20bottle%20pouring%20golden%20lubricant%20engine%20automotive?width=800&height=500&seed=1002&nologo=true' WHERE id = '63ec05d3-cbac-49c2-a187-0dd0c0fff6b8';
