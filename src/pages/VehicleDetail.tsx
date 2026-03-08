@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube } from 'lucide-react';
+import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
@@ -244,6 +245,8 @@ export default function VehicleDetail() {
 
               {/* TAB: Entretien */}
               <TabsContent value="entretien" className="space-y-4">
+                <HealthDashboard records={records} />
+
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Carnet d'entretien</h2>
                   <Button size="sm" onClick={() => setShowAddMaint(!showAddMaint)} className="gap-1.5"><Plus className="h-4 w-4" /> Ajouter</Button>
