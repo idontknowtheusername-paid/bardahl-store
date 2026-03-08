@@ -52,7 +52,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'purifiant-desodorisant': {
     name: 'Purifiant & désodorisant',
-    image: categoryEntretien,
+    image: categoryPurifiant,
     description: 'Purifiants d\'air et désodorisants habitacle',
   },
   'entretien': {
