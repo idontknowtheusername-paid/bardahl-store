@@ -78,7 +78,7 @@ serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'AutoPassion Blog <blog@autopassion.bj>',
+              from: 'AutoPassion Blog <blog@email.maxiimarket.com>',
               to: email,
               subject: `🔥 C'est vendredi chez AutoPassion ! Découvrez : ${title}`,
               html: `<!DOCTYPE html>
