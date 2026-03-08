@@ -194,8 +194,8 @@ export function BardahlChat() {
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
           <div>
-            <h3 className="text-sm font-bold leading-none">Assistant Bardahl</h3>
-            <span className="text-[10px] opacity-70">Expert huiles & entretien</span>
+            <h3 className="text-sm font-bold leading-none">Témi</h3>
+            <span className="text-[10px] opacity-70">Votre assistant auto</span>
           </div>
         </div>
         <div className="flex gap-0.5">
