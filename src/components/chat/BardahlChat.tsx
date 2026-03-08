@@ -193,7 +193,7 @@ export function BardahlChat() {
       {/* Header */}
       <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-secondary text-secondary-foreground shrink-0">
         <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" />
+          <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
           <div>
             <h3 className="text-sm font-bold leading-none">Témi</h3>
             <span className="text-[10px] opacity-70">Votre assistant auto</span>
