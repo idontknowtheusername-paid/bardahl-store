@@ -113,30 +113,34 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-    // Auth client: validate user token
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) throw new Error('Missing authorization header')
-
-    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-
-    const { data: { user }, error: authError } = await authClient.auth.getUser()
-    if (authError || !user) {
-      console.error('Auth error:', authError?.message)
-      throw new Error('Unauthorized')
-    }
-
     // Service role client for data operations
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    const { data: userData } = await serviceClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single()
+    // Auth: accept service role key (cron) OR validate user JWT
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) throw new Error('Missing authorization header')
 
-    if (userData?.role !== 'admin') throw new Error('Admin access required')
+    const token = authHeader.replace('Bearer ', '')
+    const isServiceRole = token === supabaseServiceKey
+
+    if (!isServiceRole) {
+      const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      })
+      const { data: { user }, error: authError } = await authClient.auth.getUser()
+      if (authError || !user) {
+        console.error('Auth error:', authError?.message)
+        throw new Error('Unauthorized')
+      }
+
+      const { data: userData } = await serviceClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+
+      if (userData?.role !== 'admin') throw new Error('Admin access required')
+    }
 
     const { topic, autoPublish = true } = await req.json()
 
