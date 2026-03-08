@@ -80,47 +80,57 @@ serve(async (req) => {
             body: JSON.stringify({
               from: 'AutoPassion Blog <blog@autopassion.bj>',
               to: email,
-              subject: `🚗 Nouvel article : ${title}`,
+              subject: `🔥 C'est vendredi chez AutoPassion ! Découvrez : ${title}`,
               html: `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 0; background: #f4f4f4;">
-  <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); padding: 30px; text-align: center;">
-    <h1 style="color: #e94560; margin: 0; font-size: 28px; font-weight: bold;">AutoPassion</h1>
-    <p style="color: #ccc; margin: 10px 0 0 0; font-size: 14px;">Bardahl – Performance & Protection</p>
+<body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 0; background: #f4f4f4;">
+  <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); padding: 35px 30px; text-align: center;">
+    <h1 style="color: #e94560; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 1px;">AutoPassion</h1>
+    <p style="color: #ccc; margin: 8px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2px;">Bardahl – Performance & Protection</p>
+  </div>
+  
+  <div style="background: #e94560; padding: 18px 30px; text-align: center;">
+    <p style="color: white; margin: 0; font-size: 18px; font-weight: bold;">🎉 C'est vendredi et vous savez ce que ça veut dire !</p>
+    <p style="color: rgba(255,255,255,0.9); margin: 6px 0 0 0; font-size: 14px;">Votre rendez-vous hebdo auto est arrivé 🚗</p>
   </div>
   
   <div style="background: #ffffff; padding: 30px;">
-    ${featured_image ? `<img src="${featured_image}" alt="${title}" style="width: 100%; border-radius: 8px; margin-bottom: 20px;">` : ''}
+    ${featured_image ? `<img src="${featured_image}" alt="${title}" style="width: 100%; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">` : ''}
     
-    <h2 style="color: #1a1a2e; margin-top: 0; font-size: 24px;">🚗 Nouvel article sur le blog</h2>
+    <p style="color: #555; font-size: 15px; margin-top: 0;">Cher(e) passionné(e),</p>
+    <p style="color: #555; font-size: 15px;">Comme chaque vendredi soir, l'équipe AutoPassion vous a préparé un article spécialement conçu pour vous aider à prendre soin de votre véhicule. Cette semaine, on vous parle de :</p>
     
-    <h3 style="color: #e94560; font-size: 20px; margin: 15px 0;">${title}</h3>
+    <h2 style="color: #1a1a2e; font-size: 22px; margin: 20px 0 10px 0; line-height: 1.3;">📰 ${title}</h2>
     
-    ${excerpt ? `<p style="color: #555; font-size: 16px; line-height: 1.6;">${excerpt}</p>` : ''}
+    ${excerpt ? `<p style="color: #666; font-size: 15px; line-height: 1.7; font-style: italic; border-left: 3px solid #e94560; padding-left: 15px; margin: 15px 0;">${excerpt}</p>` : ''}
     
     <div style="text-align: center; margin: 30px 0;">
-      <a href="${blogUrl}" style="display: inline-block; background: #e94560; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-        📖 Lire l'article
+      <a href="${blogUrl}" style="display: inline-block; background: linear-gradient(135deg, #e94560, #c23152); color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(233,69,96,0.35);">
+        📖 Lire l'article complet
       </a>
     </div>
 
-    <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 25px 0; border-left: 4px solid #e94560;">
-      <h4 style="color: #1a1a2e; margin: 0 0 10px 0;">🛒 Besoin de produits Bardahl ?</h4>
-      <p style="color: #555; margin: 0 0 15px 0; font-size: 14px;">Découvrez notre gamme complète d'huiles et additifs pour votre véhicule.</p>
-      <a href="${shopUrl}" style="display: inline-block; background: #1a1a2e; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">
-        Voir nos produits →
+    <div style="background: linear-gradient(135deg, #f8f9fa, #eef1f5); border-radius: 10px; padding: 22px; margin: 25px 0; border-left: 4px solid #1a1a2e;">
+      <h4 style="color: #1a1a2e; margin: 0 0 8px 0; font-size: 16px;">🛒 Profitez-en pour faire le plein !</h4>
+      <p style="color: #555; margin: 0 0 15px 0; font-size: 14px;">Huiles moteur, additifs, nettoyants… Tout ce qu'il faut pour chouchouter votre véhicule ce week-end.</p>
+      <a href="${shopUrl}" style="display: inline-block; background: #1a1a2e; color: white; padding: 10px 22px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 14px;">
+        Découvrir nos produits →
       </a>
     </div>
     
-    <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+    <p style="color: #777; font-size: 14px; margin-top: 25px;">Bon week-end et bonne route ! 🚗💨</p>
+    <p style="color: #777; font-size: 14px; font-weight: bold;">— L'équipe AutoPassion</p>
+    
+    <p style="color: #aaa; font-size: 11px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
       Vous recevez cet email car vous êtes abonné(e) aux notifications AutoPassion.
       <br><a href="${unsubscribeUrl}" style="color: #e94560; text-decoration: none;">Se désabonner</a>
     </p>
   </div>
   
-  <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-    <p>© ${new Date().getFullYear()} AutoPassion Bardahl. Tous droits réservés.</p>
+  <div style="text-align: center; padding: 20px; color: #999; font-size: 11px;">
+    <p style="margin: 0;">© ${new Date().getFullYear()} AutoPassion Bardahl — Cotonou, Bénin</p>
+    <p style="margin: 5px 0 0 0;">Votre partenaire lubrification de confiance 🏆</p>
   </div>
 </body>
 </html>`,
