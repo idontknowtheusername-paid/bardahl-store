@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode } from 'lucide-react';
+import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
+// Toggle this to true for real payments, false for testing
+const QR_TEST_MODE = true;
 
 interface MaintenanceRecord {
   id: string;
@@ -100,6 +103,16 @@ export default function VehicleDetail() {
     }
   }, [authLoading, isAuthenticated, navigate]);
 
+  const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
+    const { error } = await supabase
+      .from('vehicle_qr_codes')
+      .update({ is_paid: true, payment_id: transactionId || 'TEST_MODE' } as any)
+      .eq('id', qrId);
+    if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
+    toast.success('✅ QR code activé avec succès !');
+    fetchData();
+  }, []);
+
   if (authLoading) return <div className="min-h-[50vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!isAuthenticated) return null;
   if (!vehicle) return <div className="container py-20 text-center"><p>Véhicule non trouvé.</p><Button asChild className="mt-4"><Link to="/mon-espace">Retour</Link></Button></div>;
@@ -157,16 +170,51 @@ export default function VehicleDetail() {
 
   const handleGenerateQR = async () => {
     if (qrCode) return;
-    // Create QR code entry (unpaid)
     const { error } = await supabase.from('vehicle_qr_codes').insert({ vehicle_id: id! } as any);
     if (error) { toast.error(error.message); return; }
     toast.info('QR code créé. Procédez au paiement de 1 000 FCFA pour l\'activer.');
     fetchData();
   };
 
+
+
+
   const handlePayQR = () => {
-    // TODO: integrate with KkiaPay/GeniusPay for 1000 FCFA payment
-    toast.info('Paiement QR code : fonctionnalité en cours d\'intégration. Contactez-nous sur WhatsApp.');
+    if (!qrCode) return;
+
+    if (QR_TEST_MODE) {
+      // Test mode: activate directly without payment
+      toast.info('🧪 Mode test : activation gratuite du QR code...');
+      activateQR(qrCode.id);
+      return;
+    }
+
+    // Production mode: open KkiaPay widget
+    const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
+
+    if (!openKkiapayWidget) {
+      toast.error('Le module de paiement n\'est pas chargé. Rechargez la page.');
+      return;
+    }
+
+    addSuccessListener((response: any) => {
+      toast.success('Paiement reçu ! Activation du QR code...');
+      activateQR(qrCode.id, response.transactionId);
+    });
+
+    addFailedListener(() => {
+      toast.error('Le paiement a échoué. Veuillez réessayer.');
+    });
+
+    openKkiapayWidget({
+      amount: 1000,
+      key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+      sandbox: true,
+      phone: '',
+      name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
+      data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
+      theme: '#F59E0B',
+    });
   };
 
   return (
@@ -332,21 +380,27 @@ export default function VehicleDetail() {
 
               {/* QR Code */}
               <section>
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><QrCode className="h-5 w-5 text-primary" /> QR Code carnet d'entretien</h2>
+                <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
+                  <QrCode className="h-5 w-5 text-primary" /> QR Code carnet d'entretien
+                  {QR_TEST_MODE && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full flex items-center gap-1"><TestTube className="h-3 w-3" />Test</span>}
+                </h2>
                 <div className="bg-card border border-border rounded-xl p-6">
                   {!qrCode ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien de ce véhicule. À coller dans votre voiture !</p>
-                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">1 000 FCFA</span> (paiement unique)</p>
+                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span> (paiement unique)</p>
                       <Button onClick={handleGenerateQR}>Générer mon QR code</Button>
                     </div>
                   ) : !qrCode.is_paid ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de 1 000 FCFA pour activer votre QR code.</p>
-                      <Button onClick={handlePayQR} className="bg-accent text-accent-foreground">Payer 1 000 FCFA</Button>
+                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement (mode test).' : 'Finalisez le paiement de 1 000 FCFA pour activer votre QR code.'}</p>
+                      <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
+                        {QR_TEST_MODE && <TestTube className="h-4 w-4" />}
+                        {QR_TEST_MODE ? 'Activer (test gratuit)' : 'Payer 1 000 FCFA'}
+                      </Button>
                     </div>
                   ) : (
                     <div className="text-center">
