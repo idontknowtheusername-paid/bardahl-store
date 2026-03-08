@@ -11,7 +11,7 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-[62vh] flex items-center overflow-hidden bg-secondary">
+      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-secondary max-w-[70%] mx-auto rounded-2xl mt-4">
 
         <div className="container relative z-10 py-14 md:py-16">
           <div className="max-w-2xl mx-auto text-center animate-slide-up">
