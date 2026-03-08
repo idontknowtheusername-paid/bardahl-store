@@ -3,11 +3,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Toggle this to true for real payments, false for testing
 const QR_TEST_MODE = true;
 
 interface MaintenanceRecord {
@@ -54,14 +54,12 @@ export default function VehicleDetail() {
   const [showEditPlan, setShowEditPlan] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Add maintenance form
   const [maintType, setMaintType] = useState('');
   const [maintLastDate, setMaintLastDate] = useState('');
   const [maintNextDate, setMaintNextDate] = useState('');
   const [maintMileage, setMaintMileage] = useState('');
   const [maintNotes, setMaintNotes] = useState('');
 
-  // Edit plan form
   const [planEngine, setPlanEngine] = useState('');
   const [planGearbox, setPlanGearbox] = useState('');
   const [planQtyEngine, setPlanQtyEngine] = useState('');
@@ -71,7 +69,7 @@ export default function VehicleDetail() {
 
   const vehicle = vehicles.find(v => v.id === id);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     const [{ data: recs }, { data: lubPlan }, { data: qr }] = await Promise.all([
@@ -93,14 +91,12 @@ export default function VehicleDetail() {
       setPlanFreqMonths(p.change_frequency_months?.toString() || '');
     }
     setLoading(false);
-  };
+  }, [id]);
 
-  useEffect(() => { if (isAuthenticated && id) fetchData(); }, [isAuthenticated, id]);
+  useEffect(() => { if (isAuthenticated && id) fetchData(); }, [isAuthenticated, id, fetchData]);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/connexion');
-    }
+    if (!authLoading && !isAuthenticated) navigate('/connexion');
   }, [authLoading, isAuthenticated, navigate]);
 
   const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
@@ -111,7 +107,7 @@ export default function VehicleDetail() {
     if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
     toast.success('✅ QR code activé avec succès !');
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   if (authLoading) return <div className="min-h-[50vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!isAuthenticated) return null;
@@ -156,7 +152,6 @@ export default function VehicleDetail() {
       change_frequency_km: planFreqKm ? parseInt(planFreqKm) : null,
       change_frequency_months: planFreqMonths ? parseInt(planFreqMonths) : null,
     };
-
     if (plan) {
       await supabase.from('lubrication_plans').update(payload as any).eq('id', plan.id);
     } else {
@@ -176,41 +171,23 @@ export default function VehicleDetail() {
     fetchData();
   };
 
-
-
-
   const handlePayQR = () => {
     if (!qrCode) return;
-
     if (QR_TEST_MODE) {
-      // Test mode: activate directly without payment
       toast.info('🧪 Mode test : activation gratuite du QR code...');
       activateQR(qrCode.id);
       return;
     }
-
-    // Production mode: open KkiaPay widget
     const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
-
-    if (!openKkiapayWidget) {
-      toast.error('Le module de paiement n\'est pas chargé. Rechargez la page.');
-      return;
-    }
-
+    if (!openKkiapayWidget) { toast.error('Le module de paiement n\'est pas chargé.'); return; }
     addSuccessListener((response: any) => {
       toast.success('Paiement reçu ! Activation du QR code...');
       activateQR(qrCode.id, response.transactionId);
     });
-
-    addFailedListener(() => {
-      toast.error('Le paiement a échoué. Veuillez réessayer.');
-    });
-
+    addFailedListener(() => toast.error('Le paiement a échoué.'));
     openKkiapayWidget({
-      amount: 1000,
-      key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
-      sandbox: true,
-      phone: '',
+      amount: 1000, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+      sandbox: true, phone: '',
       name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
       data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
       theme: '#F59E0B',
@@ -222,20 +199,21 @@ export default function VehicleDetail() {
       <Helmet><title>{vehicle.brand ? `${vehicle.brand} ${vehicle.model}` : vehicle.license_plate} | Autopassion BJ</title></Helmet>
 
       <div className="min-h-[70vh] bg-muted/30">
-        <section className="bg-secondary text-secondary-foreground py-8 md:py-12">
+        {/* Header véhicule */}
+        <section className="bg-secondary text-secondary-foreground py-6 md:py-10">
           <div className="container">
-            <Link to="/mon-espace" className="inline-flex items-center gap-1 text-secondary-foreground/70 hover:text-white text-sm mb-4">
-              <ArrowLeft className="h-4 w-4" /> Retour à Mon espace
+            <Link to="/mon-espace" className="inline-flex items-center gap-1 text-secondary-foreground/70 hover:text-white text-sm mb-3">
+              <ArrowLeft className="h-4 w-4" /> Retour
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">
-                <Car className="h-6 w-6 text-primary" />
+              <div className="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                <Car className="h-5 w-5 text-primary" />
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-white">
+              <div className="min-w-0">
+                <h1 className="text-xl md:text-2xl font-extrabold text-white truncate">
                   {vehicle.brand && vehicle.model ? `${vehicle.brand} ${vehicle.model}` : 'Mon véhicule'}
                 </h1>
-                <div className="flex flex-wrap gap-3 text-secondary-foreground/70 text-sm mt-1">
+                <div className="flex flex-wrap gap-2 text-secondary-foreground/70 text-xs mt-1">
                   <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {vehicle.license_plate}</span>
                   {vehicle.year && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {vehicle.year}</span>}
                   {vehicle.fuel_type && <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type}</span>}
@@ -246,22 +224,35 @@ export default function VehicleDetail() {
           </div>
         </section>
 
-        <div className="container py-8 space-y-8">
+        {/* Contenu avec Tabs */}
+        <div className="container py-5">
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
-            <>
-              {/* Carnet d'entretien */}
-              <section>
-                <div className="flex items-center justify-between mb-4">
+            <Tabs defaultValue="entretien" className="w-full">
+              <TabsList className="w-full grid grid-cols-3 mb-5">
+                <TabsTrigger value="entretien" className="gap-1.5 text-xs sm:text-sm">
+                  <ClipboardList className="h-4 w-4 hidden sm:block" /> Entretien
+                </TabsTrigger>
+                <TabsTrigger value="lubrification" className="gap-1.5 text-xs sm:text-sm">
+                  <Droplets className="h-4 w-4 hidden sm:block" /> Lubrification
+                </TabsTrigger>
+                <TabsTrigger value="qrcode" className="gap-1.5 text-xs sm:text-sm">
+                  <QrCode className="h-4 w-4 hidden sm:block" /> QR Code
+                </TabsTrigger>
+              </TabsList>
+
+              {/* TAB: Entretien */}
+              <TabsContent value="entretien" className="space-y-4">
+                <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Carnet d'entretien</h2>
                   <Button size="sm" onClick={() => setShowAddMaint(!showAddMaint)} className="gap-1.5"><Plus className="h-4 w-4" /> Ajouter</Button>
                 </div>
 
                 {showAddMaint && (
-                  <form onSubmit={handleAddMaintenance} className="bg-card border border-border rounded-xl p-5 mb-4 shadow-card">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="md:col-span-2">
+                  <form onSubmit={handleAddMaintenance} className="bg-card border border-border rounded-xl p-4 shadow-card">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="sm:col-span-2">
                         <label className="block text-sm font-semibold mb-1">Type d'entretien *</label>
                         <select value={maintType} onChange={e => setMaintType(e.target.value)} className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" required>
                           <option value="">Sélectionner...</option>
@@ -277,7 +268,7 @@ export default function VehicleDetail() {
                         <input type="date" value={maintNextDate} onChange={e => setMaintNextDate(e.target.value)} className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Kilométrage au service</label>
+                        <label className="block text-sm font-semibold mb-1">Kilométrage</label>
                         <input type="number" value={maintMileage} onChange={e => setMaintMileage(e.target.value)} placeholder="120000" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
@@ -286,40 +277,40 @@ export default function VehicleDetail() {
                       </div>
                     </div>
                     <div className="flex gap-3 mt-4">
-                      <Button type="button" variant="outline" onClick={() => setShowAddMaint(false)}>Annuler</Button>
-                      <Button type="submit" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enregistrer'}</Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => setShowAddMaint(false)}>Annuler</Button>
+                      <Button type="submit" size="sm" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enregistrer'}</Button>
                     </div>
                   </form>
                 )}
 
                 {records.length === 0 ? (
-                  <div className="bg-card border border-border rounded-xl p-6 text-center">
+                  <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Wrench className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Aucun entretien enregistré. Ajoutez votre premier entretien.</p>
+                    <p className="text-sm text-muted-foreground">Aucun entretien enregistré.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {records.map(r => (
-                      <div key={r.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between">
-                        <div>
+                      <div key={r.id} className="bg-card border border-border rounded-xl p-3.5 flex items-start justify-between gap-2">
+                        <div className="min-w-0">
                           <h4 className="font-semibold text-sm">{r.maintenance_type}</h4>
-                          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
+                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-1">
                             {r.last_date && <span>Dernière : {new Date(r.last_date).toLocaleDateString('fr-FR')}</span>}
                             {r.next_date && <span className="text-primary font-medium">Prochaine : {new Date(r.next_date).toLocaleDateString('fr-FR')}</span>}
                             {r.mileage_at_service && <span>{r.mileage_at_service.toLocaleString()} km</span>}
                           </div>
-                          {r.notes && <p className="text-xs text-muted-foreground mt-1 italic">{r.notes}</p>}
+                          {r.notes && <p className="text-xs text-muted-foreground mt-1 italic truncate">{r.notes}</p>}
                         </div>
-                        <button onClick={() => handleDeleteMaintenance(r.id)} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="h-4 w-4" /></button>
+                        <button onClick={() => handleDeleteMaintenance(r.id)} className="text-muted-foreground hover:text-destructive p-1 shrink-0"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     ))}
                   </div>
                 )}
-              </section>
+              </TabsContent>
 
-              {/* Plan de lubrification */}
-              <section>
-                <div className="flex items-center justify-between mb-4">
+              {/* TAB: Lubrification */}
+              <TabsContent value="lubrification" className="space-y-4">
+                <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><Droplets className="h-5 w-5 text-primary" /> Plan de lubrification</h2>
                   <Button size="sm" variant="outline" onClick={() => setShowEditPlan(!showEditPlan)}>
                     {plan ? 'Modifier' : 'Configurer'}
@@ -327,8 +318,8 @@ export default function VehicleDetail() {
                 </div>
 
                 {showEditPlan && (
-                  <form onSubmit={handleSavePlan} className="bg-card border border-border rounded-xl p-5 mb-4 shadow-card">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <form onSubmit={handleSavePlan} className="bg-card border border-border rounded-xl p-4 shadow-card">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-semibold mb-1">Huile moteur</label>
                         <input type="text" value={planEngine} onChange={e => setPlanEngine(e.target.value)} placeholder="Ex: 5W-30" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
@@ -355,19 +346,19 @@ export default function VehicleDetail() {
                       </div>
                     </div>
                     <div className="flex gap-3 mt-4">
-                      <Button type="button" variant="outline" onClick={() => setShowEditPlan(false)}>Annuler</Button>
-                      <Button type="submit" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sauvegarder'}</Button>
+                      <Button type="button" variant="outline" size="sm" onClick={() => setShowEditPlan(false)}>Annuler</Button>
+                      <Button type="submit" size="sm" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sauvegarder'}</Button>
                     </div>
                   </form>
                 )}
 
                 {!plan && !showEditPlan ? (
-                  <div className="bg-card border border-border rounded-xl p-6 text-center">
+                  <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Droplets className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Aucun plan de lubrification configuré.</p>
                   </div>
                 ) : plan && !showEditPlan ? (
-                  <div className="bg-card border border-border rounded-xl p-5 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-card border border-border rounded-xl p-4 grid grid-cols-2 gap-4 text-sm">
                     {plan.oil_type_engine && <div><span className="text-muted-foreground text-xs block">Huile moteur</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
                     {plan.oil_type_gearbox && <div><span className="text-muted-foreground text-xs block">Huile boîte</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
                     {plan.oil_quantity_engine && <div><span className="text-muted-foreground text-xs block">Qté moteur</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
@@ -376,27 +367,27 @@ export default function VehicleDetail() {
                     {plan.change_frequency_months && <div><span className="text-muted-foreground text-xs block">Fréquence</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
                   </div>
                 ) : null}
-              </section>
+              </TabsContent>
 
-              {/* QR Code */}
-              <section>
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <QrCode className="h-5 w-5 text-primary" /> QR Code carnet d'entretien
+              {/* TAB: QR Code */}
+              <TabsContent value="qrcode" className="space-y-4">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <QrCode className="h-5 w-5 text-primary" /> QR Code carnet
                   {QR_TEST_MODE && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full flex items-center gap-1"><TestTube className="h-3 w-3" />Test</span>}
                 </h2>
                 <div className="bg-card border border-border rounded-xl p-6">
                   {!qrCode ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien de ce véhicule. À coller dans votre voiture !</p>
-                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span> (paiement unique)</p>
+                      <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien. À coller dans votre voiture !</p>
+                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span></p>
                       <Button onClick={handleGenerateQR}>Générer mon QR code</Button>
                     </div>
                   ) : !qrCode.is_paid ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement (mode test).' : 'Finalisez le paiement de 1 000 FCFA pour activer votre QR code.'}</p>
+                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement.' : 'Finalisez le paiement de 1 000 FCFA.'}</p>
                       <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
                         {QR_TEST_MODE && <TestTube className="h-4 w-4" />}
                         {QR_TEST_MODE ? 'Activer (test gratuit)' : 'Payer 1 000 FCFA'}
@@ -404,11 +395,11 @@ export default function VehicleDetail() {
                     </div>
                   ) : (
                     <div className="text-center">
-                      <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 inline-block mb-4">
+                      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 inline-block mb-4">
                         <img
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + '/qr/' + qrCode.qr_token)}`}
                           alt="QR Code"
-                          className="w-48 h-48 mx-auto"
+                          className="w-40 h-40 sm:w-48 sm:h-48 mx-auto"
                         />
                       </div>
                       <p className="font-semibold text-primary mb-1">✅ QR code actif</p>
@@ -423,8 +414,8 @@ export default function VehicleDetail() {
                     </div>
                   )}
                 </div>
-              </section>
-            </>
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </div>
