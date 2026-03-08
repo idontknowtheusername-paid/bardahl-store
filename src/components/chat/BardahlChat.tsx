@@ -82,7 +82,7 @@ async function streamChat({
 
 const WELCOME_MSG: Msg = {
   role: 'assistant',
-  content: "Bonjour ! 👋 Je suis l'assistant Bardahl.\n\nComment puis-je vous aider aujourd'hui ?",
+  content: "Bonjour ! 👋 Je suis **Témi**, votre assistant auto Autopassion.\n\nComment puis-je vous aider aujourd'hui ?",
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
@@ -166,7 +166,7 @@ export function BardahlChat() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-4 md:right-6 z-50 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
-        aria-label="Ouvrir l'assistant Bardahl"
+        aria-label="Demandez à Témi"
       >
         <Bot className="h-6 w-6" />
         <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary animate-pulse" />
@@ -182,7 +182,7 @@ export function BardahlChat() {
         className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
       >
         <Bot className="h-4 w-4" />
-        <span className="text-xs font-semibold">Assistant</span>
+        <span className="text-xs font-semibold">Parlez à Témi</span>
       </button>
     );
   }
@@ -194,8 +194,8 @@ export function BardahlChat() {
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
           <div>
-            <h3 className="text-sm font-bold leading-none">Assistant Bardahl</h3>
-            <span className="text-[10px] opacity-70">Expert huiles & entretien</span>
+            <h3 className="text-sm font-bold leading-none">Témi</h3>
+            <span className="text-[10px] opacity-70">Votre assistant auto</span>
           </div>
         </div>
         <div className="flex gap-0.5">
