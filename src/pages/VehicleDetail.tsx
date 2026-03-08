@@ -90,17 +90,15 @@ export default function VehicleDetail() {
     setQRCode(qr as unknown as QRCode | null);
 
     // Fetch alert reminder for this vehicle
-    const customerEmail = vehicles.find(v => v.id === id)?.customer_id;
-    if (customerEmail) {
+    const veh = vehicles.find(v => v.id === id);
+    if (veh) {
       const { data: reminder } = await supabase
         .from('oil_change_reminders')
         .select('*')
         .eq('is_active', true)
-        .limit(10);
-      // Find one matching this vehicle
-      const veh = vehicles.find(v => v.id === id);
+        .limit(50);
       const match = reminder?.find((r: any) =>
-        r.vehicle_brand === veh?.brand && r.vehicle_model === veh?.model
+        r.vehicle_brand === veh.brand && r.vehicle_model === veh.model
       );
       if (match) {
         setAlertReminder(match);
