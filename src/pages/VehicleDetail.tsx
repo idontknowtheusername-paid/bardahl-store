@@ -160,16 +160,58 @@ export default function VehicleDetail() {
 
   const handleGenerateQR = async () => {
     if (qrCode) return;
-    // Create QR code entry (unpaid)
     const { error } = await supabase.from('vehicle_qr_codes').insert({ vehicle_id: id! } as any);
     if (error) { toast.error(error.message); return; }
     toast.info('QR code créé. Procédez au paiement de 1 000 FCFA pour l\'activer.');
     fetchData();
   };
 
+  const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
+    const { error } = await supabase
+      .from('vehicle_qr_codes')
+      .update({ is_paid: true, payment_id: transactionId || 'TEST_MODE' } as any)
+      .eq('id', qrId);
+    if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
+    toast.success('✅ QR code activé avec succès !');
+    fetchData();
+  }, []);
+
   const handlePayQR = () => {
-    // TODO: integrate with KkiaPay/GeniusPay for 1000 FCFA payment
-    toast.info('Paiement QR code : fonctionnalité en cours d\'intégration. Contactez-nous sur WhatsApp.');
+    if (!qrCode) return;
+
+    if (QR_TEST_MODE) {
+      // Test mode: activate directly without payment
+      toast.info('🧪 Mode test : activation gratuite du QR code...');
+      activateQR(qrCode.id);
+      return;
+    }
+
+    // Production mode: open KkiaPay widget
+    const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
+
+    if (!openKkiapayWidget) {
+      toast.error('Le module de paiement n\'est pas chargé. Rechargez la page.');
+      return;
+    }
+
+    addSuccessListener((response: any) => {
+      toast.success('Paiement reçu ! Activation du QR code...');
+      activateQR(qrCode.id, response.transactionId);
+    });
+
+    addFailedListener(() => {
+      toast.error('Le paiement a échoué. Veuillez réessayer.');
+    });
+
+    openKkiapayWidget({
+      amount: 1000,
+      key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+      sandbox: true,
+      phone: '',
+      name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
+      data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
+      theme: '#F59E0B',
+    });
   };
 
   return (
