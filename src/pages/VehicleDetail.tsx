@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check } from 'lucide-react';
+import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -606,23 +607,16 @@ export default function VehicleDetail() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-center">
-                      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 inline-block mb-4">
-                        <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + '/qr/' + qrCode.qr_token)}`}
-                          alt="QR Code"
-                          className="w-40 h-40 sm:w-48 sm:h-48 mx-auto"
-                        />
-                      </div>
-                      <p className="font-semibold text-primary mb-1">✅ QR code actif</p>
-                      <p className="text-xs text-muted-foreground mb-3">Imprimez et collez ce QR code dans votre véhicule.</p>
-                      <a
-                        href={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(window.location.origin + '/qr/' + qrCode.qr_token)}`}
-                        download={`qr-${vehicle.license_plate}.png`}
-                        className="text-sm text-primary underline"
-                      >
-                        Télécharger le QR code
-                      </a>
+                    <div className="space-y-3">
+                      <p className="font-semibold text-primary text-center">✅ QR code actif</p>
+                      <BrandedQRCard
+                        qrToken={qrCode.qr_token}
+                        vehicleBrand={vehicle.brand}
+                        vehicleModel={vehicle.model}
+                        licensePlate={vehicle.license_plate}
+                        year={vehicle.year}
+                      />
+                      <p className="text-xs text-muted-foreground text-center">Téléchargez et imprimez ce sticker pour votre véhicule.</p>
                     </div>
                   )}
                 </div>
