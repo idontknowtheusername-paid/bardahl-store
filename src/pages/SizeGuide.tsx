@@ -59,7 +59,7 @@ export default function SizeGuide() {
               Guide de Sélection
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choisissez le produit Bardahl adapté à votre véhicule pour une performance optimale et une protection maximale.
+              Choisissez le produit adapté à votre véhicule pour une performance optimale et une protection maximale.
             </p>
           </div>
 
