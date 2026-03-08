@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import categoryTransmission from '@/assets/category-transmission.jpg';
-import { useMemo } from 'react';
+import categoryHuiles from '@/assets/category-huiles.jpg';
+import categoryAdditifs from '@/assets/category-additifs.jpg';
+import categoryEntretien from '@/assets/category-entretien.jpg';
+import categoryGraisses from '@/assets/category-graisses.jpg';
+import categoryLiquides from '@/assets/category-liquides.jpg';
 import { Skeleton } from '@/components/ui/skeleton';
 import { staticCategories } from '@/data/products';
 import { useTranslation } from '@/context/LanguageContext';
