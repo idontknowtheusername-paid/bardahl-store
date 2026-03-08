@@ -98,6 +98,20 @@ export default function Dashboard() {
     },
   });
 
+  const { data: reminderStats } = useQuery({
+    queryKey: ['dashboard-reminder-stats'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('oil_change_reminders')
+        .select('is_active, next_reminder_date')
+        .eq('is_active', true);
+      const active = data?.length || 0;
+      const due = data?.filter(r => new Date(r.next_reminder_date) <= new Date()).length || 0;
+      return { active, due };
+    },
+    refetchInterval: 30000,
+  });
+
   const exportToCSV = () => {
     if (!recentOrders || recentOrders.length === 0) { toast.error(t.common.noData); return; }
     const headers = [t.orders.orderNumber, t.orders.customer, t.common.email, t.common.total, t.common.status, t.common.date];
