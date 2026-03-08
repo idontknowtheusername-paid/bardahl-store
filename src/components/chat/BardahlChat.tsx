@@ -166,13 +166,13 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-12 px-3 pr-4 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 ring-2 ring-primary/30 animate-slide-in-right"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-2.5 pr-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:scale-105 active:scale-95 transition-transform flex items-center gap-1.5 ring-1 ring-primary/20 animate-slide-in-right"
         style={{ animationDelay: '1s', animationFillMode: 'backwards' }}
         aria-label="Demandez à Témi"
       >
-        <img src={temiAvatar} alt="Témi" className="h-9 w-9 rounded-full object-cover" />
-        <span className="text-sm font-semibold whitespace-nowrap">Parlez à Témi</span>
-        <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary animate-pulse" />
+        <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
+        <span className="text-xs font-semibold whitespace-nowrap">Parlez à Témi</span>
+        <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary animate-pulse" />
       </button>
     );
   }
