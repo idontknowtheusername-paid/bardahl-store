@@ -35,18 +35,18 @@ const AUTOMOTIVE_TOPICS = [
 ]
 
 const AUTOMOTIVE_IMAGES = [
-  { url: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=80', alt: 'Moteur automobile' },
-  { url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80', alt: 'Voiture sport' },
-  { url: 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&q=80', alt: 'Mécanicien au travail' },
-  { url: 'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800&q=80', alt: 'Vidange huile moteur' },
-  { url: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=80', alt: 'Entretien automobile' },
-  { url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80', alt: 'Garage automobile' },
-  { url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80', alt: 'Voiture de luxe' },
-  { url: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80', alt: 'Véhicule moderne' },
-  { url: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80', alt: 'Outils mécaniques' },
-  { url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=800&q=80', alt: 'Route automobile' },
-  { url: 'https://images.unsplash.com/photo-1606577924006-27d39b132ae2?w=800&q=80', alt: 'Moteur détail' },
-  { url: 'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=800&q=80', alt: 'Tableau de bord' },
+  { url: 'https://picsum.photos/seed/engine1/800/500', alt: 'Moteur automobile' },
+  { url: 'https://picsum.photos/seed/car1/800/500', alt: 'Voiture sport' },
+  { url: 'https://picsum.photos/seed/mechanic1/800/500', alt: 'Mécanicien au travail' },
+  { url: 'https://picsum.photos/seed/oil1/800/500', alt: 'Vidange huile moteur' },
+  { url: 'https://picsum.photos/seed/garage1/800/500', alt: 'Entretien automobile' },
+  { url: 'https://picsum.photos/seed/workshop1/800/500', alt: 'Garage automobile' },
+  { url: 'https://picsum.photos/seed/luxury1/800/500', alt: 'Voiture de luxe' },
+  { url: 'https://picsum.photos/seed/modern1/800/500', alt: 'Véhicule moderne' },
+  { url: 'https://picsum.photos/seed/tools1/800/500', alt: 'Outils mécaniques' },
+  { url: 'https://picsum.photos/seed/road1/800/500', alt: 'Route automobile' },
+  { url: 'https://picsum.photos/seed/detail1/800/500', alt: 'Moteur détail' },
+  { url: 'https://picsum.photos/seed/dashboard1/800/500', alt: 'Tableau de bord' },
 ]
 
 serve(async (req) => {

@@ -1,0 +1,1 @@
+UPDATE blog_posts SET featured_image = 'https://picsum.photos/seed/' || SUBSTR(id::text, 1, 8) || '/800/500' WHERE featured_image LIKE '%unsplash%';

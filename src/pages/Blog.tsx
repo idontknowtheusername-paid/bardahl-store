@@ -127,15 +127,14 @@ export default function Blog() {
               {filteredPosts.map(post => (
                 <Link key={post.id} to={`/blog/${post.slug}`}>
                   <Card className="h-full hover:shadow-lg transition-shadow duration-300 group">
-                    {post.featured_image && (
-                      <div className="aspect-video overflow-hidden">
-                        <img
-                          src={post.featured_image}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    )}
+                    <div className="aspect-video overflow-hidden bg-muted">
+                      <img
+                        src={post.featured_image || '/placeholder.svg'}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg' }}
+                      />
+                    </div>
                     <CardHeader>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                         <span className="flex items-center gap-1">
