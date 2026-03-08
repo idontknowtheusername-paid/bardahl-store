@@ -597,7 +597,7 @@ export default function VehicleDetail() {
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de {qrPrice.toLocaleString()} FCFA.</p>
+                      <p className="text-sm text-muted-foreground mb-4">Procédez au paiement de {qrPrice.toLocaleString()} FCFA pour l'activer.</p>
                       <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
                         Payer {qrPrice.toLocaleString()} FCFA
                       </Button>
