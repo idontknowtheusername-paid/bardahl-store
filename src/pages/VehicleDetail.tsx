@@ -329,7 +329,10 @@ export default function VehicleDetail() {
                           </div>
                           {r.notes && <p className="text-xs text-muted-foreground mt-1 italic truncate">{r.notes}</p>}
                         </div>
-                        <button onClick={() => handleDeleteMaintenance(r.id)} className="text-muted-foreground hover:text-destructive p-1 shrink-0"><Trash2 className="h-4 w-4" /></button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button onClick={() => startEditRecord(r)} className="text-muted-foreground hover:text-primary p-1"><Pencil className="h-3.5 w-3.5" /></button>
+                          <button onClick={() => handleDeleteMaintenance(r.id)} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="h-4 w-4" /></button>
+                        </div>
                       </div>
                     ))}
                   </div>
