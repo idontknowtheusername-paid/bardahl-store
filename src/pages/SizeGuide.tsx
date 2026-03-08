@@ -66,7 +66,7 @@ export default function SizeGuide() {
           {/* Comment choisir */}
           <section className="bg-muted/50 rounded-2xl p-6 md:p-8 mb-12">
             <h2 className="font-serif text-2xl font-medium text-foreground mb-6 flex items-center gap-2">
-              <Info className="w-6 h-6 text-rose" />
+              <Info className="w-6 h-6 text-primary" />
               Comment Choisir le Bon Produit
             </h2>
             <div className="grid md:grid-cols-2 gap-6">

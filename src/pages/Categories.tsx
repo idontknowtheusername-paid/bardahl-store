@@ -50,7 +50,7 @@ export default function Categories() {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Nos Gammes</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Découvrez notre gamme complète de produits Bardahl pour l'entretien et la performance de votre véhicule
+            Découvrez notre gamme complète de produits pour l'entretien et la performance de votre véhicule
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
