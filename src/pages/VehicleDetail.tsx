@@ -103,6 +103,16 @@ export default function VehicleDetail() {
     }
   }, [authLoading, isAuthenticated, navigate]);
 
+  const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
+    const { error } = await supabase
+      .from('vehicle_qr_codes')
+      .update({ is_paid: true, payment_id: transactionId || 'TEST_MODE' } as any)
+      .eq('id', qrId);
+    if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
+    toast.success('✅ QR code activé avec succès !');
+    fetchData();
+  }, []);
+
   if (authLoading) return <div className="min-h-[50vh] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!isAuthenticated) return null;
   if (!vehicle) return <div className="container py-20 text-center"><p>Véhicule non trouvé.</p><Button asChild className="mt-4"><Link to="/mon-espace">Retour</Link></Button></div>;
