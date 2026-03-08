@@ -72,7 +72,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'accessoires-electronique': {
     name: 'Accessoires & Électronique auto',
-    image: categoryTransmission,
+    image: categoryAccessoires,
     description: 'Accessoires et équipements électroniques',
   },
   'filtres': {
