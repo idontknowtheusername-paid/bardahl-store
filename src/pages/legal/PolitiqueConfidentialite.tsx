@@ -8,10 +8,10 @@ export default function PolitiqueConfidentialite() {
           <section>
             <h2 className="font-serif text-2xl font-medium mb-4">1. Collecte des données</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Bardahl collecte des données personnelles lors de votre navigation sur notre site, 
+              ETS Autopassion BJ collecte des données personnelles lors de votre navigation sur notre site, 
               de la création de votre compte, de vos commandes et de vos échanges avec notre service client. 
               Les données collectées incluent : nom, prénom, adresse email, adresse de livraison, numéro de téléphone 
-              et WhatsApp, historique de commandes.
+              et WhatsApp, informations véhicule, historique d'entretien et historique de commandes.
             </p>
           </section>
 
@@ -20,8 +20,9 @@ export default function PolitiqueConfidentialite() {
             <p className="text-muted-foreground leading-relaxed">
               Vos données personnelles sont utilisées pour :<br />
               - Traiter et suivre vos commandes<br />
-              - Gérer votre compte client<br />
+              - Gérer votre compte client et votre carnet d'entretien<br />
               - Vous contacter via WhatsApp pour le suivi de commande<br />
+              - Envoyer des rappels d'entretien pour vos véhicules<br />
               - Vous envoyer des informations sur nos produits et offres (avec votre consentement)<br />
               - Améliorer notre site et nos services
             </p>
@@ -30,7 +31,7 @@ export default function PolitiqueConfidentialite() {
           <section>
             <h2 className="font-serif text-2xl font-medium mb-4">3. Protection des données</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Bardahl met en œuvre des mesures techniques et organisationnelles appropriées 
+              ETS Autopassion BJ met en œuvre des mesures techniques et organisationnelles appropriées 
               pour protéger vos données personnelles contre tout accès non autorisé, toute modification, 
               divulgation ou destruction. Les paiements Mobile Money sont sécurisés par les opérateurs.
             </p>
@@ -54,7 +55,8 @@ export default function PolitiqueConfidentialite() {
               - Droit de rectification<br />
               - Droit à l'effacement<br />
               - Droit d'opposition<br /><br />
-              Pour exercer ces droits, contactez-nous à : contact@bardahl.com
+              Pour exercer ces droits, contactez-nous par WhatsApp au +229 96 78 62 84 
+              ou à l'adresse : 01 BP 369 Parakou, Bénin.
             </p>
           </section>
 
@@ -71,8 +73,9 @@ export default function PolitiqueConfidentialite() {
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question relative à cette politique de confidentialité, vous pouvez nous 
               contacter :<br />
-              - Email : contact@bardahl.com<br />
-              - WhatsApp : +229 01 97 00 00 00
+              - WhatsApp : +229 96 78 62 84<br />
+              - Téléphone : +229 96 78 62 84 / +229 62 21 67 66<br />
+              - Adresse : 01 BP 369 Parakou, Bénin
             </p>
           </section>
         </div>

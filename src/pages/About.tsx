@@ -1,23 +1,23 @@
 import { Helmet } from 'react-helmet-async';
-import { Heart, Award, Truck, Users } from 'lucide-react';
+import { Heart, Award, Truck, Users, Car, Wrench, Stethoscope, BookOpen } from 'lucide-react';
 
 export default function About() {
   return (
     <>
       <Helmet>
-        <title>À Propos | Bardahl</title>
-        <meta name="description" content="Découvrez l'histoire de Bardahl, notre passion pour les produits automobiles de qualité et notre engagement envers nos clients." />
+        <title>À Propos | Autopassion BJ</title>
+        <meta name="description" content="Découvrez Autopassion BJ, votre plateforme automobile digitale au Bénin : e-commerce, diagnostic IA, carnet d'entretien et conseils personnalisés." />
       </Helmet>
 
       <main className="min-h-screen">
         {/* Hero Section */}
-        <section className="relative py-20 bg-gradient-to-b from-rose/10 to-background">
+        <section className="relative py-20 bg-gradient-to-b from-primary/10 to-background">
           <div className="container text-center">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-foreground mb-6">
-              À Propos de <span className="text-rose">Bardahl</span>
+              À Propos d'<span className="text-primary">Autopassion BJ</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Votre partenaire de confiance pour l'entretien et la performance de votre véhicule.
+              Votre plateforme automobile digitale au Bénin — e-commerce, diagnostic intelligent et carnet d'entretien numérique.
             </p>
           </div>
         </section>
@@ -32,76 +32,120 @@ export default function About() {
                 </h2>
                 <div className="space-y-4 text-muted-foreground">
                   <p>
-                    Bardahl est une marque reconnue mondialement pour ses produits automobiles de haute qualité.
-                    Fondée avec une passion pour l'excellence, notre mission est de fournir des solutions
-                    d'entretien et de performance pour tous types de véhicules.
+                    Autopassion BJ est né de la volonté de moderniser l'entretien automobile au Bénin.
+                    Basés à Parakou, nous avons créé une plateforme digitale complète qui simplifie
+                    l'accès aux produits d'entretien de qualité et aux services automobiles.
                   </p>
                   <p>
-                    Nous croyons que chaque véhicule mérite les meilleurs soins,
-                    c'est pourquoi nous développons des produits innovants qui allient
-                    performance, protection et durabilité.
+                    Notre mission : offrir à chaque automobiliste béninois les outils et produits
+                    nécessaires pour prendre soin de son véhicule — huiles moteur, additifs,
+                    graisses, liquides de refroidissement et bien plus.
                   </p>
                   <p>
-                    Notre engagement : vous offrir des produits de qualité supérieure
-                    qui prolongent la vie de votre moteur et optimisent ses performances.
+                    Grâce à notre diagnostic intelligent par IA, notre carnet d'entretien digital
+                    et notre boutique en ligne, nous accompagnons nos clients à chaque étape de
+                    la vie de leur véhicule.
                   </p>
                 </div>
               </div>
               <div className="relative">
-                <img 
-                  src="/Bardahl_idiSpcDptj_1.svg"
-                  alt="Bardahl Logo"
-                  className="rounded-2xl shadow-2xl w-full object-contain aspect-square p-8 bg-white"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-rose text-white p-6 rounded-xl shadow-lg">
+                <div className="rounded-2xl shadow-2xl w-full aspect-square p-8 bg-secondary flex flex-col items-center justify-center gap-4">
+                  <Car className="w-24 h-24 text-accent" />
+                  <p className="text-2xl font-bold text-white">Autopassion BJ</p>
+                  <p className="text-white/70 text-center text-sm">Plateforme automobile digitale<br />Parakou, Bénin</p>
+                </div>
+                <div className="absolute -bottom-6 -left-6 bg-primary text-primary-foreground p-6 rounded-xl shadow-lg">
                   <p className="font-serif text-2xl font-medium">100%</p>
-                  <p className="text-sm">Qualité Premium</p>
+                  <p className="text-sm">Made in Bénin</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Nos Valeurs */}
+        {/* Nos Services */}
         <section className="py-16 md:py-24 bg-muted/30">
           <div className="container">
             <h2 className="font-serif text-3xl md:text-4xl font-medium text-foreground text-center mb-12">
-              Nos Valeurs
+              Nos Services
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 {
-                  icon: Heart,
-                  title: 'Passion',
-                  description: 'Nous mettons tout notre cœur dans le développement de chaque produit.',
+                  icon: Car,
+                  title: 'Boutique Auto',
+                  description: 'Huiles moteur, additifs, graisses et produits d\'entretien de marques reconnues.',
                 },
                 {
-                  icon: Award,
-                  title: 'Qualité',
-                  description: 'Des formules premium pour une protection et une performance exceptionnelles.',
+                  icon: Stethoscope,
+                  title: 'Diagnostic IA',
+                  description: 'Analysez les symptômes de votre véhicule grâce à notre assistant intelligent.',
                 },
                 {
-                  icon: Truck,
-                  title: 'Service',
-                  description: 'Livraison rapide et service client attentif à vos besoins.',
+                  icon: BookOpen,
+                  title: 'Carnet Digital',
+                  description: 'Suivez l\'entretien de vos véhicules avec un carnet numérique complet.',
                 },
                 {
-                  icon: Users,
-                  title: 'Communauté',
-                  description: 'Une relation de confiance avec nos clients fidèles.',
+                  icon: Wrench,
+                  title: 'Conseils Expert',
+                  description: 'Trouvez l\'huile adaptée à votre moteur avec notre sélecteur intelligent.',
                 },
-              ].map((value, index) => (
+              ].map((service, index) => (
                 <div 
                   key={index}
                   className="bg-background p-6 rounded-xl shadow-sm text-center hover:shadow-md transition-shadow"
                 >
-                  <div className="w-14 h-14 bg-rose/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="w-7 h-7 text-rose" />
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <service.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-serif text-xl font-medium text-foreground mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {service.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Nos Valeurs */}
+        <section className="py-16 md:py-24">
+          <div className="container">
+            <h2 className="font-serif text-3xl md:text-4xl font-medium text-foreground text-center mb-12">
+              Nos Valeurs
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Heart,
+                  title: 'Passion',
+                  description: 'L\'automobile est notre passion. Nous mettons tout notre cœur au service de vos véhicules.',
+                },
+                {
+                  icon: Award,
+                  title: 'Qualité',
+                  description: 'Nous sélectionnons uniquement des produits de marques reconnues pour leur fiabilité.',
+                },
+                {
+                  icon: Users,
+                  title: 'Proximité',
+                  description: 'Un service client humain et réactif, disponible par WhatsApp et téléphone.',
+                },
+              ].map((value, index) => (
+                <div 
+                  key={index}
+                  className="p-6 border border-border rounded-xl hover:border-primary/50 transition-colors"
+                >
+                  <div className="w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold mb-4">
+                    <value.icon className="w-5 h-5" />
                   </div>
                   <h3 className="font-serif text-xl font-medium text-foreground mb-2">
                     {value.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground">
                     {value.description}
                   </p>
                 </div>
@@ -110,61 +154,29 @@ export default function About() {
           </div>
         </section>
 
-        {/* Pourquoi Nous Choisir */}
-        <section className="py-16 md:py-24">
-          <div className="container">
-            <h2 className="font-serif text-3xl md:text-4xl font-medium text-foreground text-center mb-12">
-              Pourquoi Nous Choisir ?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: 'Large Gamme',
-                  description: 'Des huiles moteur aux additifs, trouvez le produit parfait pour votre véhicule.',
-                },
-                {
-                  title: 'Prix Compétitifs',
-                  description: 'La qualité premium à des prix justes, pour tous les budgets.',
-                },
-                {
-                  title: 'Paiement Sécurisé',
-                  description: 'Mobile Money et autres méthodes de paiement sécurisées disponibles.',
-                },
-              ].map((item, index) => (
-                <div 
-                  key={index}
-                  className="p-6 border border-border rounded-xl hover:border-rose/50 transition-colors"
-                >
-                  <div className="w-10 h-10 bg-rose text-white rounded-full flex items-center justify-center font-bold mb-4">
-                    {index + 1}
-                  </div>
-                  <h3 className="font-serif text-xl font-medium text-foreground mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* CTA */}
-        <section className="py-16 md:py-24 bg-rose text-white">
+        <section className="py-16 md:py-24 bg-primary text-primary-foreground">
           <div className="container text-center">
             <h2 className="font-serif text-3xl md:text-4xl font-medium mb-6">
-              Prêt à Découvrir Notre Gamme ?
+              Prêt à Prendre Soin de Votre Véhicule ?
             </h2>
-            <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-              Explorez notre sélection de produits et trouvez celui qui correspond à votre véhicule.
+            <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+              Explorez notre boutique, lancez un diagnostic ou créez votre carnet d'entretien digital.
             </p>
-            <a 
-              href="/collections"
-              className="inline-flex items-center justify-center px-8 py-3 bg-white text-rose font-medium rounded-lg hover:bg-white/90 transition-colors"
-            >
-              Voir les Collections
-            </a>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <a 
+                href="/categories"
+                className="inline-flex items-center justify-center px-8 py-3 bg-white text-primary font-medium rounded-lg hover:bg-white/90 transition-colors"
+              >
+                Voir la Boutique
+              </a>
+              <a 
+                href="/diagnostic"
+                className="inline-flex items-center justify-center px-8 py-3 border border-white/30 text-white font-medium rounded-lg hover:bg-white/10 transition-colors"
+              >
+                Lancer un Diagnostic
+              </a>
+            </div>
           </div>
         </section>
       </main>
