@@ -81,14 +81,17 @@ export default function VehicleDetail() {
   const fetchData = useCallback(async () => {
     if (!id) return;
     setLoading(true);
-    const [{ data: recs }, { data: lubPlan }, { data: qr }] = await Promise.all([
+    const [{ data: recs }, { data: lubPlan }, { data: qrCodes }] = await Promise.all([
       supabase.from('maintenance_records').select('*').eq('vehicle_id', id).order('last_date', { ascending: false }),
       supabase.from('lubrication_plans').select('*').eq('vehicle_id', id).maybeSingle(),
-      supabase.from('vehicle_qr_codes').select('*').eq('vehicle_id', id).maybeSingle(),
+      supabase.from('vehicle_qr_codes').select('*').eq('vehicle_id', id).order('created_at', { ascending: false }),
     ]);
     setRecords((recs as unknown as MaintenanceRecord[]) || []);
     setPlan(lubPlan as unknown as LubricationPlan | null);
-    setQRCode(qr as unknown as QRCode | null);
+    // Prefer the paid QR, otherwise the most recent unpaid one
+    const qrList = (qrCodes || []) as unknown as QRCode[];
+    const paidQr = qrList.find(q => q.is_paid);
+    setQRCode(paidQr || qrList[0] || null);
 
     // Fetch alert reminder for this vehicle
     const veh = vehicles.find(v => v.id === id);
@@ -129,7 +132,7 @@ export default function VehicleDetail() {
   const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
     const { error } = await supabase
       .from('vehicle_qr_codes')
-      .update({ is_paid: true, payment_id: transactionId || 'TEST_MODE' } as any)
+      .update({ is_paid: true, payment_id: transactionId || 'KKIAPAY' } as any)
       .eq('id', qrId);
     if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
     toast.success('✅ QR code activé avec succès !');
@@ -213,12 +216,19 @@ export default function VehicleDetail() {
     fetchData();
   };
 
+  const KKIAPAY_PUBLIC_KEY = '0ba8ae7ef28216eeadf374223adaba3ddc947acb';
+
   const handleGenerateQR = async () => {
     if (qrCode) return;
-    const { error } = await supabase.from('vehicle_qr_codes').insert({ vehicle_id: id! } as any);
+    const { data: newQr, error } = await supabase
+      .from('vehicle_qr_codes')
+      .insert({ vehicle_id: id! } as any)
+      .select()
+      .single();
     if (error) { toast.error(error.message); return; }
-    toast.info('QR code créé. Procédez au paiement de 1 000 FCFA pour l\'activer.');
-    fetchData();
+    // Set QR and immediately open payment
+    setQRCode(newQr as unknown as QRCode);
+    openPaymentWidget(newQr.id);
   };
 
   // Fetch QR price from site settings
@@ -228,22 +238,32 @@ export default function VehicleDetail() {
     });
   }, []);
 
-  const handlePayQR = () => {
-    if (!qrCode) return;
+  const openPaymentWidget = useCallback((qrId: string) => {
     const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
-    if (!openKkiapayWidget) { toast.error('Le module de paiement n\'est pas chargé.'); return; }
+    if (!openKkiapayWidget) {
+      toast.error('Le module de paiement n\'est pas chargé. Veuillez rafraîchir la page.');
+      return;
+    }
     addSuccessListener((response: any) => {
       toast.success('Paiement reçu ! Activation du QR code...');
-      activateQR(qrCode.id, response.transactionId);
+      activateQR(qrId, response.transactionId);
     });
-    addFailedListener(() => toast.error('Le paiement a échoué.'));
+    addFailedListener(() => toast.error('Le paiement a échoué. Vous pouvez réessayer.'));
     openKkiapayWidget({
-      amount: qrPrice, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
-      sandbox: false, phone: '',
+      amount: qrPrice,
+      key: KKIAPAY_PUBLIC_KEY,
+      sandbox: false,
+      phone: profile?.phone || '',
       name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
-      data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
+      email: profile?.email || '',
+      data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrId }),
       theme: '#F59E0B',
     });
+  }, [qrPrice, activateQR, id, vehicle, profile]);
+
+  const handlePayQR = () => {
+    if (!qrCode) return;
+    openPaymentWidget(qrCode.id);
   };
 
   return (
@@ -580,7 +600,7 @@ export default function VehicleDetail() {
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de {qrPrice.toLocaleString()} FCFA.</p>
+                      <p className="text-sm text-muted-foreground mb-4">Procédez au paiement de {qrPrice.toLocaleString()} FCFA pour l'activer.</p>
                       <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
                         Payer {qrPrice.toLocaleString()} FCFA
                       </Button>
