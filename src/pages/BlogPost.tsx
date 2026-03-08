@@ -180,17 +180,16 @@ export default function BlogPost() {
         </div>
       </div>
 
-      {post.featured_image && (
-        <div className="container mx-auto px-4 mb-12">
-          <div className="max-w-4xl mx-auto">
-            <img
-              src={post.featured_image}
-              alt={post.title}
-              className="w-full rounded-lg shadow-lg"
-            />
-          </div>
+      <div className="container mx-auto px-4 mb-12">
+        <div className="max-w-4xl mx-auto">
+          <img
+            src={post.featured_image || '/placeholder.svg'}
+            alt={post.title}
+            className="w-full rounded-lg shadow-lg"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg' }}
+          />
         </div>
-      )}
+      </div>
 
       <div className="container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto">
