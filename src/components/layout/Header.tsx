@@ -35,13 +35,17 @@ export function Header() {
   ];
 
   const navLinks = [
-    { label: 'Accueil', href: '/' },
-    { label: 'Diagnostic auto', href: '/diagnostic', icon: Stethoscope },
-    { label: 'Entretien véhicule', href: '/entretien', icon: Wrench },
     { label: 'Produits', href: '/categories', hasSubmenu: true },
-    { label: 'Conseils auto', href: '/blog' },
+    { label: 'Diagnostic', href: '/diagnostic', icon: Stethoscope },
+    { label: 'Entretien', href: '/entretien', icon: Wrench },
     { label: 'Mon espace', href: '/mon-espace', icon: Car },
+  ];
+
+  const secondaryLinks = [
+    { label: 'Accueil', href: '/' },
+    { label: 'Conseils auto', href: '/blog' },
     { label: 'Contact', href: '/contact' },
+    { label: 'À propos', href: '/a-propos' },
   ];
 
   const handleSearch = (query: string) => {
@@ -153,10 +157,11 @@ export function Header() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="mt-8 flex flex-col gap-1">
-                  {navLinks.map(({ label, href, hasSubmenu }) => (
+                  {navLinks.map(({ label, href, hasSubmenu, icon: Icon }) => (
                     <div key={href}>
                       <Link to={href} onClick={() => !hasSubmenu && setIsMenuOpen(false)}
                         className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                        {Icon && <Icon className="h-4 w-4" />}
                         {label}
                       </Link>
                       {hasSubmenu && (
@@ -170,6 +175,13 @@ export function Header() {
                         </div>
                       )}
                     </div>
+                  ))}
+                  <div className="border-t border-secondary-foreground/10 my-3" />
+                  {secondaryLinks.map(({ label, href }) => (
+                    <Link key={href} to={href} onClick={() => setIsMenuOpen(false)}
+                      className="px-3 py-2.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors text-sm text-secondary-foreground/60">
+                      {label}
+                    </Link>
                   ))}
                 </nav>
               </SheetContent>
