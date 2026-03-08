@@ -77,7 +77,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'filtres': {
     name: 'Filtres',
-    image: categoryGraisses,
+    image: categoryFiltres,
     description: 'Filtres à huile, gasoil, air et plus',
   },
 };
