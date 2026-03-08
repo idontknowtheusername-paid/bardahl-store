@@ -215,9 +215,12 @@ export function BardahlChat() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
         {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex items-end gap-1.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {m.role === 'assistant' && (
+              <img src={temiAvatar} alt="Témi" className="h-6 w-6 rounded-full object-cover shrink-0 mb-0.5" />
+            )}
             <div
-              className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+              className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                 m.role === 'user'
                   ? 'bg-primary text-primary-foreground rounded-br-sm'
                   : 'bg-muted text-foreground rounded-bl-sm'
@@ -227,10 +230,16 @@ export function BardahlChat() {
                 <ReactMarkdown>{m.content}</ReactMarkdown>
               </div>
             </div>
+            {m.role === 'user' && (
+              <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mb-0.5">
+                <User className="h-3.5 w-3.5 text-primary" />
+              </div>
+            )}
           </div>
         ))}
         {isLoading && messages[messages.length - 1]?.role === 'user' && (
-          <div className="flex justify-start">
+          <div className="flex items-end gap-1.5 justify-start">
+            <img src={temiAvatar} alt="Témi" className="h-6 w-6 rounded-full object-cover shrink-0 mb-0.5" />
             <div className="bg-muted rounded-xl px-3 py-2">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
