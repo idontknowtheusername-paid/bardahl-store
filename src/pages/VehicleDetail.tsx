@@ -566,7 +566,7 @@ export default function VehicleDetail() {
               <TabsContent value="qrcode" className="space-y-4">
                 <h2 className="text-lg font-bold flex items-center gap-2">
                   <QrCode className="h-5 w-5 text-primary" /> QR Code carnet
-                  {QR_TEST_MODE && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full flex items-center gap-1"><TestTube className="h-3 w-3" />Test</span>}
+                  
                 </h2>
                 <div className="bg-card border border-border rounded-xl p-6">
                   {!qrCode ? (
