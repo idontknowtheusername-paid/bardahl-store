@@ -81,14 +81,17 @@ export default function VehicleDetail() {
   const fetchData = useCallback(async () => {
     if (!id) return;
     setLoading(true);
-    const [{ data: recs }, { data: lubPlan }, { data: qr }] = await Promise.all([
+    const [{ data: recs }, { data: lubPlan }, { data: qrCodes }] = await Promise.all([
       supabase.from('maintenance_records').select('*').eq('vehicle_id', id).order('last_date', { ascending: false }),
       supabase.from('lubrication_plans').select('*').eq('vehicle_id', id).maybeSingle(),
-      supabase.from('vehicle_qr_codes').select('*').eq('vehicle_id', id).maybeSingle(),
+      supabase.from('vehicle_qr_codes').select('*').eq('vehicle_id', id).order('created_at', { ascending: false }),
     ]);
     setRecords((recs as unknown as MaintenanceRecord[]) || []);
     setPlan(lubPlan as unknown as LubricationPlan | null);
-    setQRCode(qr as unknown as QRCode | null);
+    // Prefer the paid QR, otherwise the most recent unpaid one
+    const qrList = (qrCodes || []) as unknown as QRCode[];
+    const paidQr = qrList.find(q => q.is_paid);
+    setQRCode(paidQr || qrList[0] || null);
 
     // Fetch alert reminder for this vehicle
     const veh = vehicles.find(v => v.id === id);
