@@ -31,30 +31,50 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
     image: categoryHuiles,
     description: 'Huiles moteur haute performance',
   },
+  'transmission': {
+    name: 'Huiles boîtes & Transmission',
+    image: categoryTransmission,
+    description: 'Huiles de transmission et liquides de frein',
+  },
   'additifs': {
     name: 'Additifs & Traitements',
     image: categoryAdditifs,
     description: 'Additifs moteur et carburant',
+  },
+  'liquides': {
+    name: 'Liquide de refroidissement & lave-glace',
+    image: categoryLiquides,
+    description: 'Liquides de refroidissement et antigel',
+  },
+  'purifiant-desodorisant': {
+    name: 'Purifiant & désodorisant',
+    image: categoryEntretien,
+    description: 'Purifiants d\'air et désodorisants habitacle',
   },
   'entretien': {
     name: 'Entretien & Nettoyage',
     image: categoryEntretien,
     description: 'Produits d\'entretien automobile',
   },
-  'graisses': {
-    name: 'Graisses & Lubrifiants',
+  'special-atelier': {
+    name: 'Spécial atelier',
     image: categoryGraisses,
-    description: 'Graisses et lubrifiants spécialisés',
+    description: 'Produits professionnels pour atelier',
   },
-  'liquides': {
-    name: 'Liquides de refroidissement',
-    image: categoryLiquides,
-    description: 'Liquides de refroidissement et antigel',
+  'packs-entretien': {
+    name: 'Packs entretien',
+    image: categoryHuiles,
+    description: 'Packs complets pour votre véhicule',
   },
-  'transmission': {
-    name: 'Transmission & Freinage',
+  'accessoires-electronique': {
+    name: 'Accessoires & Électronique auto',
     image: categoryTransmission,
-    description: 'Huiles de transmission et liquides de frein',
+    description: 'Accessoires et équipements électroniques',
+  },
+  'filtres': {
+    name: 'Filtres',
+    image: categoryGraisses,
+    description: 'Filtres à huile, gasoil, air et plus',
   },
 };
 
