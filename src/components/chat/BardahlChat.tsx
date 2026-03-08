@@ -164,8 +164,11 @@ export function BardahlChat() {
     sessionStorage.removeItem('bardahl-chat-session');
   };
 
+  const isHidden = HIDDEN_PATHS.some(p => pathname.startsWith(p));
+
   // Floating button — bottom-right, compact
-  if (!isOpen) {
+  if (!isOpen || isHidden) {
+    if (isHidden) return null;
     return (
       <button
         onClick={() => setIsOpen(true)}
