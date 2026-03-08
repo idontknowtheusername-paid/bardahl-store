@@ -289,6 +289,19 @@ export default function Settings() {
                 placeholder="0"
               />
             </div>
+
+            <div>
+              <Label htmlFor="qr_activation_price">Prix activation QR code (FCFA)</Label>
+              <Input
+                id="qr_activation_price"
+                type="number"
+                step="100"
+                value={(formData as any).qr_activation_price || ''}
+                onChange={(e) => setFormData({ ...formData, qr_activation_price: e.target.value ? parseFloat(e.target.value) : null } as any)}
+                placeholder="1000"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Montant facturé pour activer le carnet d'entretien numérique via QR code</p>
+            </div>
           </CardContent>
         </Card>
 

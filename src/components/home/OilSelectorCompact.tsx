@@ -90,15 +90,12 @@ const getRecommendedProducts = (engine: string, allProducts: Product[]): Product
     p.style?.toLowerCase().includes('huile')
   );
 
-  console.log('All oils found:', allOils.length, allOils.map(p => p.name));
-
   if (lowerEngine.includes('diesel')) {
     const filtered = allOils.filter(p =>
       p.name.includes('5W-30') ||
       p.name.includes('5W-40') ||
       p.name.toLowerCase().includes('diesel')
     );
-    console.log('Diesel oils:', filtered.length);
     return filtered.slice(0, 3);
   }
   if (lowerEngine.includes('hybride') || lowerEngine.includes('hybrid')) {
@@ -107,19 +104,16 @@ const getRecommendedProducts = (engine: string, allProducts: Product[]): Product
       p.name.includes('0W-30') ||
       p.name.includes('5W-30')
     );
-    console.log('Hybrid oils:', filtered.length);
     return filtered.slice(0, 3);
   }
   if (lowerEngine.includes('électrique') || lowerEngine.includes('electric')) {
     return [];
   }
-  // Essence / Gasoline
   const filtered = allOils.filter(p =>
     p.name.includes('5W-30') ||
     p.name.includes('5W-40') ||
     p.name.includes('10W-40')
   );
-  console.log('Gasoline oils:', filtered.length);
   return filtered.slice(0, 3);
 };
 

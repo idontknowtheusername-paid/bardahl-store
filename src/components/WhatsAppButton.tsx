@@ -8,7 +8,7 @@ export function WhatsAppButton() {
   const [message, setMessage] = useState('');
   
   // Numéro WhatsApp depuis les variables d'environnement
-  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '237XXXXXXXXX';
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '22996786284';
   
   const predefinedMessages = [
     "Bonjour, j'aimerais avoir plus d'informations sur vos produits",
