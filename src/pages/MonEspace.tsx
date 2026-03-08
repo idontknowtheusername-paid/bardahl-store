@@ -120,7 +120,7 @@ export default function MonEspace() {
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="border-white/20 text-white hover:bg-white/10 shrink-0">
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="border border-white/20 text-secondary-foreground hover:bg-white/10 shrink-0">
                 <LogOut className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline ml-1.5">Déconnexion</span>
               </Button>
