@@ -34,67 +34,38 @@ const AUTOMOTIVE_TOPICS = [
   'Comparatif huiles minérales vs synthétiques vs semi-synthétiques',
 ]
 
-async function generateCoverImage(topic: string, supabaseClient: any): Promise<string> {
-  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
-  if (!lovableApiKey) {
-    console.warn('LOVABLE_API_KEY not set, using fallback image')
-    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+const IMAGE_KEYWORDS: Record<string, string> = {
+  'huile': 'motor oil bottle pouring golden lubricant engine',
+  'moteur': 'car engine closeup mechanical parts',
+  'additif': 'fuel additive bottle automotive chemistry',
+  'vidange': 'oil change mechanic workshop drain plug',
+  'transmission': 'car gearbox transmission mechanical',
+  'refroidissement': 'car radiator coolant engine cooling system',
+  'carburant': 'fuel injection system gasoline diesel',
+  'injecteur': 'fuel injector nozzle spray automotive',
+  'turbo': 'turbocharger turbo engine boost automotive',
+  'diesel': 'diesel engine truck automotive maintenance',
+  'moto': 'motorcycle engine oil maintenance',
+  'filtre': 'oil filter automotive spare parts',
+  'entretien': 'car maintenance workshop mechanic tools',
+  'viscosité': 'motor oil viscosity different grades bottles',
+  'norme': 'automotive certification quality standard oil',
+}
+
+function getImagePrompt(topic: string): string {
+  const topicLower = topic.toLowerCase()
+  for (const [keyword, prompt] of Object.entries(IMAGE_KEYWORDS)) {
+    if (topicLower.includes(keyword)) {
+      return prompt
+    }
   }
+  return 'automotive motor oil car engine maintenance professional'
+}
 
-  try {
-    const imagePrompt = `Professional automotive photography related to: "${topic}". Show engine parts, motor oil, car maintenance, mechanic workshop, or lubricant products. Clean, professional, well-lit. No text overlays.`
-
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image',
-        messages: [{ role: 'user', content: imagePrompt }],
-        modalities: ['image', 'text'],
-      }),
-    })
-
-    if (!response.ok) {
-      console.error('AI image generation failed:', await response.text())
-      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
-    }
-
-    const data = await response.json()
-    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url
-
-    if (!imageData || !imageData.startsWith('data:image')) {
-      console.error('No image in AI response')
-      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
-    }
-
-    const base64Data = imageData.split(',')[1]
-    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
-    const fileName = `blog/cover-${Date.now()}.png`
-
-    const { error: uploadError } = await supabaseClient.storage
-      .from('products')
-      .upload(fileName, binaryData, {
-        contentType: 'image/png',
-        upsert: true,
-      })
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
-      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
-    }
-
-    const { data: urlData } = supabaseClient.storage
-      .from('products')
-      .getPublicUrl(fileName)
-
-    return urlData.publicUrl
-  } catch (e) {
-    console.error('Cover image generation error:', e)
-    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
-  }
+function generateCoverImageUrl(topic: string): string {
+  const prompt = getImagePrompt(topic)
+  const encoded = encodeURIComponent(prompt)
+  return `https://image.pollinations.ai/prompt/${encoded}?width=800&height=500&seed=${Date.now()}&nologo=true`
 }
 
 serve(async (req) => {
@@ -136,9 +107,8 @@ serve(async (req) => {
     const mistralApiKey = Deno.env.get('MISTRAL_API_KEY')
     if (!mistralApiKey) throw new Error('MISTRAL_API_KEY not configured')
 
-    // Generate AI cover image
-    console.log('Generating cover image for topic:', selectedTopic)
-    const coverImageUrl = await generateCoverImage(selectedTopic, supabaseClient)
+    // Generate cover image URL (Pollinations.ai - free, no API key)
+    const coverImageUrl = generateCoverImageUrl(selectedTopic)
     console.log('Cover image URL:', coverImageUrl)
 
     const prompt = `Tu es un expert en lubrifiants automobiles et produits Bardahl. Écris un article de blog complet sur : "${selectedTopic}".
