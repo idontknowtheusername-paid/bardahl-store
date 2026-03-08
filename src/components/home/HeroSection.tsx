@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Search, Shield, Truck, Award, Stethoscope, Wrench, ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
+import heroBg from '@/assets/hero-bg.jpg';
 import { OilSelectorModal } from './OilSelectorModal';
 
 export function HeroSection() {
