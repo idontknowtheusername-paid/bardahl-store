@@ -21,6 +21,7 @@ export function Header() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showProductsMenu, setShowProductsMenu] = useState(false);
+  const [mobileSubOpen, setMobileSubOpen] = useState(false);
   const navigate = useNavigate();
 
   const currentLang = languages.find(l => l.code === language);
@@ -159,20 +160,36 @@ export function Header() {
                 <nav className="mt-8 flex flex-col gap-1">
                   {navLinks.map(({ label, href, hasSubmenu, icon: Icon }) => (
                     <div key={href}>
-                      <Link to={href} onClick={() => !hasSubmenu && setIsMenuOpen(false)}
-                        className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
-                        {Icon && <Icon className="h-4 w-4" />}
-                        {label}
-                      </Link>
-                      {hasSubmenu && (
-                        <div className="pl-6 flex flex-col gap-0.5">
-                          {productCategories.map(cat => (
-                            <Link key={cat.href} to={cat.href} onClick={() => setIsMenuOpen(false)}
-                              className="px-3 py-2 rounded text-xs text-secondary-foreground/70 hover:text-primary transition-colors">
-                              {cat.label}
+                      {hasSubmenu ? (
+                        <>
+                          <div className="flex items-center">
+                            <Link to={href} onClick={() => setIsMenuOpen(false)}
+                              className="flex-1 px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                              {Icon && <Icon className="h-4 w-4" />}
+                              {label}
                             </Link>
-                          ))}
-                        </div>
+                            <button onClick={() => setMobileSubOpen(!mobileSubOpen)}
+                              className="p-3 hover:bg-primary/10 rounded-lg transition-colors">
+                              <ChevronDown className={`h-4 w-4 transition-transform ${mobileSubOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                          </div>
+                          {mobileSubOpen && (
+                            <div className="pl-6 flex flex-col gap-0.5 animate-in slide-in-from-top-2">
+                              {productCategories.map(cat => (
+                                <Link key={cat.href} to={cat.href} onClick={() => setIsMenuOpen(false)}
+                                  className="px-3 py-2 rounded text-xs text-secondary-foreground/70 hover:text-primary transition-colors">
+                                  {cat.label}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <Link to={href} onClick={() => setIsMenuOpen(false)}
+                          className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                          {Icon && <Icon className="h-4 w-4" />}
+                          {label}
+                        </Link>
                       )}
                     </div>
                   ))}
