@@ -9,7 +9,7 @@ import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const QR_TEST_MODE = true;
+const QR_DEFAULT_PRICE = 1000;
 
 interface MaintenanceRecord {
   id: string;
