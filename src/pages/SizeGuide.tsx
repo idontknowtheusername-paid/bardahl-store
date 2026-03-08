@@ -44,7 +44,7 @@ export default function SizeGuide() {
   return (
     <>
       <Helmet>
-        <title>Guide de Sélection | Bardahl</title>
+        <title>Guide de Sélection | Autopassion BJ</title>
         <meta name="description" content="Trouvez le produit adapté à votre véhicule grâce à notre guide de sélection détaillé." />
       </Helmet>
 
