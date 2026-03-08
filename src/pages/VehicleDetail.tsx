@@ -115,23 +115,46 @@ export default function VehicleDetail() {
   if (!isAuthenticated) return null;
   if (!vehicle) return <div className="container py-20 text-center"><p>Véhicule non trouvé.</p><Button asChild className="mt-4"><Link to="/mon-espace">Retour</Link></Button></div>;
 
-  const handleAddMaintenance = async (e: React.FormEvent) => {
+  const resetMaintForm = () => {
+    setMaintType(''); setMaintLastDate(''); setMaintNextDate(''); setMaintMileage(''); setMaintNotes('');
+    setEditingRecord(null);
+    setShowAddMaint(false);
+  };
+
+  const startEditRecord = (r: MaintenanceRecord) => {
+    setEditingRecord(r.id);
+    setMaintType(r.maintenance_type);
+    setMaintLastDate(r.last_date ? r.last_date.split('T')[0] : '');
+    setMaintNextDate(r.next_date ? r.next_date.split('T')[0] : '');
+    setMaintMileage(r.mileage_at_service?.toString() || '');
+    setMaintNotes(r.notes || '');
+    setShowAddMaint(true);
+  };
+
+  const handleSaveMaintenance = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!maintType) return;
     setSaving(true);
-    const { error } = await supabase.from('maintenance_records').insert({
+    const payload = {
       vehicle_id: id!,
       maintenance_type: maintType,
       last_date: maintLastDate || null,
       next_date: maintNextDate || null,
       mileage_at_service: maintMileage ? parseInt(maintMileage) : null,
       notes: maintNotes.trim() || null,
-    } as any);
-    setSaving(false);
-    if (error) { toast.error(error.message); return; }
-    toast.success('Entretien ajouté !');
-    setShowAddMaint(false);
-    setMaintType(''); setMaintLastDate(''); setMaintNextDate(''); setMaintMileage(''); setMaintNotes('');
+    };
+    if (editingRecord) {
+      const { error } = await supabase.from('maintenance_records').update(payload as any).eq('id', editingRecord);
+      setSaving(false);
+      if (error) { toast.error(error.message); return; }
+      toast.success('Entretien modifié !');
+    } else {
+      const { error } = await supabase.from('maintenance_records').insert(payload as any);
+      setSaving(false);
+      if (error) { toast.error(error.message); return; }
+      toast.success('Entretien ajouté !');
+    }
+    resetMaintForm();
     fetchData();
   };
 
