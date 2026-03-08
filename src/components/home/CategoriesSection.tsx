@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import categoryTransmission from '@/assets/category-transmission.jpg';
 import { useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { staticCategories } from '@/data/products';
@@ -47,7 +48,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'transmission': {
     name: 'Transmission & Freinage',
-    image: 'https://images.unsplash.com/photo-1635784553857-4a87fb285e44?w=800&q=80',
+    image: categoryTransmission,
     description: 'Huiles de transmission et liquides de frein',
   },
 };
