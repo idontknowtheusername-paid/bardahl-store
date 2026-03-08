@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube, Pencil } from 'lucide-react';
+import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube, Pencil, Bell, Check } from 'lucide-react';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -69,6 +69,12 @@ export default function VehicleDetail() {
   const [planFreqKm, setPlanFreqKm] = useState('');
   const [planFreqMonths, setPlanFreqMonths] = useState('');
 
+  // Alert preferences
+  const [alertReminder, setAlertReminder] = useState<any>(null);
+  const [alertPrefs, setAlertPrefs] = useState({ midpoint: true, one_week: true, one_day: true });
+  const [alertInterval, setAlertInterval] = useState('6');
+  const [savingAlerts, setSavingAlerts] = useState(false);
+
   const vehicle = vehicles.find(v => v.id === id);
 
   const fetchData = useCallback(async () => {
@@ -82,6 +88,24 @@ export default function VehicleDetail() {
     setRecords((recs as unknown as MaintenanceRecord[]) || []);
     setPlan(lubPlan as unknown as LubricationPlan | null);
     setQRCode(qr as unknown as QRCode | null);
+
+    // Fetch alert reminder for this vehicle
+    const veh = vehicles.find(v => v.id === id);
+    if (veh) {
+      const { data: reminder } = await supabase
+        .from('oil_change_reminders')
+        .select('*')
+        .eq('is_active', true)
+        .limit(50);
+      const match = reminder?.find((r: any) =>
+        r.vehicle_brand === veh.brand && r.vehicle_model === veh.model
+      );
+      if (match) {
+        setAlertReminder(match);
+        setAlertPrefs((match as any).alert_preferences || { midpoint: true, one_week: true, one_day: true });
+        setAlertInterval(String(match.reminder_interval_months || 6));
+      }
+    }
 
     if (lubPlan) {
       const p = lubPlan as any;
@@ -255,12 +279,15 @@ export default function VehicleDetail() {
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
             <Tabs defaultValue="entretien" className="w-full">
-              <TabsList className="w-full grid grid-cols-3 mb-5">
+              <TabsList className="w-full grid grid-cols-4 mb-5">
                 <TabsTrigger value="entretien" className="gap-1.5 text-xs sm:text-sm">
                   <ClipboardList className="h-4 w-4 hidden sm:block" /> Entretien
                 </TabsTrigger>
                 <TabsTrigger value="lubrification" className="gap-1.5 text-xs sm:text-sm">
                   <Droplets className="h-4 w-4 hidden sm:block" /> Lubrification
+                </TabsTrigger>
+                <TabsTrigger value="alertes" className="gap-1.5 text-xs sm:text-sm">
+                  <Bell className="h-4 w-4 hidden sm:block" /> Alertes
                 </TabsTrigger>
                 <TabsTrigger value="qrcode" className="gap-1.5 text-xs sm:text-sm">
                   <QrCode className="h-4 w-4 hidden sm:block" /> QR Code
@@ -398,6 +425,109 @@ export default function VehicleDetail() {
                     {plan.change_frequency_months && <div><span className="text-muted-foreground text-xs block">Fréquence</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
                   </div>
                 ) : null}
+              </TabsContent>
+
+              {/* TAB: Alertes */}
+              <TabsContent value="alertes" className="space-y-4">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-primary" /> Préférences d'alertes
+                </h2>
+
+                {!alertReminder ? (
+                  <div className="bg-card border border-border rounded-xl p-8 text-center">
+                    <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Aucun rappel configuré pour ce véhicule.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Les rappels sont créés automatiquement lors d'un achat d'huile.</p>
+                  </div>
+                ) : (
+                  <div className="bg-card border border-border rounded-xl p-5 space-y-5">
+                    {/* Interval */}
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Fréquence de vidange</label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {['3', '6', '9', '12'].map(m => (
+                          <button
+                            key={m}
+                            onClick={() => setAlertInterval(m)}
+                            className={`py-2.5 rounded-lg text-sm font-medium border transition-all ${
+                              alertInterval === m
+                                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                : 'bg-background border-input hover:border-primary/50'
+                            }`}
+                          >
+                            {m} mois
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Alert preferences */}
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">Quand recevoir les alertes ?</label>
+                      <div className="space-y-2.5">
+                        {[
+                          { key: 'midpoint' as const, label: 'À mi-chemin', desc: `~${Math.round(parseInt(alertInterval) / 2 * 30)} jours avant` },
+                          { key: 'one_week' as const, label: '1 semaine avant', desc: '7 jours avant la date prévue' },
+                          { key: 'one_day' as const, label: 'La veille', desc: '1 jour avant — rappel urgent' },
+                        ].map(({ key, label, desc }) => (
+                          <button
+                            key={key}
+                            onClick={() => setAlertPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
+                            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
+                              alertPrefs[key]
+                                ? 'bg-primary/5 border-primary/30'
+                                : 'bg-background border-input'
+                            }`}
+                          >
+                            <div className="text-left">
+                              <p className="text-sm font-medium">{label}</p>
+                              <p className="text-xs text-muted-foreground">{desc}</p>
+                            </div>
+                            <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
+                              alertPrefs[key] ? 'bg-primary text-primary-foreground' : 'border-2 border-muted-foreground/30'
+                            }`}>
+                              {alertPrefs[key] && <Check className="h-3 w-3" />}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Info on what emails contain */}
+                    <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+                      <p className="font-semibold text-foreground text-sm">📧 Chaque alerte contient :</p>
+                      <p>• Infos de votre véhicule et produit recommandé</p>
+                      <p>• Lien pour commander sur le site</p>
+                      <p>• Lien WhatsApp pour commande rapide</p>
+                      <p>• 🚚 Livraison gratuite pour les commandes vidange !</p>
+                    </div>
+
+                    <Button
+                      className="w-full"
+                      disabled={savingAlerts}
+                      onClick={async () => {
+                        setSavingAlerts(true);
+                        const next = new Date();
+                        next.setMonth(next.getMonth() + parseInt(alertInterval));
+                        const { error } = await supabase
+                          .from('oil_change_reminders')
+                          .update({
+                            reminder_interval_months: parseInt(alertInterval),
+                            next_reminder_date: next.toISOString(),
+                            alert_preferences: alertPrefs as any,
+                            alerts_sent: {} as any,
+                          } as any)
+                          .eq('id', alertReminder.id);
+                        setSavingAlerts(false);
+                        if (error) { toast.error('Erreur: ' + error.message); return; }
+                        toast.success('Préférences d\'alertes sauvegardées !');
+                        fetchData();
+                      }}
+                    >
+                      {savingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sauvegarder mes préférences'}
+                    </Button>
+                  </div>
+                )}
               </TabsContent>
 
               {/* TAB: QR Code */}
