@@ -45,7 +45,7 @@ const MAINTENANCE_TYPES = [
 
 export default function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
-  const { isAuthenticated, isLoading: authLoading, vehicles } = useCustomerAuth();
+  const { isAuthenticated, isLoading: authLoading, vehicles, profile } = useCustomerAuth();
   const navigate = useNavigate();
   const [records, setRecords] = useState<MaintenanceRecord[]>([]);
   const [plan, setPlan] = useState<LubricationPlan | null>(null);
