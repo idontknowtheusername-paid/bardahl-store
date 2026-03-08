@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import categoryTransmission from '@/assets/category-transmission.jpg';
 import { useMemo } from 'react';
+import categoryTransmission from '@/assets/category-transmission.jpg';
+import categoryHuiles from '@/assets/category-huiles.jpg';
+import categoryAdditifs from '@/assets/category-additifs.jpg';
+import categoryEntretien from '@/assets/category-entretien.jpg';
+import categoryGraisses from '@/assets/category-graisses.jpg';
+import categoryLiquides from '@/assets/category-liquides.jpg';
 import { Skeleton } from '@/components/ui/skeleton';
 import { staticCategories } from '@/data/products';
 import { useTranslation } from '@/context/LanguageContext';
@@ -23,27 +28,27 @@ function CategoryCardSkeleton() {
 const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; description: string }> = {
   'huiles-moteur': {
     name: 'Huiles Moteur',
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=80',
+    image: categoryHuiles,
     description: 'Huiles moteur haute performance',
   },
   'additifs': {
     name: 'Additifs & Traitements',
-    image: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&q=80',
+    image: categoryAdditifs,
     description: 'Additifs moteur et carburant',
   },
   'entretien': {
     name: 'Entretien & Nettoyage',
-    image: 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&q=80',
+    image: categoryEntretien,
     description: 'Produits d\'entretien automobile',
   },
   'graisses': {
     name: 'Graisses & Lubrifiants',
-    image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=80',
+    image: categoryGraisses,
     description: 'Graisses et lubrifiants spécialisés',
   },
   'liquides': {
     name: 'Liquides de refroidissement',
-    image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
+    image: categoryLiquides,
     description: 'Liquides de refroidissement et antigel',
   },
   'transmission': {
