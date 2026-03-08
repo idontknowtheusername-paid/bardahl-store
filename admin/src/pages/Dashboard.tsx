@@ -214,6 +214,7 @@ export default function Dashboard() {
         </Link>
       )}
 
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>{t.dashboard.revenueChart}</CardTitle></CardHeader>
           <CardContent>
