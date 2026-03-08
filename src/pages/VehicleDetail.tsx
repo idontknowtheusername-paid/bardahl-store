@@ -436,8 +436,37 @@ export default function VehicleDetail() {
                 {!alertReminder ? (
                   <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Aucun rappel configuré pour ce véhicule.</p>
-                    <p className="text-xs text-muted-foreground mt-1">Les rappels sont créés automatiquement lors d'un achat d'huile.</p>
+                    <p className="text-sm text-muted-foreground mb-3">Aucun rappel configuré pour ce véhicule.</p>
+                    <p className="text-xs text-muted-foreground mb-4">Activez les rappels pour recevoir des alertes avant chaque vidange.</p>
+                    <Button
+                      disabled={savingAlerts}
+                      onClick={async () => {
+                        setSavingAlerts(true);
+                        const next = new Date();
+                        next.setMonth(next.getMonth() + 6);
+                        const { data: newReminder, error } = await supabase
+                          .from('oil_change_reminders')
+                          .insert({
+                            customer_email: profile?.email || `${profile?.phone}@autopassion.local`,
+                            customer_name: profile?.full_name || '',
+                            customer_phone: profile?.phone || '',
+                            vehicle_brand: vehicle.brand || null,
+                            vehicle_model: vehicle.model || null,
+                            reminder_interval_months: 6,
+                            next_reminder_date: next.toISOString(),
+                            alert_preferences: { midpoint: true, one_week: true, one_day: true },
+                          } as any)
+                          .select()
+                          .single();
+                        setSavingAlerts(false);
+                        if (error) { toast.error('Erreur: ' + error.message); return; }
+                        toast.success('🔔 Rappels vidange activés ! (par défaut : tous les 6 mois)');
+                        fetchData();
+                      }}
+                      className="gap-2"
+                    >
+                      {savingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Bell className="h-4 w-4" /> Activer les rappels vidange</>}
+                    </Button>
                   </div>
                 ) : (
                   <div className="bg-card border border-border rounded-xl p-5 space-y-5">
