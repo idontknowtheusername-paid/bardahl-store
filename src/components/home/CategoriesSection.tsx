@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import categoryTransmission from '@/assets/category-transmission.jpg';
 import { useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { staticCategories } from '@/data/products';
