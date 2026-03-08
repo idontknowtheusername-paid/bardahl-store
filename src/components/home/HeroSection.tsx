@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Search, Shield, Truck, Award, Stethoscope, Wrench, ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
-import heroBg from '@/assets/hero-bg.jpg';
 import { OilSelectorModal } from './OilSelectorModal';
 
 export function HeroSection() {
@@ -12,19 +11,7 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-[62vh] flex items-center overflow-hidden">
-        {/* Hero background image */}
-        <img
-          src={heroBg}
-          alt="Huile moteur versée dans un moteur automobile"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          loading="eager"
-        />
-        {/* Overlays */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-secondary/90 via-secondary/70 to-secondary/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-secondary/30" />
-        </div>
+      <section className="relative min-h-[62vh] flex items-center overflow-hidden bg-secondary">
 
         <div className="container relative z-10 py-14 md:py-16">
           <div className="max-w-2xl mx-auto text-center animate-slide-up">
