@@ -182,7 +182,7 @@ export function BardahlChat() {
         className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
       >
         <Bot className="h-4 w-4" />
-        <span className="text-xs font-semibold">Assistant</span>
+        <span className="text-xs font-semibold">Parlez à Témi</span>
       </button>
     );
   }
