@@ -245,6 +245,8 @@ export default function VehicleDetail() {
 
               {/* TAB: Entretien */}
               <TabsContent value="entretien" className="space-y-4">
+                <HealthDashboard records={records} />
+
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Carnet d'entretien</h2>
                   <Button size="sm" onClick={() => setShowAddMaint(!showAddMaint)} className="gap-1.5"><Plus className="h-4 w-4" /> Ajouter</Button>
