@@ -3,24 +3,32 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 
 const faqData = [
   {
-    q: { fr: 'Quelle huile choisir pour mon véhicule ?', en: 'Which oil should I choose for my vehicle?' },
-    a: { fr: 'Utilisez notre sélecteur d\'huile intelligent sur la page d\'accueil ou consultez le manuel de votre véhicule pour connaître la viscosité recommandée.', en: 'Use our smart oil selector on the homepage or consult your vehicle manual for the recommended viscosity.' },
+    q: 'Quelle huile choisir pour mon véhicule ?',
+    a: 'Utilisez notre sélecteur d\'huile intelligent sur la page d\'accueil ou consultez le manuel de votre véhicule pour connaître la viscosité recommandée. Vous pouvez aussi nous contacter sur WhatsApp pour un conseil personnalisé.',
   },
   {
-    q: { fr: 'Qu\'est-ce que la technologie Polar Plus® ?', en: 'What is Polar Plus® technology?' },
-    a: { fr: 'Polar Plus® est une technologie exclusive Bardahl qui crée un film protecteur ultra-résistant sur les surfaces métalliques du moteur, réduisant la friction et l\'usure.', en: 'Polar Plus® is an exclusive Bardahl technology that creates an ultra-resistant protective film on engine metal surfaces, reducing friction and wear.' },
+    q: 'Comment fonctionne le diagnostic IA ?',
+    a: 'Notre assistant intelligent analyse les symptômes que vous décrivez (bruits, vibrations, voyants) et vous propose un pré-diagnostic avec les causes probables et les actions recommandées. Il ne remplace pas un mécanicien professionnel mais vous aide à mieux comprendre votre véhicule.',
   },
   {
-    q: { fr: 'Quels sont les délais de livraison ?', en: 'What are the delivery times?' },
-    a: { fr: 'Livraison standard en 2-4 jours ouvrés, express en 24-48h. Gratuite dès 59€ d\'achat.', en: 'Standard delivery in 2-4 business days, express in 24-48h. Free shipping on orders over €59.' },
+    q: 'Quels sont les délais de livraison ?',
+    a: 'Parakou et environs : 24-48h. Autres villes du Bénin (Cotonou, Porto-Novo, Bohicon, etc.) : 2-4 jours ouvrés. Afrique de l\'Ouest : 5-10 jours selon la destination.',
   },
   {
-    q: { fr: 'Puis-je retourner un produit ?', en: 'Can I return a product?' },
-    a: { fr: 'Oui, vous disposez de 14 jours pour retourner un produit non ouvert dans son emballage d\'origine.', en: 'Yes, you have 14 days to return an unopened product in its original packaging.' },
+    q: 'Puis-je retourner un produit ?',
+    a: 'Oui, vous disposez de 7 jours à compter de la réception pour demander un échange. Le produit doit être non ouvert et dans son emballage d\'origine.',
   },
   {
-    q: { fr: 'Quels modes de paiement acceptez-vous ?', en: 'What payment methods do you accept?' },
-    a: { fr: 'Nous acceptons les cartes bancaires (Visa, Mastercard), le mobile money et les virements bancaires.', en: 'We accept credit cards (Visa, Mastercard), mobile money and bank transfers.' },
+    q: 'Quels modes de paiement acceptez-vous ?',
+    a: 'Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires et le paiement à la livraison (Parakou et environs uniquement).',
+  },
+  {
+    q: 'Qu\'est-ce que le carnet d\'entretien digital ?',
+    a: 'C\'est un espace personnel où vous enregistrez vos véhicules, suivez l\'historique des entretiens et recevez des rappels automatiques pour vos prochaines vidanges ou maintenances.',
+  },
+  {
+    q: 'Les produits vendus sont-ils authentiques ?',
+    a: 'Oui, tous nos produits proviennent de fournisseurs officiels et de marques reconnues. Nous garantissons l\'authenticité de chaque article.',
   },
 ];
 
@@ -32,16 +40,17 @@ export default function FAQ() {
       <div className="container max-w-3xl">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-extrabold mb-4">{t.faqTitle}</h1>
+          <p className="text-muted-foreground">Retrouvez les réponses aux questions les plus fréquentes sur Autopassion BJ.</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-2">
           {faqData.map((faq, i) => (
             <AccordionItem key={i} value={`faq-${i}`} className="border rounded-lg px-4">
               <AccordionTrigger className="text-left font-semibold">
-                {faq.q.fr}
+                {faq.q}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                {faq.a.fr}
+                {faq.a}
               </AccordionContent>
             </AccordionItem>
           ))}

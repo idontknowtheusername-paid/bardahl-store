@@ -9,8 +9,8 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 1 - Objet</h2>
             <p className="text-muted-foreground leading-relaxed">
               Les présentes conditions générales de vente régissent les relations contractuelles entre 
-              Bardahl et ses clients, dans le cadre de la vente de produits automobiles via le
-              site internet bardahl.com.
+              ETS Autopassion BJ (RCCM : RB/PKO/17 A 4167, IFU : 2201501541800) et ses clients, 
+              dans le cadre de la vente de produits automobiles via le site internet autopassionbj.com.
             </p>
           </section>
 
@@ -38,7 +38,7 @@ export default function CGV() {
               Le paiement s'effectue par :<br />
               - Mobile Money (MTN MoMo, Moov Money)<br />
               - Virement bancaire<br />
-              - Paiement à la livraison (Cotonou et environs uniquement)<br />
+              - Paiement à la livraison (Parakou et environs uniquement)<br />
               La commande est validée après réception du paiement ou confirmation pour les paiements 
               à la livraison.
             </p>
@@ -48,10 +48,10 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 5 - Livraison</h2>
             <p className="text-muted-foreground leading-relaxed">
               Les produits sont livrés à l'adresse de livraison indiquée lors de la commande.<br />
-              - Cotonou : 24-48h, à partir de 1 000 FCFA<br />
+              - Parakou et environs : 24-48h, à partir de 1 000 FCFA<br />
               - Autres villes du Bénin : 2-4 jours, à partir de 2 000 FCFA<br />
               - Afrique de l'Ouest : 5-10 jours, tarif selon destination<br />
-              Livraison gratuite dès 50 000 FCFA d'achat à Cotonou.
+              Livraison gratuite dès 50 000 FCFA d'achat à Parakou.
             </p>
           </section>
 
@@ -78,9 +78,9 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 8 - Service client</h2>
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question ou réclamation, notre service client est disponible :<br />
-              - Par WhatsApp : +229 01 97 00 00 00 (du lundi au samedi de 8h à 20h)<br />
-              - Par email : contact@bardahl.com<br />
-              - Par téléphone : +229 01 97 00 00 00
+              - Par WhatsApp : +229 96 78 62 84 (du lundi au samedi de 8h à 20h)<br />
+              - Par téléphone : +229 96 78 62 84 / +229 62 21 67 66<br />
+              - Adresse : 01 BP 369 Parakou, Bénin
             </p>
           </section>
         </div>

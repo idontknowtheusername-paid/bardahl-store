@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Phone, Clock, Send, MessageCircle } from 'lucide-react';
+import { Mail, Phone, Clock, Send, MessageCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,19 +27,19 @@ const faqs = [
   },
   {
     question: "Quels sont les délais de livraison ?",
-    answer: "Cotonou : 24-48h. Autres villes du Bénin : 2-4 jours. Afrique de l'Ouest : 5-10 jours selon la destination."
+    answer: "Parakou et environs : 24-48h. Autres villes du Bénin : 2-4 jours. Afrique de l'Ouest : 5-10 jours selon la destination."
   },
   {
     question: "Comment retourner un produit ?",
-    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 97 00 00 00 avec votre numéro de commande et une photo du produit (non ouvert)."
+    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
-    answer: "Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires, et le paiement à la livraison (Cotonou uniquement)."
+    answer: "Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires, et le paiement à la livraison (Parakou et environs uniquement)."
   },
   {
-    question: "La livraison est-elle sécurisée ?",
-    answer: "Oui, tous nos colis sont emballés de manière professionnelle et suivis. L'expéditeur affiché est 'Bardahl Express'."
+    question: "Les produits sont-ils authentiques ?",
+    answer: "Oui, tous nos produits proviennent de fournisseurs officiels et de marques reconnues. Nous garantissons l'authenticité de chaque article vendu sur Autopassion BJ."
   },
 ];
 
@@ -65,7 +65,6 @@ export default function Contact() {
 
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      // Fallback: simulate success for demo without backend
       toast({
         title: "Message envoyé !",
         description: "Nous vous répondrons dans les plus brefs délais.",
@@ -97,12 +96,12 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">WhatsApp (Recommandé)</h3>
                 <a
-                  href="https://wa.me/22901970000000"
+                  href="https://wa.me/22996786284"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700 transition-colors font-medium"
                 >
-                  +229 01 97 00 00 00
+                  +229 96 78 62 84
                 </a>
                 <p className="text-xs text-muted-foreground mt-1">
                   Réponse rapide garantie
@@ -111,38 +110,42 @@ export default function Contact() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-rose-light rounded-full">
-                <Phone className="h-5 w-5 text-rose" />
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Phone className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-medium mb-1">Téléphone</h3>
                 <a
-                  href="tel:+22901970000000"
-                  className="text-muted-foreground hover:text-rose transition-colors"
+                  href="tel:+22996786284"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +229 01 97 00 00 00
+                  +229 96 78 62 84
+                </a>
+                <br />
+                <a
+                  href="tel:+22962216766"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  +229 62 21 67 66
                 </a>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-rose-light rounded-full">
-                <Mail className="h-5 w-5 text-rose" />
+              <div className="p-3 bg-primary/10 rounded-full">
+                <MapPin className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-medium mb-1">Email</h3>
-                <a
-                  href="mailto:contact@bardahl.com"
-                  className="text-muted-foreground hover:text-rose transition-colors"
-                >
-                  contact@bardahl.com
-                </a>
+                <h3 className="font-medium mb-1">Adresse</h3>
+                <p className="text-muted-foreground text-sm">
+                  01 BP 369 Parakou, Bénin
+                </p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-rose-light rounded-full">
-                <Clock className="h-5 w-5 text-rose" />
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Clock className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-medium mb-1">Horaires</h3>
@@ -194,6 +197,7 @@ export default function Contact() {
                     <SelectItem value="return">Échange</SelectItem>
                     <SelectItem value="advice">Conseil technique</SelectItem>
                     <SelectItem value="delivery">Livraison</SelectItem>
+                    <SelectItem value="diagnostic">Diagnostic véhicule</SelectItem>
                     <SelectItem value="other">Autre</SelectItem>
                   </SelectContent>
                 </Select>

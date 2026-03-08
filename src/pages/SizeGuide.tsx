@@ -44,7 +44,7 @@ export default function SizeGuide() {
   return (
     <>
       <Helmet>
-        <title>Guide de Sélection | Bardahl</title>
+        <title>Guide de Sélection | Autopassion BJ</title>
         <meta name="description" content="Trouvez le produit adapté à votre véhicule grâce à notre guide de sélection détaillé." />
       </Helmet>
 
@@ -52,21 +52,21 @@ export default function SizeGuide() {
         <div className="container max-w-4xl">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-rose/10 rounded-full mb-6">
-              <Wrench className="w-8 h-8 text-rose" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
+              <Wrench className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-serif text-4xl md:text-5xl font-medium text-foreground mb-4">
               Guide de Sélection
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choisissez le produit Bardahl adapté à votre véhicule pour une performance optimale et une protection maximale.
+              Choisissez le produit adapté à votre véhicule pour une performance optimale et une protection maximale.
             </p>
           </div>
 
           {/* Comment choisir */}
           <section className="bg-muted/50 rounded-2xl p-6 md:p-8 mb-12">
             <h2 className="font-serif text-2xl font-medium text-foreground mb-6 flex items-center gap-2">
-              <Info className="w-6 h-6 text-rose" />
+              <Info className="w-6 h-6 text-primary" />
               Comment Choisir le Bon Produit
             </h2>
             <div className="grid md:grid-cols-2 gap-6">

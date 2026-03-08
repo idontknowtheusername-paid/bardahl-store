@@ -9,18 +9,18 @@ export default function LivraisonRetours() {
         {/* Shipping Options */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <Truck className="h-6 w-6 text-rose" />
+            <Truck className="h-6 w-6 text-primary" />
             <h2 className="font-serif text-2xl font-medium">Options de livraison</h2>
           </div>
           
           <div className="space-y-4">
             <div className="p-4 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">Cotonou Express</h3>
-                <span className="text-rose font-medium">1 500 FCFA</span>
+                <h3 className="font-medium">Parakou Express</h3>
+                <span className="text-primary font-medium">1 500 FCFA</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Livraison à domicile sous 24-48h à Cotonou et environs. 
+                Livraison à domicile sous 24-48h à Parakou et environs. 
                 <strong className="text-green-600"> Gratuite dès 50 000 FCFA d'achat !</strong>
               </p>
             </div>
@@ -28,18 +28,18 @@ export default function LivraisonRetours() {
             <div className="p-4 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">Bénin Standard</h3>
-                <span className="text-rose font-medium">2 500 FCFA</span>
+                <span className="text-primary font-medium">2 500 FCFA</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Livraison dans toutes les grandes villes du Bénin sous 2-4 jours ouvrés 
-                (Porto-Novo, Parakou, Abomey-Calavi, Bohicon, etc.).
+                (Cotonou, Porto-Novo, Abomey-Calavi, Bohicon, etc.).
               </p>
             </div>
 
             <div className="p-4 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">Afrique de l'Ouest</h3>
-                <span className="text-rose font-medium">À partir de 5 000 FCFA</span>
+                <span className="text-primary font-medium">À partir de 5 000 FCFA</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Livraison au Togo, Niger, Burkina Faso, Côte d'Ivoire, Sénégal et autres pays 
@@ -53,7 +53,7 @@ export default function LivraisonRetours() {
                 <span className="text-green-600 font-medium">Disponible</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Option disponible uniquement pour Cotonou et ses environs. 
+                Option disponible uniquement pour Parakou et ses environs. 
                 Payez en espèces ou Mobile Money à la réception.
               </p>
             </div>
@@ -63,24 +63,24 @@ export default function LivraisonRetours() {
         {/* Packaging */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <Package className="h-6 w-6 text-rose" />
-            <h2 className="font-serif text-2xl font-medium">Emballage discret</h2>
+            <Package className="h-6 w-6 text-primary" />
+            <h2 className="font-serif text-2xl font-medium">Emballage soigné</h2>
           </div>
           <p className="text-muted-foreground leading-relaxed">
-            Toutes nos commandes sont expédiées dans un emballage neutre et discret, sans aucune mention 
-            de la nature du contenu. Votre intimité est notre priorité. L'expéditeur indiqué est simplement 
-            "CL Express".
+            Toutes nos commandes sont emballées avec soin pour garantir l'intégrité de vos produits 
+            pendant le transport. Chaque colis est vérifié avant expédition. 
+            L'expéditeur indiqué est "Autopassion BJ".
           </p>
         </section>
 
         {/* Returns */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <RefreshCw className="h-6 w-6 text-rose" />
+            <RefreshCw className="h-6 w-6 text-primary" />
             <h2 className="font-serif text-2xl font-medium">Échanges & Retours</h2>
           </div>
           
-          <div className="bg-rose-light p-4 rounded-lg mb-6">
+          <div className="bg-primary/10 p-4 rounded-lg mb-6">
             <p className="font-medium text-center">
               7 jours pour échanger votre produit
             </p>
@@ -96,7 +96,7 @@ export default function LivraisonRetours() {
 
             <p className="leading-relaxed">
               <strong className="text-foreground">Procédure d'échange :</strong><br />
-              1. Contactez-nous via WhatsApp au +229 01 97 00 00 00<br />
+              1. Contactez-nous via WhatsApp au +229 96 78 62 84<br />
               2. Envoyez une photo du produit et votre numéro de commande<br />
               3. Nous organisons la récupération du produit<br />
               4. L'échange est effectué sous 48h après réception
@@ -113,7 +113,7 @@ export default function LivraisonRetours() {
         {/* Tracking */}
         <section>
           <div className="flex items-center gap-3 mb-6">
-            <Clock className="h-6 w-6 text-rose" />
+            <Clock className="h-6 w-6 text-primary" />
             <h2 className="font-serif text-2xl font-medium">Suivi de commande</h2>
           </div>
           <p className="text-muted-foreground leading-relaxed">
