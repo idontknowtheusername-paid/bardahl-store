@@ -246,30 +246,34 @@ Utilise des emojis et formate bien la réponse.`;
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-bold text-center mb-8">Quel problème a votre voiture ?</h2>
-              <div className="space-y-8">
+              <Accordion type="single" collapsible className="space-y-3">
                 {symptomCategories.map((cat) => (
-                  <div key={cat.label}>
-                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">{cat.label}</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {cat.symptoms.map((symptom) => (
-                        <button
-                          key={symptom.id}
-                          onClick={() => setSelectedSymptom(symptom.id)}
-                          className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
-                            selectedSymptom === symptom.id
-                              ? 'border-primary bg-primary/5 shadow-md'
-                              : 'border-border bg-card hover:border-primary/30'
-                          }`}
-                        >
-                          <symptom.icon className={`h-6 w-6 mx-auto mb-2 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                          <h4 className="font-bold text-xs mb-1">{symptom.label}</h4>
-                          <p className="text-[10px] text-muted-foreground leading-tight">{symptom.description}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <AccordionItem key={cat.label} value={cat.label} className="border border-border rounded-xl overflow-hidden bg-card">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                      {cat.label}
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
+                        {cat.symptoms.map((symptom) => (
+                          <button
+                            key={symptom.id}
+                            onClick={() => setSelectedSymptom(symptom.id)}
+                            className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
+                              selectedSymptom === symptom.id
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : 'border-border bg-background hover:border-primary/30'
+                            }`}
+                          >
+                            <symptom.icon className={`h-6 w-6 mx-auto mb-2 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                            <h4 className="font-bold text-xs mb-1">{symptom.label}</h4>
+                            <p className="text-[10px] text-muted-foreground leading-tight">{symptom.description}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
               {selectedSymptom && (
                 <div className="text-center mt-8 sticky bottom-4">
                   <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg">
