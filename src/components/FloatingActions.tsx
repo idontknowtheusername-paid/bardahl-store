@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Stethoscope, ShoppingBag } from 'lucide-react';
+import { Stethoscope, MessageCircle } from 'lucide-react';
 
 export function FloatingActions() {
   const whatsappNumber = '22996786284';
@@ -14,7 +14,7 @@ export function FloatingActions() {
     },
     {
       label: 'WhatsApp',
-      icon: ShoppingBag,
+      icon: MessageCircle,
       href: whatsappUrl,
       color: 'bg-green-500 hover:bg-green-600 text-white',
       external: true,
@@ -27,11 +27,11 @@ export function FloatingActions() {
         const content = (
           <>
             <action.icon className="h-4 w-4 shrink-0" />
-            <span className="text-xs font-semibold whitespace-nowrap hidden md:inline">{action.label}</span>
+            <span className="text-xs font-semibold whitespace-nowrap">{action.label}</span>
           </>
         );
 
-        const className = `flex items-center gap-2 px-3 py-2.5 rounded-full shadow-lg transition-all duration-300 ${action.color}`;
+        const className = `flex items-center gap-1.5 h-10 px-3 rounded-full shadow-lg transition-all duration-300 ${action.color}`;
 
         if (action.external) {
           return (
