@@ -10,11 +10,15 @@ import Autoplay from 'embla-carousel-autoplay';
 
 const PRODUCT_TYPE_CONFIG = [
   { type: 'huiles-moteur', title: 'Huiles Moteur' },
+  { type: 'transmission', title: 'Huiles boîtes & Transmission' },
   { type: 'additifs', title: 'Additifs & Traitements' },
+  { type: 'liquides', title: 'Liquide de refroidissement & lave-glace' },
+  { type: 'purifiant-desodorisant', title: 'Purifiant & désodorisant' },
   { type: 'entretien', title: 'Entretien & Nettoyage' },
-  { type: 'graisses', title: 'Graisses & Lubrifiants' },
-  { type: 'liquides', title: 'Liquides de refroidissement' },
-  { type: 'transmission', title: 'Transmission & Freinage' },
+  { type: 'special-atelier', title: 'Spécial atelier' },
+  { type: 'packs-entretien', title: 'Packs entretien' },
+  { type: 'accessoires-electronique', title: 'Accessoires & Électronique auto' },
+  { type: 'filtres', title: 'Filtres' },
 ];
 
 function CategorySection({ title, productType }: { title: string; productType: string }) {

@@ -65,11 +65,15 @@ const ACEA_NORMS = ['ACEA A3/B4', 'ACEA A5/B5', 'ACEA C2', 'ACEA C3', 'ACEA C4',
 const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '20L', '60L', '200L'];
 const PRODUCT_TYPES = [
   { value: 'huiles-moteur', label: 'Huiles Moteur' },
+  { value: 'transmission', label: 'Huiles boîtes & Transmission' },
   { value: 'additifs', label: 'Additifs & Traitements' },
+  { value: 'liquides', label: 'Liquide de refroidissement & lave-glace' },
+  { value: 'purifiant-desodorisant', label: 'Purifiant & désodorisant' },
   { value: 'entretien', label: 'Entretien & Nettoyage' },
-  { value: 'graisses', label: 'Graisses & Lubrifiants' },
-  { value: 'liquides', label: 'Liquides de refroidissement' },
-  { value: 'transmission', label: 'Transmission & Freinage' },
+  { value: 'special-atelier', label: 'Spécial atelier' },
+  { value: 'packs-entretien', label: 'Packs entretien' },
+  { value: 'accessoires-electronique', label: 'Accessoires & Électronique auto' },
+  { value: 'filtres', label: 'Filtres' },
 ];
 
 // Sortable Image Component

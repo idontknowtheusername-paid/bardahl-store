@@ -7,11 +7,15 @@ import { useMemo } from 'react';
 
 const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string }> = {
   'huiles-moteur': { name: 'Huiles Moteur', description: 'Huiles moteur haute performance pour tous types de véhicules' },
+  'transmission': { name: 'Huiles boîtes & Transmission', description: 'Huiles de transmission, liquides de frein et direction assistée' },
   'additifs': { name: 'Additifs & Traitements', description: 'Additifs moteur et carburant pour optimiser les performances' },
+  'liquides': { name: 'Liquide de refroidissement & lave-glace', description: 'Liquides de refroidissement, antigel et lave-glace' },
+  'purifiant-desodorisant': { name: 'Purifiant & désodorisant', description: 'Purifiants d\'air et désodorisants pour habitacle' },
   'entretien': { name: 'Entretien & Nettoyage', description: 'Produits d\'entretien et de nettoyage automobile' },
-  'graisses': { name: 'Graisses & Lubrifiants', description: 'Graisses et lubrifiants spécialisés' },
-  'liquides': { name: 'Liquides de refroidissement', description: 'Liquides de refroidissement et antigel haute performance' },
-  'transmission': { name: 'Transmission & Freinage', description: 'Huiles de transmission et liquides de frein' },
+  'special-atelier': { name: 'Spécial atelier', description: 'Produits professionnels pour atelier et garage' },
+  'packs-entretien': { name: 'Packs entretien', description: 'Packs complets pour l\'entretien de votre véhicule' },
+  'accessoires-electronique': { name: 'Accessoires & Électronique auto', description: 'Accessoires et équipements électroniques pour votre véhicule' },
+  'filtres': { name: 'Filtres', description: 'Filtres à huile, à gasoil, à air et autres filtres' },
 };
 
 export default function CategoryDetail() {
