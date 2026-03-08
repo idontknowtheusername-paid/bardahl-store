@@ -4,10 +4,16 @@ import { useTranslation } from '@/context/LanguageContext';
 
 const PRODUCT_TYPES = [
   {
-    slug: 'huiles-moteur',
+    slug: 'huile-moteur',
     name: 'Huiles Moteur',
     description: 'Huiles moteur haute performance pour tous types de véhicules',
     image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=80',
+  },
+  {
+    slug: 'transmission',
+    name: 'Huiles boîtes & Transmission',
+    description: 'Huiles de transmission, liquides de frein et direction assistée',
+    image: 'https://images.unsplash.com/photo-1486496146582-9ffcd0b2b2b7?w=800&q=80',
   },
   {
     slug: 'additifs',
@@ -16,28 +22,46 @@ const PRODUCT_TYPES = [
     image: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=80',
   },
   {
+    slug: 'liquides',
+    name: 'Liquide de refroidissement & lave-glace',
+    description: 'Liquides de refroidissement, antigel et lave-glace',
+    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80',
+  },
+  {
+    slug: 'purifiant-desodorisant',
+    name: 'Purifiant & désodorisant',
+    description: 'Purifiants d\'air et désodorisants pour habitacle',
+    image: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&q=80',
+  },
+  {
     slug: 'entretien',
     name: 'Entretien & Nettoyage',
     description: 'Produits d\'entretien et de nettoyage automobile',
     image: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&q=80',
   },
   {
-    slug: 'graisses',
-    name: 'Graisses & Lubrifiants',
-    description: 'Graisses et lubrifiants spécialisés',
+    slug: 'special-atelier',
+    name: 'Spécial atelier',
+    description: 'Produits professionnels pour atelier et garage',
     image: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80',
   },
   {
-    slug: 'liquides',
-    name: 'Liquides de refroidissement',
-    description: 'Liquides de refroidissement et antigel haute performance',
-    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80',
+    slug: 'packs-entretien',
+    name: 'Packs entretien',
+    description: 'Packs complets pour l\'entretien de votre véhicule',
+    image: 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&q=80',
   },
   {
-    slug: 'transmission',
-    name: 'Transmission & Freinage',
-    description: 'Huiles de transmission et liquides de frein',
-    image: 'https://images.unsplash.com/photo-1486496146582-9ffcd0b2b2b7?w=800&q=80',
+    slug: 'accessoires-electronique',
+    name: 'Accessoires & Électronique auto',
+    description: 'Accessoires et équipements électroniques pour votre véhicule',
+    image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
+  },
+  {
+    slug: 'filtres',
+    name: 'Filtres',
+    description: 'Filtres à huile, à gasoil, à air et autres filtres',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80',
   },
 ];
 

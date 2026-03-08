@@ -12,10 +12,11 @@ export function Footer() {
 
   const footerLinks = {
     produits: [
-      { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
+      { label: 'Huiles moteur', href: '/categories/huile-moteur' },
+      { label: 'Transmission & freinage', href: '/categories/transmission' },
       { label: 'Additifs', href: '/categories/additifs' },
-      { label: 'Transmission', href: '/categories/transmission' },
-      { label: 'Entretien & nettoyage', href: '/categories/entretien' },
+      { label: 'Liquides & lave-glace', href: '/categories/liquides' },
+      { label: 'Accessoires & Électronique', href: '/categories/accessoires-electronique' },
       { label: 'Tous les produits', href: '/categories' },
     ],
     services: [
