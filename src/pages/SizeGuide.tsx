@@ -52,8 +52,8 @@ export default function SizeGuide() {
         <div className="container max-w-4xl">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-rose/10 rounded-full mb-6">
-              <Wrench className="w-8 h-8 text-rose" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
+              <Wrench className="w-8 h-8 text-primary" />
             </div>
             <h1 className="font-serif text-4xl md:text-5xl font-medium text-foreground mb-4">
               Guide de Sélection
