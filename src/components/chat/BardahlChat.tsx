@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Loader2, Minimize2, Bot, Trash2 } from 'lucide-react';
+import { X, Send, Loader2, Minimize2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import temiAvatar from '@/assets/temi-avatar.png';
 import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
@@ -165,10 +166,10 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-14 w-14 rounded-full shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center justify-center overflow-hidden ring-2 ring-primary/30"
         aria-label="Demandez à Témi"
       >
-        <Bot className="h-6 w-6" />
+        <img src={temiAvatar} alt="Témi" className="h-full w-full object-cover" />
         <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary animate-pulse" />
       </button>
     );
@@ -179,9 +180,9 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-2 pr-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
       >
-        <Bot className="h-4 w-4" />
+        <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
         <span className="text-xs font-semibold">Parlez à Témi</span>
       </button>
     );
@@ -192,7 +193,7 @@ export function BardahlChat() {
       {/* Header */}
       <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-secondary text-secondary-foreground shrink-0">
         <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" />
+          <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
           <div>
             <h3 className="text-sm font-bold leading-none">Témi</h3>
             <span className="text-[10px] opacity-70">Votre assistant auto</span>
