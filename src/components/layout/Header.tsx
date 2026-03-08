@@ -21,6 +21,7 @@ export function Header() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showProductsMenu, setShowProductsMenu] = useState(false);
+  const [mobileSubOpen, setMobileSubOpen] = useState(false);
   const navigate = useNavigate();
 
   const currentLang = languages.find(l => l.code === language);
