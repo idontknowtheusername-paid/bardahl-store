@@ -12,19 +12,18 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-[62vh] flex items-center overflow-hidden bg-gradient-to-br from-secondary via-secondary/95 to-secondary/80">
-        {/* Decorative background */}
+      <section className="relative min-h-[62vh] flex items-center overflow-hidden">
+        {/* Hero background image */}
+        <img
+          src={heroBg}
+          alt="Huile moteur versée dans un moteur automobile"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          loading="eager"
+        />
+        {/* Overlays */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-secondary/95 via-secondary/75 to-secondary/30" />
-          {/* Blue glow */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-30"
-            style={{
-              background: 'radial-gradient(ellipse at 80% 50%, hsl(var(--primary) / 0.5) 0%, transparent 70%)',
-            }}
-          />
-          {/* Orange accent line */}
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 w-px h-48 bg-gradient-to-b from-transparent via-accent/50 to-transparent hidden lg:block" />
-          <div className="absolute right-24 top-1/4 w-32 h-px bg-gradient-to-r from-accent/30 to-transparent hidden lg:block" />
+          <div className="absolute inset-0 bg-gradient-to-r from-secondary/90 via-secondary/70 to-secondary/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-secondary/30" />
         </div>
 
         <div className="container relative z-10 py-14 md:py-16">
