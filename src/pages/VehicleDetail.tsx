@@ -273,11 +273,12 @@ export default function VehicleDetail() {
 
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Carnet d'entretien</h2>
-                  <Button size="sm" onClick={() => setShowAddMaint(!showAddMaint)} className="gap-1.5"><Plus className="h-4 w-4" /> Ajouter</Button>
+                  <Button size="sm" onClick={() => { resetMaintForm(); setShowAddMaint(true); }} className="gap-1.5"><Plus className="h-4 w-4" /> Ajouter</Button>
                 </div>
 
                 {showAddMaint && (
-                  <form onSubmit={handleAddMaintenance} className="bg-card border border-border rounded-xl p-4 shadow-card">
+                  <form onSubmit={handleSaveMaintenance} className="bg-card border border-border rounded-xl p-4 shadow-card">
+                    <h3 className="font-semibold text-sm mb-3">{editingRecord ? '✏️ Modifier l\'entretien' : '➕ Nouvel entretien'}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="sm:col-span-2">
                         <label className="block text-sm font-semibold mb-1">Type d'entretien *</label>
@@ -304,8 +305,8 @@ export default function VehicleDetail() {
                       </div>
                     </div>
                     <div className="flex gap-3 mt-4">
-                      <Button type="button" variant="outline" size="sm" onClick={() => setShowAddMaint(false)}>Annuler</Button>
-                      <Button type="submit" size="sm" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enregistrer'}</Button>
+                      <Button type="button" variant="outline" size="sm" onClick={resetMaintForm}>Annuler</Button>
+                      <Button type="submit" size="sm" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : editingRecord ? 'Modifier' : 'Enregistrer'}</Button>
                     </div>
                   </form>
                 )}
