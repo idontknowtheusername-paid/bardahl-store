@@ -7,8 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download,
+  Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download, Bell,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
