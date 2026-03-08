@@ -1,5 +1,7 @@
-import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Disc3, CircleDot, Shield, FileCheck, Receipt } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Disc3, CircleDot, Shield, FileCheck, Receipt, ChevronDown } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface MaintenanceRecord {
   id: string;
@@ -54,6 +56,8 @@ const statusConfig: Record<Status, { color: string; bg: string; progressColor: s
 };
 
 export default function HealthDashboard({ records }: HealthDashboardProps) {
+  const [open, setOpen] = useState(false);
+
   const latestByType = new Map<string, MaintenanceRecord>();
   for (const r of records) {
     const existing = latestByType.get(r.maintenance_type);
@@ -69,46 +73,69 @@ export default function HealthDashboard({ records }: HealthDashboardProps) {
   });
 
   const okCount = items.filter(i => i.status === 'ok').length;
+  const warningCount = items.filter(i => i.status === 'warning').length;
+  const urgentCount = items.filter(i => i.status === 'urgent').length;
   const totalKnown = items.filter(i => i.status !== 'unknown').length;
 
+  // Build summary badges
+  const summaryParts: { label: string; className: string }[] = [];
+  if (urgentCount > 0) summaryParts.push({ label: `${urgentCount} urgent`, className: 'bg-red-100 text-red-700' });
+  if (warningCount > 0) summaryParts.push({ label: `${warningCount} à surveiller`, className: 'bg-amber-100 text-amber-700' });
+  if (okCount > 0) summaryParts.push({ label: `${okCount} OK`, className: 'bg-emerald-100 text-emerald-700' });
+  if (totalKnown === 0) summaryParts.push({ label: 'Aucune donnée', className: 'bg-muted text-muted-foreground' });
+
   return (
-    <div className="bg-card border border-border rounded-xl p-4 shadow-card mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-bold text-sm">🔍 Santé véhicule 360°</h3>
-        {totalKnown > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {okCount}/{totalKnown} OK
-          </span>
-        )}
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        {items.map(item => {
-          const cfg = statusConfig[item.status];
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.type}
-              className={`rounded-lg border p-2 text-center transition-all ${cfg.bg}`}
-            >
-              <Icon className={`h-4 w-4 mx-auto mb-1 ${cfg.color}`} />
-              <p className="text-[10px] font-semibold truncate">{item.label}</p>
-              <p className={`text-[9px] mt-0.5 ${cfg.color} font-medium`}>
-                {item.status === 'unknown' ? '—' : item.label}
-              </p>
-              {item.status !== 'unknown' && (
-                <Progress value={item.progress} className={`h-1 mt-1 ${cfg.progressColor}`} />
-              )}
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <div className="bg-card border border-border rounded-xl shadow-card mb-4 overflow-hidden">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-between p-3.5 hover:bg-muted/30 transition-colors text-left">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-sm">🔍</span>
+              <span className="font-bold text-sm">Santé 360°</span>
+              <div className="flex gap-1.5 flex-wrap">
+                {summaryParts.map((s, i) => (
+                  <span key={i} className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${s.className}`}>
+                    {s.label}
+                  </span>
+                ))}
+              </div>
             </div>
-          );
-        })}
-      </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </button>
+        </CollapsibleTrigger>
 
-      {totalKnown === 0 && (
-        <p className="text-xs text-muted-foreground text-center mt-3">
-          Ajoutez des entretiens avec des dates pour voir l'état de santé.
-        </p>
-      )}
-    </div>
+        <CollapsibleContent>
+          <div className="px-3.5 pb-3.5">
+            <div className="grid grid-cols-3 gap-2">
+              {items.map(item => {
+                const cfg = statusConfig[item.status];
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.type}
+                    className={`rounded-lg border p-2 text-center transition-all ${cfg.bg}`}
+                  >
+                    <Icon className={`h-4 w-4 mx-auto mb-1 ${cfg.color}`} />
+                    <p className="text-[10px] font-semibold truncate">{item.label}</p>
+                    <p className={`text-[9px] mt-0.5 ${cfg.color} font-medium`}>
+                      {item.status === 'unknown' ? '—' : item.label}
+                    </p>
+                    {item.status !== 'unknown' && (
+                      <Progress value={item.progress} className={`h-1 mt-1 ${cfg.progressColor}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {totalKnown === 0 && (
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                Ajoutez des entretiens avec des dates pour voir l'état de santé.
+              </p>
+            )}
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
   );
 }
