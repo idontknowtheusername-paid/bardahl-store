@@ -573,7 +573,7 @@ export default function VehicleDetail() {
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien. À coller dans votre voiture !</p>
-                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span></p>
+                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{qrPrice.toLocaleString()} FCFA</span></p>
                       <Button onClick={handleGenerateQR}>Générer mon QR code</Button>
                     </div>
                   ) : !qrCode.is_paid ? (
