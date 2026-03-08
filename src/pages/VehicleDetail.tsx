@@ -52,6 +52,7 @@ export default function VehicleDetail() {
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddMaint, setShowAddMaint] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<string | null>(null);
   const [showEditPlan, setShowEditPlan] = useState(false);
   const [saving, setSaving] = useState(false);
 
