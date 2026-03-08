@@ -180,9 +180,9 @@ export function BardahlChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
+        className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-2 pr-3 rounded-full bg-secondary text-secondary-foreground shadow-xl hover:scale-105 transition-transform flex items-center gap-1.5"
       >
-        <Bot className="h-4 w-4" />
+        <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
         <span className="text-xs font-semibold">Parlez à Témi</span>
       </button>
     );
