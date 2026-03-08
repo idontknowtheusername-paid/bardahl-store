@@ -67,7 +67,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'packs-entretien': {
     name: 'Packs entretien',
-    image: categoryHuiles,
+    image: categoryPacks,
     description: 'Packs complets pour votre véhicule',
   },
   'accessoires-electronique': {
