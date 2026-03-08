@@ -35,13 +35,17 @@ export function Header() {
   ];
 
   const navLinks = [
-    { label: 'Accueil', href: '/' },
-    { label: 'Diagnostic auto', href: '/diagnostic', icon: Stethoscope },
-    { label: 'Entretien véhicule', href: '/entretien', icon: Wrench },
     { label: 'Produits', href: '/categories', hasSubmenu: true },
-    { label: 'Conseils auto', href: '/blog' },
+    { label: 'Diagnostic', href: '/diagnostic', icon: Stethoscope },
+    { label: 'Entretien', href: '/entretien', icon: Wrench },
     { label: 'Mon espace', href: '/mon-espace', icon: Car },
+  ];
+
+  const secondaryLinks = [
+    { label: 'Accueil', href: '/' },
+    { label: 'Conseils auto', href: '/blog' },
     { label: 'Contact', href: '/contact' },
+    { label: 'À propos', href: '/a-propos' },
   ];
 
   const handleSearch = (query: string) => {
