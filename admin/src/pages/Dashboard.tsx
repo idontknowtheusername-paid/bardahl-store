@@ -192,7 +192,28 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Reminders widget */}
+      {(reminderStats?.due || 0) > 0 && (
+        <Link to="/reminders">
+          <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors cursor-pointer">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Bell className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{reminderStats.due} rappel{(reminderStats.due || 0) > 1 ? 's' : ''} vidange à envoyer</p>
+                    <p className="text-xs text-muted-foreground">{reminderStats.active} rappels actifs au total</p>
+                  </div>
+                </div>
+                <span className="text-sm text-orange-600 font-medium">Voir →</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
+
         <Card>
           <CardHeader><CardTitle>{t.dashboard.revenueChart}</CardTitle></CardHeader>
           <CardContent>
