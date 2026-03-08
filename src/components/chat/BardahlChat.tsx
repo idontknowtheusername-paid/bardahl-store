@@ -82,7 +82,7 @@ async function streamChat({
 
 const WELCOME_MSG: Msg = {
   role: 'assistant',
-  content: "Bonjour ! 👋 Je suis l'assistant Bardahl.\n\nComment puis-je vous aider aujourd'hui ?",
+  content: "Bonjour ! 👋 Je suis **Témi**, votre assistant auto Autopassion.\n\nComment puis-je vous aider aujourd'hui ?",
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
