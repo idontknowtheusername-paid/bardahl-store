@@ -1,45 +1,58 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toast } from 'sonner'
-import { Loader2, Plus, Edit, Trash2, Eye, Sparkles, RefreshCw } from 'lucide-react'
 import { generateBlogPost } from '@/lib/mistral'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { toast } from 'sonner'
+import { Loader2, Pencil, Trash2, Eye, Sparkles, Wand2, Image, RefreshCw } from 'lucide-react'
 
 interface BlogPost {
   id: string
   title: string
   slug: string
-  excerpt: string
-  content: string
-  status: 'draft' | 'published' | 'scheduled'
+  excerpt: string | null
+  content: string | null
+  featured_image: string | null
+  author: string | null
+  tags: string[] | null
+  read_time: number | null
+  views: number | null
+  status: string | null
   published_at: string | null
-  tags: string[]
-  read_time: number
-  views: number
-  created_at: string
+  created_at: string | null
 }
+
+const SUGGESTED_TOPICS = [
+  'Comment choisir la bonne huile moteur pour votre véhicule',
+  'Les avantages des huiles synthétiques Bardahl',
+  'Guide complet des additifs moteur',
+  'Entretien de la boîte de vitesses',
+  'Viscosité des huiles moteur : normes SAE et ACEA',
+  'Changement d\'huile : fréquence recommandée',
+  'Entretien préventif automobile',
+  'Comment protéger votre moteur pendant les fortes chaleurs',
+  'Vidange moteur : guide pour les débutants',
+  'Guide de maintenance pour véhicules à fort kilométrage',
+  'Entretien automobile au Bénin',
+  'Comment prolonger la durée de vie de votre moteur diesel',
+]
 
 export default function BlogPosts() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    title: '',
-    excerpt: '',
-    content: '',
-    status: 'draft' as 'draft' | 'published' | 'scheduled',
-    tags: '',
-  })
+  const [editPost, setEditPost] = useState<BlogPost | null>(null)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false)
+  const [customTopic, setCustomTopic] = useState('')
+  const [autoPublish, setAutoPublish] = useState(true)
 
   useEffect(() => {
     fetchPosts()
@@ -55,121 +68,119 @@ export default function BlogPosts() {
       if (error) throw error
       setPosts(data || [])
     } catch (error) {
-      console.error('Error fetching posts:', error)
+      console.error('Error:', error)
       toast.error('Erreur lors du chargement des articles')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleGeneratePost = async () => {
+  const handleQuickGenerate = async () => {
     setGenerating(true)
+    toast.info('🤖 Génération en cours... (30-60 secondes)')
     try {
-      const result = await generateBlogPost()
-      
-      if (result.success && result.blogPost) {
-        toast.success('Article généré avec succès!')
-        await fetchPosts()
+      const result = await generateBlogPost(undefined, true)
+      if (result.success) {
+        toast.success('✅ Article généré et publié avec succès !')
+        fetchPosts()
       } else {
-        throw new Error(result.error || 'Erreur de génération')
+        toast.error(`Erreur : ${result.error}`)
       }
     } catch (error: any) {
-      console.error('Error generating post:', error)
-      toast.error(error.message || 'Erreur lors de la génération')
+      toast.error(`Erreur : ${error.message}`)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  const handleCustomGenerate = async () => {
+    if (!customTopic.trim()) {
+      toast.error('Veuillez entrer un sujet')
+      return
+    }
+    setGenerating(true)
+    setShowGenerateDialog(false)
+    toast.info('🤖 Génération en cours avec votre sujet personnalisé...')
+    try {
+      const result = await generateBlogPost(customTopic.trim(), autoPublish)
+      if (result.success) {
+        toast.success('✅ Article généré avec succès !')
+        setCustomTopic('')
+        fetchPosts()
+      } else {
+        toast.error(`Erreur : ${result.error}`)
+      }
+    } catch (error: any) {
+      toast.error(`Erreur : ${error.message}`)
     } finally {
       setGenerating(false)
     }
   }
 
   const handleEdit = (post: BlogPost) => {
-    setEditingPost(post)
-    setFormData({
-      title: post.title,
-      excerpt: post.excerpt || '',
-      content: post.content,
-      status: post.status,
-      tags: post.tags?.join(', ') || '',
-    })
-    setIsDialogOpen(true)
+    setEditPost({ ...post })
+    setShowEditDialog(true)
   }
 
   const handleSave = async () => {
-    if (!editingPost) return
-
+    if (!editPost) return
     try {
-      const tagsArray = formData.tags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0)
-
-      const wordCount = formData.content.split(/\s+/).length
+      const wordCount = (editPost.content || '').split(/\s+/).length
       const readTime = Math.ceil(wordCount / 200)
 
       const updateData: any = {
-        title: formData.title,
-        excerpt: formData.excerpt,
-        content: formData.content,
-        status: formData.status,
-        tags: tagsArray,
+        title: editPost.title,
+        excerpt: editPost.excerpt,
+        content: editPost.content,
+        status: editPost.status,
+        tags: editPost.tags,
+        featured_image: editPost.featured_image,
         read_time: readTime,
       }
 
-      if (formData.status === 'published' && !editingPost.published_at) {
+      if (editPost.status === 'published' && !editPost.published_at) {
         updateData.published_at = new Date().toISOString()
       }
 
       const { error } = await supabase
         .from('blog_posts')
         .update(updateData)
-        .eq('id', editingPost.id)
+        .eq('id', editPost.id)
 
       if (error) throw error
 
-      toast.success('Article mis à jour avec succès')
-      setIsDialogOpen(false)
-      setEditingPost(null)
-      await fetchPosts()
+      toast.success('Article mis à jour')
+      setShowEditDialog(false)
+      fetchPosts()
     } catch (error) {
-      console.error('Error updating post:', error)
+      console.error('Error:', error)
       toast.error('Erreur lors de la mise à jour')
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
-
+    if (!confirm('Supprimer cet article ?')) return
     try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', id)
-
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id)
       if (error) throw error
-
       toast.success('Article supprimé')
-      await fetchPosts()
+      fetchPosts()
     } catch (error) {
-      console.error('Error deleting post:', error)
       toast.error('Erreur lors de la suppression')
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-      published: 'default',
-      draft: 'secondary',
-      scheduled: 'destructive',
+  const getStatusBadge = (status: string | null) => {
+    switch (status) {
+      case 'published': return <Badge className="bg-green-600">Publié</Badge>
+      case 'draft': return <Badge variant="secondary">Brouillon</Badge>
+      default: return <Badge variant="outline">{status}</Badge>
     }
-    return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
   }
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '-'
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
+  const formatDate = (d: string | null) => {
+    if (!d) return '-'
+    return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   if (loading) {
@@ -182,184 +193,216 @@ export default function BlogPosts() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Blog</h1>
+          <p className="text-muted-foreground">{posts.length} article(s) • Génération automatique hebdomadaire active</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={fetchPosts} variant="outline" size="sm">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Actualiser
+          </Button>
+          <Button onClick={handleQuickGenerate} disabled={generating} className="gap-2">
+            <Sparkles className="w-4 h-4" />
+            {generating ? 'Génération...' : 'Générer auto'}
+          </Button>
+          <Button variant="outline" onClick={() => setShowGenerateDialog(true)} disabled={generating} className="gap-2">
+            <Wand2 className="w-4 h-4" />
+            Sujet personnalisé
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Total articles</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{posts.length}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Publiés</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold text-green-600">{posts.filter(p => p.status === 'published').length}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Brouillons</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold text-amber-600">{posts.filter(p => p.status === 'draft').length}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Vues totales</CardTitle></CardHeader>
+          <CardContent><div className="text-2xl font-bold">{posts.reduce((s, p) => s + (p.views || 0), 0)}</div></CardContent>
+        </Card>
+      </div>
+
+      {/* Posts table */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Articles de Blog</CardTitle>
-              <CardDescription>
-                Gérez vos articles et générez du contenu automatiquement
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={fetchPosts} variant="outline" size="sm">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Actualiser
-              </Button>
-              <Button onClick={handleGeneratePost} disabled={generating}>
-                {generating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Génération...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Générer un article
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Titre</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Publié le</TableHead>
-                <TableHead>Vues</TableHead>
-                <TableHead>Temps de lecture</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500">
-                    Aucun article. Générez-en un pour commencer!
-                  </TableCell>
-                </TableRow>
-              ) : (
-                posts.map(post => (
-                  <TableRow key={post.id}>
-                    <TableCell className="font-medium max-w-md">
-                      <div>
-                        <div className="font-semibold">{post.title}</div>
-                        {post.excerpt && (
-                          <div className="text-sm text-gray-500 line-clamp-1">
-                            {post.excerpt}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(post.status)}</TableCell>
-                    <TableCell>{formatDate(post.published_at)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {post.views || 0}
-                      </div>
-                    </TableCell>
-                    <TableCell>{post.read_time || 0} min</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(`https://bardahl.maxiimarket.com/blog/${post.slug}`, '_blank')}
-                          title="Voir sur le site"
-                        >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Image</TableHead>
+              <TableHead>Titre</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead>Vues</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {posts.map(post => (
+              <TableRow key={post.id}>
+                <TableCell>
+                  {post.featured_image ? (
+                    <img src={post.featured_image} alt="" className="w-16 h-10 rounded object-cover" />
+                  ) : (
+                    <div className="w-16 h-10 rounded bg-muted flex items-center justify-center">
+                      <Image className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="max-w-xs">
+                    <div className="font-medium truncate">{post.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">{post.excerpt}</div>
+                  </div>
+                </TableCell>
+                <TableCell>{getStatusBadge(post.status)}</TableCell>
+                <TableCell>{post.views || 0}</TableCell>
+                <TableCell className="text-sm">{formatDate(post.published_at || post.created_at)}</TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {post.status === 'published' && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
                           <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(post)}
-                          title="Modifier"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(post.id)}
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
+                        </a>
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(post)}>
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(post.id)} className="text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+            {posts.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  Aucun article. Cliquez sur "Générer auto" pour créer votre premier article !
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </Card>
 
-      {/* Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      {/* Generate with custom topic dialog */}
+      <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Modifier l'article</DialogTitle>
-            <DialogDescription>
-              Modifiez le contenu de votre article de blog
-            </DialogDescription>
+            <DialogTitle>Générer un article avec sujet personnalisé</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Titre</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="excerpt">Résumé</Label>
+              <Label>Votre sujet / thème</Label>
               <Textarea
-                id="excerpt"
-                value={formData.excerpt}
-                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                rows={2}
+                value={customTopic}
+                onChange={e => setCustomTopic(e.target.value)}
+                placeholder="Ex: Comment entretenir son moteur diesel en climat tropical"
+                rows={3}
               />
             </div>
+
             <div>
-              <Label htmlFor="content">Contenu (Markdown)</Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={15}
-                className="font-mono text-sm"
+              <Label className="text-sm text-muted-foreground">Suggestions de sujets :</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {SUGGESTED_TOPICS.slice(0, 6).map(topic => (
+                  <Badge
+                    key={topic}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => setCustomTopic(topic)}
+                  >
+                    {topic.length > 40 ? topic.substring(0, 40) + '...' : topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="autoPublish"
+                checked={autoPublish}
+                onChange={e => setAutoPublish(e.target.checked)}
+                className="rounded"
               />
+              <Label htmlFor="autoPublish">Publier automatiquement</Label>
             </div>
-            <div>
-              <Label htmlFor="tags">Tags (séparés par des virgules)</Label>
-              <Input
-                id="tags"
-                value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="huile-moteur, entretien, automobile"
-              />
-            </div>
-            <div>
-              <Label htmlFor="status">Statut</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Brouillon</SelectItem>
-                  <SelectItem value="published">Publié</SelectItem>
-                  <SelectItem value="scheduled">Programmé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button onClick={handleSave}>
-                Enregistrer
+
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowGenerateDialog(false)}>Annuler</Button>
+              <Button onClick={handleCustomGenerate} disabled={generating || !customTopic.trim()} className="gap-2">
+                <Wand2 className="w-4 h-4" />
+                Générer l'article
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Modifier l'article</DialogTitle>
+          </DialogHeader>
+          {editPost && (
+            <div className="space-y-4">
+              <div>
+                <Label>Titre</Label>
+                <Input value={editPost.title} onChange={e => setEditPost({ ...editPost, title: e.target.value })} />
+              </div>
+              <div>
+                <Label>Extrait</Label>
+                <Textarea value={editPost.excerpt || ''} onChange={e => setEditPost({ ...editPost, excerpt: e.target.value })} rows={2} />
+              </div>
+              <div>
+                <Label>Image de couverture (URL)</Label>
+                <Input value={editPost.featured_image || ''} onChange={e => setEditPost({ ...editPost, featured_image: e.target.value })} />
+                {editPost.featured_image && (
+                  <img src={editPost.featured_image} alt="" className="mt-2 w-full h-40 rounded object-cover" />
+                )}
+              </div>
+              <div>
+                <Label>Contenu (Markdown)</Label>
+                <Textarea value={editPost.content || ''} onChange={e => setEditPost({ ...editPost, content: e.target.value })} rows={15} className="font-mono text-sm" />
+              </div>
+              <div>
+                <Label>Tags (séparés par virgule)</Label>
+                <Input
+                  value={(editPost.tags || []).join(', ')}
+                  onChange={e => setEditPost({ ...editPost, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                />
+              </div>
+              <div>
+                <Label>Statut</Label>
+                <Select value={editPost.status || 'draft'} onValueChange={v => setEditPost({ ...editPost, status: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Brouillon</SelectItem>
+                    <SelectItem value="published">Publié</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowEditDialog(false)}>Annuler</Button>
+                <Button onClick={handleSave}>Sauvegarder</Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
