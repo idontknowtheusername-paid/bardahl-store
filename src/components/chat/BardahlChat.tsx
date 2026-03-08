@@ -3,7 +3,6 @@ import { X, Send, Loader2, Minimize2, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import temiAvatar from '@/assets/temi-avatar.png';
 import ReactMarkdown from 'react-markdown';
-import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 type QuickAction = { label: string; msg?: string; isWhatsApp?: boolean };
