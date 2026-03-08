@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw } from 'lucide-react';
+import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw, Thermometer, Wind, Car, Disc3, Plug, Wrench, Droplets, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import { useProducts } from '@/hooks/use-supabase-api';
@@ -16,14 +16,72 @@ import {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
 
-const symptoms = [
-  { id: 'fumee-noire', label: 'Fumée noire', icon: Flame, description: 'Fumée noire à l\'échappement' },
-  { id: 'perte-puissance', label: 'Perte de puissance', icon: Gauge, description: 'Le moteur manque de puissance' },
-  { id: 'consommation', label: 'Consommation élevée', icon: Fuel, description: 'Surconsommation de carburant' },
-  { id: 'vibrations', label: 'Moteur qui tremble', icon: Activity, description: 'Vibrations ou tremblements' },
-  { id: 'demarrage', label: 'Démarrage difficile', icon: Zap, description: 'Difficulté au démarrage' },
-  { id: 'bruit', label: 'Moteur bruyant', icon: Volume2, description: 'Bruits anormaux du moteur' },
+const symptomCategories = [
+  {
+    label: 'Moteur',
+    symptoms: [
+      { id: 'perte-puissance', label: 'Perte de puissance', icon: Gauge, description: 'Le moteur manque de puissance ou de reprise' },
+      { id: 'demarrage', label: 'Démarrage difficile', icon: Zap, description: 'Difficulté au démarrage du moteur' },
+      { id: 'vibrations', label: 'Moteur qui tremble', icon: Activity, description: 'Vibrations, tremblements ou le moteur broute' },
+      { id: 'bruit', label: 'Moteur bruyant', icon: Volume2, description: 'Bruits métalliques ou moteur bruyant au ralenti' },
+      { id: 'ralenti-instable', label: 'Ralenti instable', icon: Activity, description: 'Le moteur tourne de manière irrégulière au ralenti' },
+      { id: 'moteur-cale', label: 'Moteur qui cale', icon: Zap, description: 'Le moteur cale en roulant ou à l\'arrêt' },
+      { id: 'compression', label: 'Perte de compression', icon: Gauge, description: 'Le moteur a perdu de la compression' },
+      { id: 'entretien-preventif', label: 'Entretien préventif', icon: Shield, description: 'Protéger et prolonger la vie du moteur' },
+    ]
+  },
+  {
+    label: 'Échappement & Fumées',
+    symptoms: [
+      { id: 'fumee-noire', label: 'Fumée noire', icon: Flame, description: 'Fumée noire à l\'échappement' },
+      { id: 'fumee-blanche', label: 'Fumée blanche', icon: Wind, description: 'Fumée blanche à l\'échappement' },
+      { id: 'fumee-bleue', label: 'Fumée bleue', icon: Flame, description: 'Fumée bleue = consommation d\'huile' },
+      { id: 'diesel-fume', label: 'Diesel qui fume', icon: Flame, description: 'Moteur diesel qui fume excessivement' },
+    ]
+  },
+  {
+    label: 'Carburant & Injection',
+    symptoms: [
+      { id: 'consommation', label: 'Consommation élevée', icon: Fuel, description: 'Surconsommation de carburant' },
+      { id: 'encrassement', label: 'Moteur encrassé', icon: Wrench, description: 'Encrassement moteur diesel ou essence' },
+      { id: 'turbo-egr', label: 'Turbo/EGR encrassé', icon: Wind, description: 'Turbo ou vanne EGR encrassée' },
+      { id: 'mauvais-carburant', label: 'Carburant de mauvaise qualité', icon: Fuel, description: 'Eau dans le diesel ou carburant douteux' },
+      { id: 'odeur-carburant', label: 'Odeur de carburant', icon: Droplets, description: 'Odeur anormale de carburant' },
+    ]
+  },
+  {
+    label: 'Refroidissement',
+    symptoms: [
+      { id: 'surchauffe', label: 'Surchauffe moteur', icon: Thermometer, description: 'Le moteur surchauffe' },
+      { id: 'radiateur', label: 'Radiateur bouché/fuite', icon: Droplets, description: 'Radiateur bouché ou fuite du radiateur' },
+      { id: 'liquide-sale', label: 'Liquide refroidissement sale', icon: Droplets, description: 'Le liquide de refroidissement est sale ou usé' },
+    ]
+  },
+  {
+    label: 'Habitacle & Climatisation',
+    symptoms: [
+      { id: 'clim-odeur', label: 'Mauvaises odeurs', icon: Wind, description: 'Climatisation ou habitacle qui sent mauvais' },
+      { id: 'plastiques', label: 'Plastiques/tableau de bord', icon: Car, description: 'Plastiques ternes ou tableau de bord sale' },
+    ]
+  },
+  {
+    label: 'Transmission & Freinage',
+    symptoms: [
+      { id: 'boite-dure', label: 'Boîte de vitesse dure', icon: Wrench, description: 'La boîte de vitesse est dure ou accroche' },
+      { id: 'freins', label: 'Freins bruyants', icon: Disc3, description: 'Freins qui grincent ou disques encrassés' },
+      { id: 'direction', label: 'Direction bruyante', icon: Car, description: 'Bruits dans la direction assistée' },
+    ]
+  },
+  {
+    label: 'Électrique',
+    symptoms: [
+      { id: 'contacts-oxydes', label: 'Contacts oxydés', icon: Plug, description: 'Contacts électriques ou connecteurs sales/oxydés' },
+    ]
+  },
 ];
+
+// Flatten all symptoms for lookup
+const allSymptoms = symptomCategories.flatMap(c => c.symptoms);
 
 // Extract product slugs from AI response markdown links like (/produits/slug)
 function extractProductSlugs(text: string): string[] {
@@ -47,7 +105,6 @@ export default function Diagnostic() {
   const [error, setError] = useState<string>('');
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Fetch all products to match against slugs found in AI response
   const { data: allProducts } = useProducts({ limit: 200 });
 
   const recommendedProducts = useMemo(() => {
@@ -70,18 +127,21 @@ export default function Diagnostic() {
     setError('');
     setDiagnosticResult('');
 
-    const symptomLabel = symptoms.find(s => s.id === selectedSymptom)?.label || selectedSymptom;
+    const symptomData = allSymptoms.find(s => s.id === selectedSymptom);
+    const symptomLabel = symptomData?.label || selectedSymptom;
+    const symptomDesc = symptomData?.description || '';
 
     const diagnosticMessage = `DIAGNOSTIC AUTO - Analyse structurée demandée.
 
 Symptôme principal : ${symptomLabel}
+Description : ${symptomDesc}
 Type de carburant : ${fuelType}
 Kilométrage : ${mileage || 'Non précisé'}
 Année du véhicule : ${year || 'Non précisée'}
 
 Fais un diagnostic structuré avec :
 1. **Diagnostic probable** : explique la cause probable du problème
-2. **Solutions recommandées** : liste les produits Autopassion/Bardahl adaptés avec leur lien (/produits/slug)
+2. **Solutions recommandées** : liste les produits Autopassion/Bardahl adaptés avec leur lien (/produits/slug). UTILISE IMPÉRATIVEMENT le guide diagnostic problèmes/solutions pour recommander les bons produits.
 3. **Conseil entretien** : un conseil préventif
 
 Utilise des emojis et formate bien la réponse.`;
@@ -100,10 +160,7 @@ Utilise des emojis et formate bien la réponse.`;
         }),
       });
 
-      if (!resp.ok) {
-        throw new Error('Erreur du service de diagnostic');
-      }
-
+      if (!resp.ok) throw new Error('Erreur du service de diagnostic');
       if (!resp.body) throw new Error('Pas de réponse');
 
       const reader = resp.body.getReader();
@@ -173,36 +230,43 @@ Utilise des emojis et formate bien la réponse.`;
               Votre voiture a un problème ?
             </h1>
             <p className="text-secondary-foreground/70 text-lg max-w-lg mx-auto">
-              Faites un diagnostic en quelques secondes et découvrez les solutions recommandées.
+              Sélectionnez le symptôme et découvrez les solutions recommandées par nos experts.
             </p>
           </div>
         </section>
 
         <div className="container py-12">
-          {/* Step 1: Symptom selection */}
+          {/* Step 1: Symptom selection by category */}
           {step === 1 && (
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-bold text-center mb-8">Quel problème a votre voiture ?</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {symptoms.map((symptom) => (
-                  <button
-                    key={symptom.id}
-                    onClick={() => setSelectedSymptom(symptom.id)}
-                    className={`p-6 rounded-xl border-2 transition-all text-center hover-lift ${
-                      selectedSymptom === symptom.id
-                        ? 'border-primary bg-primary/5 shadow-md'
-                        : 'border-border bg-card hover:border-primary/30'
-                    }`}
-                  >
-                    <symptom.icon className={`h-8 w-8 mx-auto mb-3 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <h3 className="font-bold text-sm mb-1">{symptom.label}</h3>
-                    <p className="text-xs text-muted-foreground">{symptom.description}</p>
-                  </button>
+              <div className="space-y-8">
+                {symptomCategories.map((cat) => (
+                  <div key={cat.label}>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">{cat.label}</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {cat.symptoms.map((symptom) => (
+                        <button
+                          key={symptom.id}
+                          onClick={() => setSelectedSymptom(symptom.id)}
+                          className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
+                            selectedSymptom === symptom.id
+                              ? 'border-primary bg-primary/5 shadow-md'
+                              : 'border-border bg-card hover:border-primary/30'
+                          }`}
+                        >
+                          <symptom.icon className={`h-6 w-6 mx-auto mb-2 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <h4 className="font-bold text-xs mb-1">{symptom.label}</h4>
+                          <p className="text-[10px] text-muted-foreground leading-tight">{symptom.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
               {selectedSymptom && (
-                <div className="text-center mt-8">
-                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8">
+                <div className="text-center mt-8 sticky bottom-4">
+                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg">
                     Continuer <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
@@ -213,7 +277,10 @@ Utilise des emojis et formate bien la réponse.`;
           {/* Step 2: Vehicle info */}
           {step === 2 && (
             <div className="max-w-md mx-auto">
-              <h2 className="text-xl font-bold text-center mb-8">Quelques informations sur votre véhicule</h2>
+              <h2 className="text-xl font-bold text-center mb-2">Quelques informations sur votre véhicule</h2>
+              <p className="text-center text-sm text-muted-foreground mb-8">
+                Symptôme : <span className="font-semibold text-primary">{allSymptoms.find(s => s.id === selectedSymptom)?.label}</span>
+              </p>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Type de carburant</label>
@@ -272,7 +339,7 @@ Utilise des emojis et formate bien la réponse.`;
                   <div>
                     <h2 className="text-lg font-bold">Résultat du diagnostic</h2>
                     <p className="text-xs text-muted-foreground">
-                      {symptoms.find(s => s.id === selectedSymptom)?.label} • {fuelType} {year && `• ${year}`} {mileage && `• ${mileage} km`}
+                      {allSymptoms.find(s => s.id === selectedSymptom)?.label} • {fuelType} {year && `• ${year}`} {mileage && `• ${mileage} km`}
                     </p>
                   </div>
                 </div>

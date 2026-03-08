@@ -14,6 +14,7 @@ const SYSTEM_PROMPT = `Tu es Témi, l'assistant intelligent d'Autopassion BJ, ex
 - Conseiller sur l'entretien automobile (vidange, fréquence, bonnes pratiques)
 - Répondre aux questions sur les produits Bardahl (huiles moteur, additifs, graisses)
 - Guider les clients dans leur achat sur le site
+- **DIAGNOSTIQUER les problèmes de voiture et recommander les produits adaptés**
 
 📋 CONNAISSANCES PRODUITS BARDAHL :
 - Huiles moteur : gamme complète (5W-30, 5W-40, 10W-40, 0W-20, 0W-30, etc.)
@@ -38,7 +39,8 @@ Quand un client donne sa marque/modèle/moteur :
 ⚠️ IMPORTANT :
 - Ne recommande JAMAIS de produits concurrents
 - Oriente toujours vers les produits Bardahl
-- En cas de doute sur une spécification, recommande de vérifier le carnet d'entretien du véhicule`;
+- En cas de doute sur une spécification, recommande de vérifier le carnet d'entretien du véhicule
+- Quand tu recommandes un produit, inclus TOUJOURS le lien vers la page produit au format (/produits/slug-du-produit) si tu le connais`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -50,16 +52,13 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Save conversation to DB
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     let convId = conversationId;
 
-    // Create conversation if needed
     if (!convId && sessionId) {
-      // Check for existing conversation with this session
       const { data: existing } = await supabase
         .from("chat_conversations")
         .select("id")
@@ -80,7 +79,6 @@ serve(async (req) => {
       }
     }
 
-    // Save the user message
     const lastUserMsg = messages[messages.length - 1];
     if (convId && lastUserMsg?.role === "user") {
       await supabase.from("chat_messages").insert({
@@ -90,16 +88,26 @@ serve(async (req) => {
       });
     }
 
-    // Fetch products and vehicle data for context
-    const { data: products } = await supabase
-      .from("products")
-      .select("title, slug, price, viscosity, api_norm, acea_norm, capacity, product_type, short_description")
-      .eq("is_active", true)
-      .limit(50);
+    // Fetch products, vehicle data, AND problem/solution mappings in parallel
+    const [productsRes, vehicleBrandsRes, problemSolutionsRes] = await Promise.all([
+      supabase
+        .from("products")
+        .select("title, slug, price, viscosity, api_norm, acea_norm, capacity, product_type, short_description")
+        .eq("is_active", true)
+        .limit(50),
+      supabase
+        .from("vehicle_brands")
+        .select("name, id"),
+      supabase
+        .from("problem_solutions")
+        .select("symptom, category, recommended_products")
+        .eq("is_active", true)
+        .order("problem_number"),
+    ]);
 
-    const { data: vehicleBrands } = await supabase
-      .from("vehicle_brands")
-      .select("name, id");
+    const products = productsRes.data;
+    const vehicleBrands = vehicleBrandsRes.data;
+    const problemSolutions = problemSolutionsRes.data;
 
     let productContext = "";
     if (products && products.length > 0) {
@@ -116,9 +124,20 @@ serve(async (req) => {
       vehicleContext = `\n\n🚗 MARQUES VÉHICULES EN BASE : ${vehicleBrands.map((b) => b.name).join(", ")}`;
     }
 
-    const fullSystemPrompt = SYSTEM_PROMPT + productContext + vehicleContext;
+    let problemContext = "";
+    if (problemSolutions && problemSolutions.length > 0) {
+      problemContext = `\n\n🔧 GUIDE DIAGNOSTIC - PROBLÈMES ET SOLUTIONS RECOMMANDÉES :
+Utilise IMPÉRATIVEMENT ce tableau quand un client décrit un problème ou symptôme. Recommande EXACTEMENT les produits listés.
 
-    // Stream from Lovable AI Gateway
+${problemSolutions
+        .map((ps) => `• ${ps.symptom} → ${ps.recommended_products}`)
+        .join("\n")}
+
+RÈGLE CRITIQUE : Quand un client décrit un symptôme, cherche d'abord dans ce tableau. Si le symptôme correspond, recommande EXACTEMENT les produits indiqués. Ne substitue pas par d'autres produits.`;
+    }
+
+    const fullSystemPrompt = SYSTEM_PROMPT + productContext + vehicleContext + problemContext;
+
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
@@ -159,7 +178,6 @@ serve(async (req) => {
       );
     }
 
-    // We need to intercept the stream to save the assistant message
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
     const reader = response.body!.getReader();
@@ -173,7 +191,6 @@ serve(async (req) => {
           if (done) break;
           await writer.write(value);
 
-          // Parse SSE to collect full content
           const text = decoder.decode(value, { stream: true });
           for (const line of text.split("\n")) {
             if (!line.startsWith("data: ")) continue;
@@ -188,7 +205,6 @@ serve(async (req) => {
         }
       } finally {
         await writer.close();
-        // Save assistant response to DB
         if (convId && fullAssistantContent) {
           await supabase.from("chat_messages").insert({
             conversation_id: convId,
