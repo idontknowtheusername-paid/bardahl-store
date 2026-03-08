@@ -50,7 +50,7 @@ export async function chatWithAssistant(
   }
 }
 
-export async function generateBlogPost(topic?: string, category?: string, autoPublish = false) {
+export async function generateBlogPost(topic?: string, autoPublish = true) {
   try {
     const { data: { session } } = await supabase.auth.getSession()
 
@@ -59,7 +59,7 @@ export async function generateBlogPost(topic?: string, category?: string, autoPu
     }
 
     const response = await supabase.functions.invoke('blog-generate', {
-      body: { topic, category, autoPublish }
+      body: { topic, autoPublish }
     })
 
     if (response.error) {
