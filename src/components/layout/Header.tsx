@@ -27,12 +27,16 @@ export function Header() {
   const currentLang = languages.find(l => l.code === language);
 
   const productCategories = [
-    { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
+    { label: 'Huiles moteur', href: '/categories/huile-moteur' },
     { label: 'Huiles boîtes & transmission', href: '/categories/transmission' },
     { label: 'Additifs', href: '/categories/additifs' },
     { label: 'Liquide de refroidissement & lave-glace', href: '/categories/liquides' },
-    { label: 'Purifiant & désodorisant', href: '/categories/entretien' },
-    { label: 'Spécial atelier', href: '/categories/graisses' },
+    { label: 'Purifiant & désodorisant', href: '/categories/purifiant-desodorisant' },
+    { label: 'Spécial atelier', href: '/categories/special-atelier' },
+    { label: 'Entretien & nettoyage', href: '/categories/entretien' },
+    { label: 'Accessoires & Électronique', href: '/categories/accessoires-electronique' },
+    { label: 'Filtres', href: '/categories/filtres' },
+    { label: 'Packs entretien', href: '/categories/packs-entretien' },
   ];
 
   const navLinks = [
