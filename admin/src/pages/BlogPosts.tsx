@@ -272,7 +272,7 @@ export default function BlogPosts() {
                   <div className="flex gap-1">
                     {post.status === 'published' && (
                       <Button variant="ghost" size="icon" asChild>
-                        <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://autopassionbj.com/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
                           <Eye className="w-4 h-4" />
                         </a>
                       </Button>
