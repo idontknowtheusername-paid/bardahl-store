@@ -1,7 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Stethoscope, MessageCircle } from 'lucide-react';
 
+const HIDDEN_PATHS = ['/panier', '/checkout'];
+
 export function FloatingActions() {
+  const { pathname } = useLocation();
+  if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
   const whatsappNumber = '22996786284';
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour, je souhaite passer une commande")}`;
 
@@ -22,7 +26,7 @@ export function FloatingActions() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-4 md:right-6 z-40 flex flex-col-reverse items-end gap-2" style={{ marginBottom: '4rem' }}>
+    <div className="fixed bottom-6 right-4 md:right-6 z-40 flex flex-col-reverse items-end gap-2" style={{ marginBottom: '2.75rem' }}>
       {actions.map((action) => {
         const content = (
           <>
