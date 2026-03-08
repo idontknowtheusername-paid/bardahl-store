@@ -89,6 +89,26 @@ export default function VehicleDetail() {
     setPlan(lubPlan as unknown as LubricationPlan | null);
     setQRCode(qr as unknown as QRCode | null);
 
+    // Fetch alert reminder for this vehicle
+    const customerEmail = vehicles.find(v => v.id === id)?.customer_id;
+    if (customerEmail) {
+      const { data: reminder } = await supabase
+        .from('oil_change_reminders')
+        .select('*')
+        .eq('is_active', true)
+        .limit(10);
+      // Find one matching this vehicle
+      const veh = vehicles.find(v => v.id === id);
+      const match = reminder?.find((r: any) =>
+        r.vehicle_brand === veh?.brand && r.vehicle_model === veh?.model
+      );
+      if (match) {
+        setAlertReminder(match);
+        setAlertPrefs((match as any).alert_preferences || { midpoint: true, one_week: true, one_day: true });
+        setAlertInterval(String(match.reminder_interval_months || 6));
+      }
+    }
+
     if (lubPlan) {
       const p = lubPlan as any;
       setPlanEngine(p.oil_type_engine || '');
