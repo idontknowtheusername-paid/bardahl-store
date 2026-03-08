@@ -1098,6 +1098,7 @@ export type Database = {
           instagram_url: string | null
           maintenance_mode: boolean | null
           minimum_order_amount: number | null
+          qr_activation_price: number | null
           site_description: string | null
           site_name: string | null
           tiktok_url: string | null
@@ -1117,6 +1118,7 @@ export type Database = {
           instagram_url?: string | null
           maintenance_mode?: boolean | null
           minimum_order_amount?: number | null
+          qr_activation_price?: number | null
           site_description?: string | null
           site_name?: string | null
           tiktok_url?: string | null
@@ -1136,6 +1138,7 @@ export type Database = {
           instagram_url?: string | null
           maintenance_mode?: boolean | null
           minimum_order_amount?: number | null
+          qr_activation_price?: number | null
           site_description?: string | null
           site_name?: string | null
           tiktok_url?: string | null
