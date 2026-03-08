@@ -39,25 +39,68 @@ const AUTOMOTIVE_TOPICS = [
   'Comparatif huiles minérales vs synthétiques vs semi-synthétiques',
 ]
 
-const AUTOMOTIVE_IMAGES = [
-  { url: 'https://picsum.photos/seed/engine1/800/500', alt: 'Moteur automobile' },
-  { url: 'https://picsum.photos/seed/car1/800/500', alt: 'Voiture sport' },
-  { url: 'https://picsum.photos/seed/mechanic1/800/500', alt: 'Mécanicien au travail' },
-  { url: 'https://picsum.photos/seed/oil1/800/500', alt: 'Vidange huile moteur' },
-  { url: 'https://picsum.photos/seed/garage1/800/500', alt: 'Entretien automobile' },
-  { url: 'https://picsum.photos/seed/workshop1/800/500', alt: 'Garage automobile' },
-  { url: 'https://picsum.photos/seed/luxury1/800/500', alt: 'Voiture de luxe' },
-  { url: 'https://picsum.photos/seed/modern1/800/500', alt: 'Véhicule moderne' },
-  { url: 'https://picsum.photos/seed/tools1/800/500', alt: 'Outils mécaniques' },
-  { url: 'https://picsum.photos/seed/road1/800/500', alt: 'Route automobile' },
-  { url: 'https://picsum.photos/seed/detail1/800/500', alt: 'Moteur détail' },
-  { url: 'https://picsum.photos/seed/dashboard1/800/500', alt: 'Tableau de bord' },
-]
+async function generateCoverImage(topic: string, supabaseClient: any): Promise<string> {
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
+  if (!lovableApiKey) {
+    console.warn('LOVABLE_API_KEY not set, using fallback image')
+    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+  }
 
-function getRandomImages(count: number, exclude: number[] = []): typeof AUTOMOTIVE_IMAGES {
-  const available = AUTOMOTIVE_IMAGES.filter((_, i) => !exclude.includes(i))
-  const shuffled = [...available].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
+  try {
+    const imagePrompt = `Professional automotive photography related to: "${topic}". Show engine parts, motor oil, car maintenance, mechanic workshop, or lubricant products. Clean, professional, well-lit. No text overlays.`
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image',
+        messages: [{ role: 'user', content: imagePrompt }],
+        modalities: ['image', 'text'],
+      }),
+    })
+
+    if (!response.ok) {
+      console.error('AI image generation failed:', await response.text())
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    const data = await response.json()
+    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url
+
+    if (!imageData || !imageData.startsWith('data:image')) {
+      console.error('No image in AI response')
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    // Extract base64 and upload to Supabase storage
+    const base64Data = imageData.split(',')[1]
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
+    const fileName = `blog/cover-${Date.now()}.png`
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from('products')
+      .upload(fileName, binaryData, {
+        contentType: 'image/png',
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    const { data: urlData } = supabaseClient.storage
+      .from('products')
+      .getPublicUrl(fileName)
+
+    return urlData.publicUrl
+  } catch (e) {
+    console.error('Cover image generation error:', e)
+    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+  }
 }
 
 serve(async (req) => {
@@ -66,20 +109,28 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-    // Verify admin user
+    // Auth client: validate user token
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) throw new Error('Missing authorization header')
 
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
-    if (authError || !user) throw new Error('Unauthorized')
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    })
 
-    const { data: userData } = await supabaseClient
+    const { data: { user }, error: authError } = await authClient.auth.getUser()
+    if (authError || !user) {
+      console.error('Auth error:', authError?.message)
+      throw new Error('Unauthorized')
+    }
+
+    // Service role client for data operations
+    const serviceClient = createClient(supabaseUrl, supabaseServiceKey)
+
+    const { data: userData } = await serviceClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -90,7 +141,7 @@ serve(async (req) => {
     const { topic, autoPublish = true } = await req.json()
 
     // Anti-duplicate: get existing post titles
-    const { data: existingPosts } = await supabaseClient
+    const { data: existingPosts } = await serviceClient
       .from('blog_posts')
       .select('title')
 
@@ -99,7 +150,7 @@ serve(async (req) => {
     // Pick a topic that hasn't been used
     let selectedTopic = topic
     if (!selectedTopic) {
-      const unusedTopics = AUTOMOTIVE_TOPICS.filter(t => 
+      const unusedTopics = AUTOMOTIVE_TOPICS.filter(t =>
         !existingTitles.some((et: string) => et.includes(t.substring(0, 30).toLowerCase()))
       )
       selectedTopic = unusedTopics.length > 0
@@ -110,14 +161,10 @@ serve(async (req) => {
     const mistralApiKey = Deno.env.get('MISTRAL_API_KEY')
     if (!mistralApiKey) throw new Error('MISTRAL_API_KEY not configured')
 
-    // Pick images for the blog
-    const coverIdx = Math.floor(Math.random() * AUTOMOTIVE_IMAGES.length)
-    const coverImage = AUTOMOTIVE_IMAGES[coverIdx]
-    const inlineImages = getRandomImages(3, [coverIdx])
-
-    const imageInstructions = inlineImages.map((img, i) => 
-      `Image ${i + 1}: ![${img.alt}](${img.url})`
-    ).join('\n')
+    // Generate AI cover image relevant to the topic
+    console.log('Generating cover image for topic:', selectedTopic)
+    const coverImageUrl = await generateCoverImage(selectedTopic, serviceClient)
+    console.log('Cover image URL:', coverImageUrl)
 
     const prompt = `Tu es un expert en lubrifiants automobiles et produits Bardahl. Écris un article de blog complet sur : "${selectedTopic}".
 
@@ -129,17 +176,13 @@ L'article doit :
 - Inclure des conseils concrets pour les automobilistes
 - Ton professionnel et expert
 - Conclure avec un appel à l'action vers les produits AutoPassion/Bardahl
-
-IMPORTANT : Intègre ces images dans le contenu markdown aux endroits pertinents :
-${imageInstructions}
-
-Place au moins 2 images dans le contenu à des endroits logiques (après une introduction, entre des sections, etc.)
+- NE PAS inclure d'images dans le contenu, la couverture est gérée séparément
 
 Format JSON strict :
 {
   "title": "Titre de l'article",
   "excerpt": "Résumé court de 150-200 caractères",
-  "content": "Contenu complet en markdown avec les images intégrées",
+  "content": "Contenu complet en markdown sans images",
   "tags": ["tag1", "tag2", "tag3"],
   "meta_title": "Titre SEO (60 caractères max)",
   "meta_description": "Description SEO (155 caractères max)"
@@ -155,7 +198,7 @@ Format JSON strict :
         model: 'mistral-large-latest',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       }),
     })
 
@@ -177,7 +220,7 @@ Format JSON strict :
     const wordCount = generatedContent.content.split(/\s+/).length
     const readTime = Math.ceil(wordCount / 200)
 
-    const { data: blogPost, error: insertError } = await supabaseClient
+    const { data: blogPost, error: insertError } = await serviceClient
       .from('blog_posts')
       .insert({
         title: generatedContent.title,
@@ -186,7 +229,7 @@ Format JSON strict :
         content: generatedContent.content,
         tags: generatedContent.tags || [],
         read_time: readTime,
-        featured_image: coverImage.url,
+        featured_image: coverImageUrl,
         author: 'AutoPassion',
         status: autoPublish ? 'published' : 'draft',
         published_at: autoPublish ? new Date().toISOString() : null,
@@ -199,18 +242,18 @@ Format JSON strict :
     // Notify subscribers if published
     if (autoPublish && blogPost) {
       try {
-        await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/blog-notify-subscribers`, {
+        await fetch(`${supabaseUrl}/functions/v1/blog-notify-subscribers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            'Authorization': `Bearer ${supabaseServiceKey}`,
           },
           body: JSON.stringify({
             blog_post_id: blogPost.id,
             title: blogPost.title,
             slug: blogPost.slug,
             excerpt: blogPost.excerpt,
-            featured_image: coverImage.url,
+            featured_image: coverImageUrl,
           }),
         })
       } catch (e) {

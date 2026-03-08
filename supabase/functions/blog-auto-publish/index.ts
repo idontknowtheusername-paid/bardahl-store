@@ -34,27 +34,74 @@ const AUTOMOTIVE_TOPICS = [
   'Comparatif huiles minérales vs synthétiques vs semi-synthétiques',
 ]
 
-const AUTOMOTIVE_IMAGES = [
-  { url: 'https://picsum.photos/seed/engine1/800/500', alt: 'Moteur automobile' },
-  { url: 'https://picsum.photos/seed/car1/800/500', alt: 'Voiture sport' },
-  { url: 'https://picsum.photos/seed/mechanic1/800/500', alt: 'Mécanicien au travail' },
-  { url: 'https://picsum.photos/seed/oil1/800/500', alt: 'Vidange huile moteur' },
-  { url: 'https://picsum.photos/seed/garage1/800/500', alt: 'Entretien automobile' },
-  { url: 'https://picsum.photos/seed/workshop1/800/500', alt: 'Garage automobile' },
-  { url: 'https://picsum.photos/seed/luxury1/800/500', alt: 'Voiture de luxe' },
-  { url: 'https://picsum.photos/seed/modern1/800/500', alt: 'Véhicule moderne' },
-  { url: 'https://picsum.photos/seed/tools1/800/500', alt: 'Outils mécaniques' },
-  { url: 'https://picsum.photos/seed/road1/800/500', alt: 'Route automobile' },
-  { url: 'https://picsum.photos/seed/detail1/800/500', alt: 'Moteur détail' },
-  { url: 'https://picsum.photos/seed/dashboard1/800/500', alt: 'Tableau de bord' },
-]
+async function generateCoverImage(topic: string, supabaseClient: any): Promise<string> {
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
+  if (!lovableApiKey) {
+    console.warn('LOVABLE_API_KEY not set, using fallback image')
+    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+  }
+
+  try {
+    const imagePrompt = `Professional automotive photography related to: "${topic}". Show engine parts, motor oil, car maintenance, mechanic workshop, or lubricant products. Clean, professional, well-lit. No text overlays.`
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image',
+        messages: [{ role: 'user', content: imagePrompt }],
+        modalities: ['image', 'text'],
+      }),
+    })
+
+    if (!response.ok) {
+      console.error('AI image generation failed:', await response.text())
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    const data = await response.json()
+    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url
+
+    if (!imageData || !imageData.startsWith('data:image')) {
+      console.error('No image in AI response')
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    const base64Data = imageData.split(',')[1]
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
+    const fileName = `blog/cover-${Date.now()}.png`
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from('products')
+      .upload(fileName, binaryData, {
+        contentType: 'image/png',
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+    }
+
+    const { data: urlData } = supabaseClient.storage
+      .from('products')
+      .getPublicUrl(fileName)
+
+    return urlData.publicUrl
+  } catch (e) {
+    console.error('Cover image generation error:', e)
+    return 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=500&fit=crop'
+  }
+}
 
 serve(async (req) => {
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
     // Check if post already created this week
     const oneWeekAgo = new Date()
@@ -89,16 +136,10 @@ serve(async (req) => {
     const mistralApiKey = Deno.env.get('MISTRAL_API_KEY')
     if (!mistralApiKey) throw new Error('MISTRAL_API_KEY not configured')
 
-    // Pick images
-    const coverIdx = Math.floor(Math.random() * AUTOMOTIVE_IMAGES.length)
-    const coverImage = AUTOMOTIVE_IMAGES[coverIdx]
-    const inlineImages = AUTOMOTIVE_IMAGES.filter((_, i) => i !== coverIdx)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
-
-    const imageInstructions = inlineImages.map((img, i) =>
-      `Image ${i + 1}: ![${img.alt}](${img.url})`
-    ).join('\n')
+    // Generate AI cover image
+    console.log('Generating cover image for topic:', selectedTopic)
+    const coverImageUrl = await generateCoverImage(selectedTopic, supabaseClient)
+    console.log('Cover image URL:', coverImageUrl)
 
     const prompt = `Tu es un expert en lubrifiants automobiles et produits Bardahl. Écris un article de blog complet sur : "${selectedTopic}".
 
@@ -109,17 +150,13 @@ L'article doit :
 - Mentionner Bardahl naturellement
 - Ton professionnel et expert
 - Conclure avec un appel à l'action vers AutoPassion/Bardahl
-
-IMPORTANT : Intègre ces images dans le contenu markdown :
-${imageInstructions}
-
-Place au moins 2 images dans le contenu à des endroits logiques.
+- NE PAS inclure d'images dans le contenu
 
 Format JSON strict :
 {
   "title": "Titre",
   "excerpt": "Résumé 150-200 caractères",
-  "content": "Contenu markdown avec images",
+  "content": "Contenu markdown sans images",
   "tags": ["tag1", "tag2", "tag3"]
 }`
 
@@ -133,7 +170,7 @@ Format JSON strict :
         model: 'mistral-large-latest',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       }),
     })
 
@@ -159,7 +196,7 @@ Format JSON strict :
         content: generated.content,
         tags: generated.tags || [],
         read_time: readTime,
-        featured_image: coverImage.url,
+        featured_image: coverImageUrl,
         author: 'AutoPassion',
         status: 'published',
         published_at: new Date().toISOString(),
@@ -171,18 +208,18 @@ Format JSON strict :
 
     // Notify subscribers
     try {
-      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/blog-notify-subscribers`, {
+      await fetch(`${supabaseUrl}/functions/v1/blog-notify-subscribers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Authorization': `Bearer ${supabaseServiceKey}`,
         },
         body: JSON.stringify({
           blog_post_id: blogPost.id,
           title: blogPost.title,
           slug: blogPost.slug,
           excerpt: blogPost.excerpt,
-          featured_image: coverImage.url,
+          featured_image: coverImageUrl,
         }),
       })
     } catch (e) {
