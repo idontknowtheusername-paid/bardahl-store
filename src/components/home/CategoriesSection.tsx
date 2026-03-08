@@ -62,7 +62,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'special-atelier': {
     name: 'Spécial atelier',
-    image: categoryGraisses,
+    image: categoryAtelier,
     description: 'Produits professionnels pour atelier',
   },
   'packs-entretien': {
