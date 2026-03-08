@@ -580,10 +580,9 @@ export default function VehicleDetail() {
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement.' : 'Finalisez le paiement de 1 000 FCFA.'}</p>
+                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de {qrPrice.toLocaleString()} FCFA.</p>
                       <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
-                        {QR_TEST_MODE && <TestTube className="h-4 w-4" />}
-                        {QR_TEST_MODE ? 'Activer (test gratuit)' : 'Payer 1 000 FCFA'}
+                        Payer {qrPrice.toLocaleString()} FCFA
                       </Button>
                     </div>
                   ) : (
