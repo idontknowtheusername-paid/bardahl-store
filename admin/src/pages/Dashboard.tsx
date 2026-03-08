@@ -7,8 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download,
+  Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download, Bell,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
@@ -97,6 +98,20 @@ export default function Dashboard() {
     },
   });
 
+  const { data: reminderStats } = useQuery({
+    queryKey: ['dashboard-reminder-stats'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('oil_change_reminders')
+        .select('is_active, next_reminder_date')
+        .eq('is_active', true);
+      const active = data?.length || 0;
+      const due = data?.filter(r => new Date(r.next_reminder_date) <= new Date()).length || 0;
+      return { active, due };
+    },
+    refetchInterval: 30000,
+  });
+
   const exportToCSV = () => {
     if (!recentOrders || recentOrders.length === 0) { toast.error(t.common.noData); return; }
     const headers = [t.orders.orderNumber, t.orders.customer, t.common.email, t.common.total, t.common.status, t.common.date];
@@ -176,6 +191,28 @@ export default function Dashboard() {
           <CardContent><div className="text-2xl font-bold">{stats?.subscribers || 0}</div></CardContent>
         </Card>
       </div>
+
+      {/* Reminders widget */}
+      {(reminderStats?.due || 0) > 0 && (
+        <Link to="/reminders">
+          <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors cursor-pointer">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Bell className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{reminderStats.due} rappel{(reminderStats.due || 0) > 1 ? 's' : ''} vidange à envoyer</p>
+                    <p className="text-xs text-muted-foreground">{reminderStats.active} rappels actifs au total</p>
+                  </div>
+                </div>
+                <span className="text-sm text-orange-600 font-medium">Voir →</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
