@@ -71,18 +71,21 @@ export type Database = {
           email: string
           id: string
           is_active: boolean | null
+          unsubscribe_token: string | null
         }
         Insert: {
           created_at?: string | null
           email: string
           id?: string
           is_active?: boolean | null
+          unsubscribe_token?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
           is_active?: boolean | null
+          unsubscribe_token?: string | null
         }
         Relationships: []
       }
