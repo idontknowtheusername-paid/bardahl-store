@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useMemo } from 'react';
 import categoryTransmission from '@/assets/category-transmission.jpg';
 import categoryHuiles from '@/assets/category-huiles.jpg';
 import categoryAdditifs from '@/assets/category-additifs.jpg';
