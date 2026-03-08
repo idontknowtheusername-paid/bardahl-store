@@ -35,37 +35,91 @@ const AUTOMOTIVE_TOPICS = [
 ]
 
 const IMAGE_KEYWORDS: Record<string, string> = {
-  'huile': 'motor oil bottle pouring golden lubricant engine',
-  'moteur': 'car engine closeup mechanical parts',
-  'additif': 'fuel additive bottle automotive chemistry',
-  'vidange': 'oil change mechanic workshop drain plug',
-  'transmission': 'car gearbox transmission mechanical',
-  'refroidissement': 'car radiator coolant engine cooling system',
-  'carburant': 'fuel injection system gasoline diesel',
-  'injecteur': 'fuel injector nozzle spray automotive',
-  'turbo': 'turbocharger turbo engine boost automotive',
-  'diesel': 'diesel engine truck automotive maintenance',
-  'moto': 'motorcycle engine oil maintenance',
-  'filtre': 'oil filter automotive spare parts',
-  'entretien': 'car maintenance workshop mechanic tools',
-  'viscosité': 'motor oil viscosity different grades bottles',
-  'norme': 'automotive certification quality standard oil',
+  'huile': 'a professional photo of motor oil being poured from a bottle into a car engine, golden lubricant, workshop lighting',
+  'moteur': 'a detailed closeup photo of a clean car engine bay with visible components, professional automotive photography',
+  'additif': 'professional product photo of automotive fuel additives bottles lined up, clean studio background',
+  'vidange': 'a mechanic performing an oil change in a professional workshop, oil draining from engine',
+  'transmission': 'a cutaway view of an automatic car transmission gearbox, mechanical engineering photo',
+  'refroidissement': 'a car radiator and cooling system components laid out, automotive parts photography',
+  'carburant': 'a fuel injection system closeup on a modern car engine, professional automotive photo',
+  'injecteur': 'fuel injector nozzles spraying fuel mist, macro automotive photography',
+  'turbo': 'a shiny turbocharger component removed from engine, metallic automotive part photography',
+  'diesel': 'a diesel truck engine compartment, heavy duty automotive maintenance photography',
+  'moto': 'a motorcycle engine being serviced with oil, sport bike maintenance photography',
+  'filtre': 'new and used oil filters side by side comparison, automotive spare parts photography',
+  'entretien': 'a professional mechanic working on a car in a modern workshop with tools, automotive service',
+  'viscosité': 'different grades of motor oil bottles labeled 5W30 10W40 arranged neatly, product photography',
+  'norme': 'automotive certification labels and quality stamps on oil bottles, professional product photo',
 }
 
 function getImagePrompt(topic: string): string {
   const topicLower = topic.toLowerCase()
   for (const [keyword, prompt] of Object.entries(IMAGE_KEYWORDS)) {
-    if (topicLower.includes(keyword)) {
-      return prompt
-    }
+    if (topicLower.includes(keyword)) return prompt
   }
-  return 'automotive motor oil car engine maintenance professional'
+  return 'a professional automotive workshop with motor oil products and car engine parts, clean well-lit photography'
 }
 
-function generateCoverImageUrl(topic: string): string {
-  const prompt = getImagePrompt(topic)
-  const encoded = encodeURIComponent(prompt)
-  return `https://image.pollinations.ai/prompt/${encoded}?width=800&height=500&seed=${Date.now()}&nologo=true`
+const FALLBACK_IMAGE = 'https://image.pollinations.ai/prompt/automotive%20motor%20oil%20car%20engine%20maintenance?width=800&height=500&nologo=true'
+
+async function generateCoverImage(topic: string, supabaseClient: any): Promise<string> {
+  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
+  if (!lovableApiKey) {
+    console.warn('LOVABLE_API_KEY not set, using fallback')
+    return FALLBACK_IMAGE
+  }
+
+  try {
+    const imagePrompt = getImagePrompt(topic)
+    console.log('Generating image with prompt:', imagePrompt)
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image',
+        messages: [{ role: 'user', content: imagePrompt }],
+        modalities: ['image', 'text'],
+      }),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('AI image generation failed:', response.status, errText)
+      return FALLBACK_IMAGE
+    }
+
+    const data = await response.json()
+    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url
+
+    if (!imageData || !imageData.startsWith('data:image')) {
+      console.error('No image in AI response')
+      return FALLBACK_IMAGE
+    }
+
+    const base64Data = imageData.split(',')[1]
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
+    const fileName = `blog/cover-${Date.now()}.png`
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from('products')
+      .upload(fileName, binaryData, { contentType: 'image/png', upsert: true })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      return FALLBACK_IMAGE
+    }
+
+    const { data: urlData } = supabaseClient.storage.from('products').getPublicUrl(fileName)
+    console.log('Image uploaded:', urlData.publicUrl)
+    return urlData.publicUrl
+  } catch (e) {
+    console.error('Cover image generation error:', e)
+    return FALLBACK_IMAGE
+  }
 }
 
 serve(async (req) => {
@@ -91,11 +145,7 @@ serve(async (req) => {
       )
     }
 
-    // Anti-duplicate: get existing titles
-    const { data: existingPosts } = await supabaseClient
-      .from('blog_posts')
-      .select('title')
-
+    const { data: existingPosts } = await supabaseClient.from('blog_posts').select('title')
     const existingTitles = (existingPosts || []).map((p: any) => p.title.toLowerCase())
     const unusedTopics = AUTOMOTIVE_TOPICS.filter(t =>
       !existingTitles.some((et: string) => et.includes(t.substring(0, 30).toLowerCase()))
@@ -107,9 +157,8 @@ serve(async (req) => {
     const mistralApiKey = Deno.env.get('MISTRAL_API_KEY')
     if (!mistralApiKey) throw new Error('MISTRAL_API_KEY not configured')
 
-    // Generate cover image URL (Pollinations.ai - free, no API key)
-    const coverImageUrl = generateCoverImageUrl(selectedTopic)
-    console.log('Cover image URL:', coverImageUrl)
+    // Generate AI cover image via Lovable AI Gateway (with Pollinations fallback)
+    const coverImageUrl = await generateCoverImage(selectedTopic, supabaseClient)
 
     const prompt = `Tu es un expert en lubrifiants automobiles et produits Bardahl. Écris un article de blog complet sur : "${selectedTopic}".
 
@@ -176,7 +225,6 @@ Format JSON strict :
 
     if (insertError) throw insertError
 
-    // Notify subscribers
     try {
       await fetch(`${supabaseUrl}/functions/v1/blog-notify-subscribers`, {
         method: 'POST',
