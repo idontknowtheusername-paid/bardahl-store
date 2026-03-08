@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { X, Send, Loader2, Minimize2, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import temiAvatar from '@/assets/temi-avatar.png';
@@ -8,6 +9,7 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 type QuickAction = { label: string; msg?: string; isWhatsApp?: boolean };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
+const HIDDEN_PATHS = ['/panier', '/checkout'];
 
 function getSessionId() {
   let sid = sessionStorage.getItem('bardahl-chat-session');
