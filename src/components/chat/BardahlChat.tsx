@@ -264,7 +264,7 @@ export function BardahlChat() {
               key={a.label}
               onClick={() => {
                 if (a.isWhatsApp) {
-                  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '237XXXXXXXXX';
+                  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '22996786284';
                   const message = encodeURIComponent("Bonjour, j'aimerais avoir plus d'informations sur vos produits");
                   window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
                 } else {

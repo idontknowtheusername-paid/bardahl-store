@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, TestTube, Pencil, Bell, Check } from 'lucide-react';
+import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check } from 'lucide-react';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const QR_TEST_MODE = true;
+const QR_DEFAULT_PRICE = 1000;
 
 interface MaintenanceRecord {
   id: string;
@@ -48,6 +48,7 @@ export default function VehicleDetail() {
   const { isAuthenticated, isLoading: authLoading, vehicles, profile } = useCustomerAuth();
   const navigate = useNavigate();
   const [records, setRecords] = useState<MaintenanceRecord[]>([]);
+  const [qrPrice, setQrPrice] = useState<number>(QR_DEFAULT_PRICE);
   const [plan, setPlan] = useState<LubricationPlan | null>(null);
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
@@ -220,13 +221,15 @@ export default function VehicleDetail() {
     fetchData();
   };
 
+  // Fetch QR price from site settings
+  useEffect(() => {
+    supabase.from('site_settings').select('qr_activation_price').single().then(({ data }) => {
+      if (data?.qr_activation_price) setQrPrice(data.qr_activation_price);
+    });
+  }, []);
+
   const handlePayQR = () => {
     if (!qrCode) return;
-    if (QR_TEST_MODE) {
-      toast.info('🧪 Mode test : activation gratuite du QR code...');
-      activateQR(qrCode.id);
-      return;
-    }
     const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
     if (!openKkiapayWidget) { toast.error('Le module de paiement n\'est pas chargé.'); return; }
     addSuccessListener((response: any) => {
@@ -235,8 +238,8 @@ export default function VehicleDetail() {
     });
     addFailedListener(() => toast.error('Le paiement a échoué.'));
     openKkiapayWidget({
-      amount: 1000, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
-      sandbox: true, phone: '',
+      amount: qrPrice, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+      sandbox: false, phone: '',
       name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
       data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
       theme: '#F59E0B',
@@ -563,24 +566,23 @@ export default function VehicleDetail() {
               <TabsContent value="qrcode" className="space-y-4">
                 <h2 className="text-lg font-bold flex items-center gap-2">
                   <QrCode className="h-5 w-5 text-primary" /> QR Code carnet
-                  {QR_TEST_MODE && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full flex items-center gap-1"><TestTube className="h-3 w-3" />Test</span>}
+                  
                 </h2>
                 <div className="bg-card border border-border rounded-xl p-6">
                   {!qrCode ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien. À coller dans votre voiture !</p>
-                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span></p>
+                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{qrPrice.toLocaleString()} FCFA</span></p>
                       <Button onClick={handleGenerateQR}>Générer mon QR code</Button>
                     </div>
                   ) : !qrCode.is_paid ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement.' : 'Finalisez le paiement de 1 000 FCFA.'}</p>
+                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de {qrPrice.toLocaleString()} FCFA.</p>
                       <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
-                        {QR_TEST_MODE && <TestTube className="h-4 w-4" />}
-                        {QR_TEST_MODE ? 'Activer (test gratuit)' : 'Payer 1 000 FCFA'}
+                        Payer {qrPrice.toLocaleString()} FCFA
                       </Button>
                     </div>
                   ) : (
