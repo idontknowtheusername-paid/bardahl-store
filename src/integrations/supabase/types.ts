@@ -430,6 +430,8 @@ export type Database = {
       }
       oil_change_reminders: {
         Row: {
+          alert_preferences: Json
+          alerts_sent: Json
           created_at: string
           customer_email: string
           customer_name: string | null
@@ -449,6 +451,8 @@ export type Database = {
           vehicle_model: string | null
         }
         Insert: {
+          alert_preferences?: Json
+          alerts_sent?: Json
           created_at?: string
           customer_email: string
           customer_name?: string | null
@@ -468,6 +472,8 @@ export type Database = {
           vehicle_model?: string | null
         }
         Update: {
+          alert_preferences?: Json
+          alerts_sent?: Json
           created_at?: string
           customer_email?: string
           customer_name?: string | null
