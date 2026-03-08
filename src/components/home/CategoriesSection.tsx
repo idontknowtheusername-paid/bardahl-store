@@ -5,8 +5,12 @@ import categoryTransmission from '@/assets/category-transmission.jpg';
 import categoryHuiles from '@/assets/category-huiles.jpg';
 import categoryAdditifs from '@/assets/category-additifs.jpg';
 import categoryEntretien from '@/assets/category-entretien.jpg';
-import categoryGraisses from '@/assets/category-graisses.jpg';
 import categoryLiquides from '@/assets/category-liquides.jpg';
+import categoryPurifiant from '@/assets/category-purifiant.jpg';
+import categoryAtelier from '@/assets/category-atelier.jpg';
+import categoryPacks from '@/assets/category-packs.jpg';
+import categoryAccessoires from '@/assets/category-accessoires.jpg';
+import categoryFiltres from '@/assets/category-filtres.jpg';
 import { Skeleton } from '@/components/ui/skeleton';
 import { staticCategories } from '@/data/products';
 import { useTranslation } from '@/context/LanguageContext';
@@ -48,7 +52,7 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'purifiant-desodorisant': {
     name: 'Purifiant & désodorisant',
-    image: categoryEntretien,
+    image: categoryPurifiant,
     description: 'Purifiants d\'air et désodorisants habitacle',
   },
   'entretien': {
@@ -58,22 +62,22 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; descripti
   },
   'special-atelier': {
     name: 'Spécial atelier',
-    image: categoryGraisses,
+    image: categoryAtelier,
     description: 'Produits professionnels pour atelier',
   },
   'packs-entretien': {
     name: 'Packs entretien',
-    image: categoryHuiles,
+    image: categoryPacks,
     description: 'Packs complets pour votre véhicule',
   },
   'accessoires-electronique': {
     name: 'Accessoires & Électronique auto',
-    image: categoryTransmission,
+    image: categoryAccessoires,
     description: 'Accessoires et équipements électroniques',
   },
   'filtres': {
     name: 'Filtres',
-    image: categoryGraisses,
+    image: categoryFiltres,
     description: 'Filtres à huile, gasoil, air et plus',
   },
 };
