@@ -96,8 +96,6 @@ serve(async (req) => {
   </div>
   
   <div style="background: #ffffff; padding: 30px;">
-    ${featured_image ? `<img src="${featured_image}" alt="${title}" style="width: 100%; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">` : ''}
-    
     <p style="color: #555; font-size: 15px; margin-top: 0;">Cher(e) passionné(e),</p>
     <p style="color: #555; font-size: 15px;">Comme chaque vendredi soir, l'équipe AutoPassion vous a préparé un article spécialement conçu pour vous aider à prendre soin de votre véhicule. Cette semaine, on vous parle de :</p>
     
