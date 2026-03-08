@@ -380,21 +380,27 @@ export default function VehicleDetail() {
 
               {/* QR Code */}
               <section>
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><QrCode className="h-5 w-5 text-primary" /> QR Code carnet d'entretien</h2>
+                <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
+                  <QrCode className="h-5 w-5 text-primary" /> QR Code carnet d'entretien
+                  {QR_TEST_MODE && <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full flex items-center gap-1"><TestTube className="h-3 w-3" />Test</span>}
+                </h2>
                 <div className="bg-card border border-border rounded-xl p-6">
                   {!qrCode ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                       <p className="text-sm text-muted-foreground mb-3">Générez un QR code unique pour accéder au carnet d'entretien de ce véhicule. À coller dans votre voiture !</p>
-                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">1 000 FCFA</span> (paiement unique)</p>
+                      <p className="text-xs text-muted-foreground mb-4">Prix : <span className="font-bold text-foreground">{QR_TEST_MODE ? 'Gratuit (mode test)' : '1 000 FCFA'}</span> (paiement unique)</p>
                       <Button onClick={handleGenerateQR}>Générer mon QR code</Button>
                     </div>
                   ) : !qrCode.is_paid ? (
                     <div className="text-center">
                       <QrCode className="h-12 w-12 text-accent mx-auto mb-3" />
                       <p className="font-semibold mb-1">QR code créé</p>
-                      <p className="text-sm text-muted-foreground mb-4">Finalisez le paiement de 1 000 FCFA pour activer votre QR code.</p>
-                      <Button onClick={handlePayQR} className="bg-accent text-accent-foreground">Payer 1 000 FCFA</Button>
+                      <p className="text-sm text-muted-foreground mb-4">{QR_TEST_MODE ? 'Cliquez pour activer gratuitement (mode test).' : 'Finalisez le paiement de 1 000 FCFA pour activer votre QR code.'}</p>
+                      <Button onClick={handlePayQR} className="bg-accent text-accent-foreground gap-2">
+                        {QR_TEST_MODE && <TestTube className="h-4 w-4" />}
+                        {QR_TEST_MODE ? 'Activer (test gratuit)' : 'Payer 1 000 FCFA'}
+                      </Button>
                     </div>
                   ) : (
                     <div className="text-center">
