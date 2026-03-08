@@ -253,7 +253,7 @@ serve(async (req) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              from: "Autopassion BJ <noreply@autopassion.bj>",
+              from: "Autopassion BJ <noreply@email.maxiimarket.com>",
               to: [reminder.customer_email],
               subject,
               html,
