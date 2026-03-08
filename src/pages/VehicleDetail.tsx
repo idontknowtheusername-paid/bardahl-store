@@ -129,7 +129,7 @@ export default function VehicleDetail() {
   const activateQR = useCallback(async (qrId: string, transactionId?: string) => {
     const { error } = await supabase
       .from('vehicle_qr_codes')
-      .update({ is_paid: true, payment_id: transactionId || 'TEST_MODE' } as any)
+      .update({ is_paid: true, payment_id: transactionId || 'KKIAPAY' } as any)
       .eq('id', qrId);
     if (error) { toast.error('Erreur activation QR : ' + error.message); return; }
     toast.success('✅ QR code activé avec succès !');
