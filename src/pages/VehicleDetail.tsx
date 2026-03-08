@@ -48,6 +48,7 @@ export default function VehicleDetail() {
   const { isAuthenticated, isLoading: authLoading, vehicles, profile } = useCustomerAuth();
   const navigate = useNavigate();
   const [records, setRecords] = useState<MaintenanceRecord[]>([]);
+  const [qrPrice, setQrPrice] = useState<number>(QR_DEFAULT_PRICE);
   const [plan, setPlan] = useState<LubricationPlan | null>(null);
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
