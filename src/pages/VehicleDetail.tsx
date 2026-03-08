@@ -221,13 +221,15 @@ export default function VehicleDetail() {
     fetchData();
   };
 
+  // Fetch QR price from site settings
+  useEffect(() => {
+    supabase.from('site_settings').select('qr_activation_price').single().then(({ data }) => {
+      if (data?.qr_activation_price) setQrPrice(data.qr_activation_price);
+    });
+  }, []);
+
   const handlePayQR = () => {
     if (!qrCode) return;
-    if (QR_TEST_MODE) {
-      toast.info('🧪 Mode test : activation gratuite du QR code...');
-      activateQR(qrCode.id);
-      return;
-    }
     const { openKkiapayWidget, addSuccessListener, addFailedListener } = window as any;
     if (!openKkiapayWidget) { toast.error('Le module de paiement n\'est pas chargé.'); return; }
     addSuccessListener((response: any) => {
@@ -236,8 +238,8 @@ export default function VehicleDetail() {
     });
     addFailedListener(() => toast.error('Le paiement a échoué.'));
     openKkiapayWidget({
-      amount: 1000, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
-      sandbox: true, phone: '',
+      amount: qrPrice, key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+      sandbox: false, phone: '',
       name: vehicle?.brand ? `${vehicle.brand} ${vehicle.model}` : 'QR Carnet',
       data: JSON.stringify({ type: 'qr_activation', vehicle_id: id, qr_id: qrCode.id }),
       theme: '#F59E0B',
