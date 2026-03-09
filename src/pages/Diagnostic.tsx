@@ -123,8 +123,14 @@ export default function Diagnostic() {
       .filter(Boolean) as NonNullable<typeof allProducts>[number][];
   }, [diagnosticResult, allProducts]);
 
+  const toggleSymptom = (id: string) => {
+    setSelectedSymptoms(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
+  };
+
   const handleStartDiagnostic = () => {
-    if (!selectedSymptom) return;
+    if (selectedSymptoms.length === 0) return;
     setStep(2);
   };
 
