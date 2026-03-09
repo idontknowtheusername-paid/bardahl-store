@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -24,6 +24,8 @@ import {
   Receipt,
   Users as UsersIcon,
   Bell,
+  Moon,
+  Sun,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -37,6 +39,27 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('admin-theme') !== 'light';
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      root.classList.remove('light');
+      localStorage.setItem('admin-theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+      localStorage.setItem('admin-theme', 'light');
+    }
+  }, [isDark]);
+
+  const hideChatWidget = location.pathname.startsWith('/products/');
 
   const navItems = [
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
@@ -127,12 +150,21 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
 
           {/* User section */}
-          <div className="border-t p-4">
+          <div className="border-t p-4 space-y-2">
             {!collapsed && (
               <p className="text-sm text-muted-foreground truncate mb-2">
                 {user?.email}
               </p>
             )}
+            <Button
+              variant="ghost"
+              size={collapsed ? 'icon' : 'default'}
+              className={cn('w-full justify-start', collapsed && 'justify-center px-2')}
+              onClick={() => setIsDark(!isDark)}
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {!collapsed && <span className="ml-2">{isDark ? 'Mode clair' : 'Mode sombre'}</span>}
+            </Button>
             <Button
               variant="ghost"
               className={cn('w-full justify-start', collapsed && 'justify-center px-2')}
@@ -155,8 +187,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="p-6">{children}</div>
       </main>
 
-      {/* Chat Widget */}
-      <ChatWidget />
+      {/* Chat Widget - hidden on product edit */}
+      {!hideChatWidget && <ChatWidget />}
     </div>
   );
 }
