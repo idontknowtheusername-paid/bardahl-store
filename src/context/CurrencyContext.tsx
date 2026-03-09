@@ -84,8 +84,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useCurrency() {
+export function useCurrency(): CurrencyContextType {
   const context = useContext(CurrencyContext);
-  if (!context) throw new Error('useCurrency must be used within a CurrencyProvider');
+  if (!context) {
+    throw new Error('useCurrency must be used within a CurrencyProvider');
+  }
   return context;
 }
