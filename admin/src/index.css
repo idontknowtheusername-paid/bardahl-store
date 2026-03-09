@@ -23,16 +23,16 @@
     --destructive-foreground: 0 0% 95%;
     --border: 0 0% 16%;
     --input: 0 0% 16%;
-    --ring: 49 100% 50%;
+    --ring: 220 70% 45%;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 49 100% 50%;
-    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-primary: 220 70% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 16%;
-    --sidebar-ring: 49 100% 50%;
+    --sidebar-ring: 220 70% 45%;
   }
 }
 

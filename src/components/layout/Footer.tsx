@@ -1,14 +1,29 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
-
-const socialLinks = [
-  { icon: Facebook, href: 'https://facebook.com/autopassionbj', label: 'Facebook' },
-  { icon: Instagram, href: 'https://instagram.com/autopassionbj', label: 'Instagram' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export function Footer() {
   const t = useTranslation();
+
+  const { data: settings } = useQuery({
+    queryKey: ['public-site-settings'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('public_site_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const socialLinks = [
+    ...(settings?.facebook_url ? [{ icon: Facebook, href: settings.facebook_url, label: 'Facebook' }] : [{ icon: Facebook, href: 'https://facebook.com/autopassionbj', label: 'Facebook' }]),
+    ...(settings?.instagram_url ? [{ icon: Instagram, href: settings.instagram_url, label: 'Instagram' }] : [{ icon: Instagram, href: 'https://instagram.com/autopassionbj', label: 'Instagram' }]),
+  ];
 
   const footerLinks = {
     produits: [
@@ -51,8 +66,8 @@ export function Footer() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center text-xs text-secondary-foreground/50">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> 01 BP 369 Parakou</span>
-            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> 96 78 62 84 / 62 21 67 66</span>
-            <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> contact@autopassionbj.com</span>
+            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {settings?.contact_phone || '96 78 62 84 / 62 21 67 66'}</span>
+            <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {settings?.contact_email || 'contact@autopassionbj.com'}</span>
           </div>
         </div>
 

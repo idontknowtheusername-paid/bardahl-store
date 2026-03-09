@@ -209,7 +209,7 @@ export default function Media() {
   };
 
   const filteredFiles = files?.filter(file =>
-    file.name.toLowerCase().includes(search.toLowerCase())
+    file.name && file.name.toLowerCase().includes(search.toLowerCase()) && !file.name.endsWith('/')
   );
 
   const formatFileSize = (bytes: number) => {
