@@ -104,6 +104,10 @@ export default function Dashboard() {
         totalOrders, totalRevenue, pendingOrders, totalProducts, lowStock,
         subscribers: subscribers || 0, conversionRate, chartData, statusChartData,
         averageOrderValue: paidOrders.length > 0 ? totalRevenue / paidOrders.length : 0,
+        totalCustomers: totalCustomers || 0,
+        unreadMessages: unreadMessages || 0,
+        monthRevenue,
+        monthOrderCount,
       };
     },
     refetchInterval: 30000,
