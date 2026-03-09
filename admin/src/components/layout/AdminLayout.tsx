@@ -76,6 +76,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     // { href: '/newsletter', label: t.nav.newsletter, icon: Mail },
     // { href: '/messages', label: t.nav.messages, icon: MessageSquare },
     { href: '/shipping', label: t.nav.shipping, icon: Truck },
+    { href: '/finances', label: 'Finances', icon: PiggyBank },
     { href: '/settings', label: t.nav.settings, icon: Settings },
   ];
 
