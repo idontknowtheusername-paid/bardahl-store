@@ -4,7 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { chatWithAssistant } from '@/lib/mistral';
 import { toast } from 'sonner';
-import ReactMarkdown from 'react-markdown';
+// Simple markdown-like rendering for bold and lists
+function SimpleMarkdown({ content }: { content: string }) {
+  const lines = content.split('\n');
+  return (
+    <>
+      {lines.map((line, i) => {
+        // Bold
+        let processed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // List items
+        if (processed.startsWith('- ')) {
+          return <li key={i} className="ml-4 list-disc" dangerouslySetInnerHTML={{ __html: processed.slice(2) }} />;
+        }
+        if (processed.trim() === '') return <br key={i} />;
+        return <p key={i} className="mb-1" dangerouslySetInnerHTML={{ __html: processed }} />;
+      })}
+    </>
+  );
+}
 
 type Message = {
   role: 'user' | 'assistant';
