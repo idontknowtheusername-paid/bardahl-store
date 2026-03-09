@@ -46,6 +46,28 @@ export default function Dashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
 
+      // Clients count
+      const { count: totalCustomers } = await supabase
+        .from('customers')
+        .select('*', { count: 'exact', head: true });
+
+      // Messages non lus
+      const { count: unreadMessages } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'new');
+
+      // Commandes ce mois
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const { data: monthOrders } = await supabase
+        .from('orders')
+        .select('total, payment_status')
+        .gte('created_at', startOfMonth.toISOString());
+      const monthRevenue = (monthOrders || []).filter(o => o.payment_status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
+      const monthOrderCount = monthOrders?.length || 0;
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
