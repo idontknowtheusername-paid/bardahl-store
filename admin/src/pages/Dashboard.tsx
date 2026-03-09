@@ -118,6 +118,8 @@ export default function Dashboard() {
         unreadMessages: unreadMessages || 0,
         monthRevenue,
         monthOrderCount,
+        monthVisits: monthVisits || 0,
+        totalVisits: totalVisits || 0,
       };
     },
     refetchInterval: 30000,
