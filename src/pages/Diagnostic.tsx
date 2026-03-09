@@ -135,26 +135,28 @@ export default function Diagnostic() {
   };
 
   const handleSubmitInfo = async () => {
-    if (!fuelType || !selectedSymptom) return;
+    if (!fuelType || selectedSymptoms.length === 0) return;
     setStep(3);
     setIsLoading(true);
     setError('');
     setDiagnosticResult('');
 
-    const symptomData = allSymptoms.find(s => s.id === selectedSymptom);
-    const symptomLabel = symptomData?.label || selectedSymptom;
-    const symptomDesc = symptomData?.description || '';
+    const symptomDetails = selectedSymptoms.map(id => {
+      const s = allSymptoms.find(x => x.id === id);
+      return s ? `${s.label} (${s.description})` : id;
+    }).join('\n- ');
 
     const diagnosticMessage = `DIAGNOSTIC AUTO - Analyse structurée demandée.
 
-Symptôme principal : ${symptomLabel}
-Description : ${symptomDesc}
+Symptômes signalés :
+- ${symptomDetails}
+
 Type de carburant : ${fuelType}
 Kilométrage : ${mileage || 'Non précisé'}
 Année du véhicule : ${year || 'Non précisée'}
 
 Fais un diagnostic structuré avec :
-1. **Diagnostic probable** : explique la cause probable du problème
+1. **Diagnostic probable** : explique la cause probable du/des problème(s)
 2. **Solutions recommandées** : liste les produits Autopassion/Bardahl adaptés avec leur lien (/produits/slug). UTILISE IMPÉRATIVEMENT le guide diagnostic problèmes/solutions pour recommander les bons produits.
 3. **Conseil entretien** : un conseil préventif
 
