@@ -187,8 +187,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="p-6">{children}</div>
       </main>
 
-      {/* Chat Widget */}
-      <ChatWidget />
+      {/* Chat Widget - hidden on product edit */}
+      {!hideChatWidget && <ChatWidget />}
     </div>
   );
 }
