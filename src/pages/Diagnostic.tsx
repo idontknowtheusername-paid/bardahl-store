@@ -270,16 +270,16 @@ Utilise des emojis et formate bien la réponse.`;
                         {cat.symptoms.map((symptom) => (
                           <button
                             key={symptom.id}
-                            onClick={() => setSelectedSymptom(symptom.id)}
+                            onClick={() => toggleSymptom(symptom.id)}
                             className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
-                              selectedSymptom === symptom.id
+                              selectedSymptoms.includes(symptom.id)
                                 ? 'border-primary bg-primary/5 shadow-md'
                                 : 'border-border bg-background hover:border-primary/30'
                             }`}
                           >
-                            <symptom.icon className={`h-6 w-6 mx-auto mb-2 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                            <h4 className="font-bold text-xs mb-1">{symptom.label}</h4>
-                            <p className="text-[10px] text-muted-foreground leading-tight">{symptom.description}</p>
+                            <symptom.icon className={`h-7 w-7 mx-auto mb-2 ${selectedSymptoms.includes(symptom.id) ? 'text-primary' : 'text-muted-foreground'}`} />
+                            <h4 className="font-bold text-sm mb-1">{symptom.label}</h4>
+                            <p className="text-xs text-muted-foreground leading-tight">{symptom.description}</p>
                           </button>
                         ))}
                       </div>
