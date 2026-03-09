@@ -302,7 +302,7 @@ Utilise des emojis et formate bien la réponse.`;
             <div className="max-w-md mx-auto">
               <h2 className="text-xl font-bold text-center mb-2">Quelques informations sur votre véhicule</h2>
               <p className="text-center text-sm text-muted-foreground mb-8">
-                Symptôme : <span className="font-semibold text-primary">{allSymptoms.find(s => s.id === selectedSymptom)?.label}</span>
+                Symptôme(s) : <span className="font-semibold text-primary">{selectedSymptoms.map(id => allSymptoms.find(s => s.id === id)?.label).filter(Boolean).join(', ')}</span>
               </p>
               <div className="space-y-4">
                 <div>

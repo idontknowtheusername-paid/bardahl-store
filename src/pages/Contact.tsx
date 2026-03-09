@@ -104,12 +104,12 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">WhatsApp (Recommandé)</h3>
                 <a
-                  href="https://wa.me/22996786284"
+                  href="https://wa.me/2290196786284"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700 transition-colors font-medium"
                 >
-                  +229 96 78 62 84
+                  +229 01 96 78 62 84
                 </a>
                 <p className="text-xs text-muted-foreground mt-1">
                   Réponse rapide garantie
