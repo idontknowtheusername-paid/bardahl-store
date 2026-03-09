@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download, Bell,
+  DollarSign, BarChart3, Eye, UserCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -45,6 +46,28 @@ export default function Dashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
 
+      // Clients count
+      const { count: totalCustomers } = await supabase
+        .from('customers')
+        .select('*', { count: 'exact', head: true });
+
+      // Messages non lus
+      const { count: unreadMessages } = await supabase
+        .from('contact_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'new');
+
+      // Commandes ce mois
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const { data: monthOrders } = await supabase
+        .from('orders')
+        .select('total, payment_status')
+        .gte('created_at', startOfMonth.toISOString());
+      const monthRevenue = (monthOrders || []).filter(o => o.payment_status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
+      const monthOrderCount = monthOrders?.length || 0;
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -81,6 +104,10 @@ export default function Dashboard() {
         totalOrders, totalRevenue, pendingOrders, totalProducts, lowStock,
         subscribers: subscribers || 0, conversionRate, chartData, statusChartData,
         averageOrderValue: paidOrders.length > 0 ? totalRevenue / paidOrders.length : 0,
+        totalCustomers: totalCustomers || 0,
+        unreadMessages: unreadMessages || 0,
+        monthRevenue,
+        monthOrderCount,
       };
     },
     refetchInterval: 30000,
@@ -189,6 +216,41 @@ export default function Dashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent><div className="text-2xl font-bold">{stats?.subscribers || 0}</div></CardContent>
+        </Card>
+      </div>
+
+      {/* Second row of KPIs */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Panier moyen</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatPrice(stats?.averageOrderValue || 0)}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Taux de conversion</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{(stats?.conversionRate || 0).toFixed(1)}%</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Clients inscrits</CardTitle>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{stats?.totalCustomers || 0}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Ce mois</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.monthOrderCount || 0} <span className="text-sm font-normal text-muted-foreground">commandes</span></div>
+            <p className="text-xs text-muted-foreground">{formatPrice(stats?.monthRevenue || 0)} de CA</p>
+          </CardContent>
         </Card>
       </div>
 
