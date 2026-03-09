@@ -39,6 +39,27 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('admin-theme') !== 'light';
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      root.classList.remove('light');
+      localStorage.setItem('admin-theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+      localStorage.setItem('admin-theme', 'light');
+    }
+  }, [isDark]);
+
+  const hideChatWidget = location.pathname.startsWith('/products/');
 
   const navItems = [
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
