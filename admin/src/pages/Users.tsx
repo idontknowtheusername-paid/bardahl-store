@@ -130,26 +130,18 @@ export default function Users() {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return
 
     try {
-      // Delete from user_roles
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('id', userId)
+      const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+        body: { userRoleId: userId, authUserId }
+      })
 
-      if (roleError) throw roleError
-
-      // Delete from auth (requires service role)
-      const { error: authError } = await supabase.auth.admin.deleteUser(authUserId)
-      
-      if (authError) {
-        console.error('Error deleting auth user:', authError)
-      }
+      if (error) throw error
+      if (!data?.success) throw new Error(data?.error || 'Erreur lors de la suppression')
 
       toast.success('Utilisateur supprimé')
       await fetchUsers()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error)
-      toast.error('Erreur lors de la suppression')
+      toast.error(error.message || 'Erreur lors de la suppression')
     }
   }
 
