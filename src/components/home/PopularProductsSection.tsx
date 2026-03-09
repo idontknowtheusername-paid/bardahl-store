@@ -19,8 +19,8 @@ export function PopularProductsSection() {
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestseller || 'POPULAIRES'}</span>
-              <h2 className="text-2xl md:text-3xl font-bold mt-1">{t.popularProducts || 'Produits Populaires'}</h2>
+              <span className="text-primary text-sm font-bold tracking-widest uppercase">LES PLUS UTILISÉS</span>
+              <h2 className="text-2xl md:text-3xl font-bold mt-1">Produits & Solutions les plus utilisés par les automobilistes</h2>
             </div>
           </div>
           <ProductCarouselSkeleton count={4} />
@@ -36,8 +36,9 @@ export function PopularProductsSection() {
       <div className="container">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.bestseller || 'POPULAIRES'}</span>
-            <h2 className="text-2xl md:text-3xl font-bold mt-1">{t.popularProducts || 'Produits Populaires'}</h2>
+            <span className="text-primary text-sm font-bold tracking-widest uppercase">LES PLUS UTILISÉS</span>
+            <h2 className="text-2xl md:text-3xl font-bold mt-1">Produits & Solutions les plus utilisés</h2>
+            <p className="text-muted-foreground text-base mt-2">Des solutions testées pour protéger votre moteur, améliorer les performances et réduire l'usure.</p>
           </div>
           <Button variant="link" className="p-0 text-primary font-semibold shrink-0 ml-4" asChild>
             <Link to="/categories">{t.seeAll}</Link>
