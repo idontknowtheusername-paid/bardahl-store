@@ -189,7 +189,7 @@ export default function Invoices() {
       const { error } = await supabase.functions.invoke('send-email', {
         body: {
           to: order.customer_email,
-          subject: `Votre facture ${invoiceNumber} - Bardahl`,
+          subject: `Votre facture ${invoiceNumber} - AutoPassion BJ`,
           template: 'order_confirmation',
           data: {
             customerName: order.customer_name,
