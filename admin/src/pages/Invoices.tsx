@@ -81,8 +81,8 @@ function generateInvoiceHTML(order: Order): string {
     <div class="invoice">
       <div class="header">
         <div>
-          <div class="brand">BARDAHL</div>
-          <div class="brand-sub">Lubrifiants & Solutions Automobile</div>
+          <div class="brand">AUTOPASSION</div>
+          <div class="brand-sub">Lubrifiants & Solutions Automobile - Bénin</div>
         </div>
         <div class="invoice-badge">FACTURE</div>
       </div>
