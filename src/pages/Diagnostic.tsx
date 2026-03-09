@@ -230,9 +230,9 @@ Utilise des emojis et formate bien la réponse.`;
   return (
     <>
       <SEOHead
-        title="Diagnostic Auto Intelligent | Autopassion BJ - Assistant IA"
-        description="Diagnostiquez les problèmes de votre voiture en quelques secondes grâce à notre assistant intelligent par IA. Analyse des symptômes et recommandations personnalisées."
-        keywords="diagnostic auto, assistant ia, problème voiture, symptômes moteur, autopassion, bénin"
+        title="Diagnostic Auto Rapide | Autopassion BJ"
+        description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées."
+        keywords="diagnostic auto, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
         url="/diagnostic"
       />
 
