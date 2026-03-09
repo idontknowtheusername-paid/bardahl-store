@@ -101,7 +101,7 @@ function extractProductSlugs(text: string): string[] {
 }
 
 export default function Diagnostic() {
-  const [selectedSymptom, setSelectedSymptom] = useState<string | null>(null);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [step, setStep] = useState(1);
   const [fuelType, setFuelType] = useState<string>('');
   const [mileage, setMileage] = useState<string>('');
