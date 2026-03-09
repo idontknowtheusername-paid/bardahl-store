@@ -11,16 +11,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, isAdmin, isLoading } = useAuth();
   const location = useLocation();
 
+  // Rediriger immédiatement vers login si pas d'utilisateur et pas en chargement
+  if (!isLoading && !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Afficher le loader seulement si on est en train de charger
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!isAdmin) {
