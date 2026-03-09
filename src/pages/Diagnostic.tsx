@@ -219,7 +219,7 @@ Utilise des emojis et formate bien la réponse.`;
 
   const resetDiagnostic = () => {
     setStep(1);
-    setSelectedSymptom(null);
+    setSelectedSymptoms([]);
     setFuelType('');
     setMileage('');
     setYear('');
