@@ -181,8 +181,8 @@ export function ChatWidget() {
               }`}
             >
               {message.role === 'assistant' ? (
-                <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:mb-1 [&>ul]:mb-1 [&>ol]:mb-1">
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                <div className="text-sm">
+                  <SimpleMarkdown content={message.content} />
                 </div>
               ) : (
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
