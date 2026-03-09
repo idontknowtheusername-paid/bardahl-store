@@ -385,7 +385,7 @@ export default function Media() {
                           <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
                             <p className="text-xs text-white truncate">{file.name}</p>
                             <p className="text-xs text-white/70">
-                              {formatFileSize(file.metadata.size)}
+                              {file.metadata?.size ? formatFileSize(file.metadata.size) : '—'}
                             </p>
                           </div>
                         </div>
