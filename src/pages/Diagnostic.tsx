@@ -257,7 +257,8 @@ Utilise des emojis et formate bien la réponse.`;
           {/* Step 1: Symptom selection by category */}
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-xl font-bold text-center mb-8">Quel problème a votre voiture ?</h2>
+              <h2 className="text-xl font-bold text-center mb-2">Quel(s) problème(s) a votre voiture ?</h2>
+              <p className="text-sm text-muted-foreground text-center mb-8">Vous pouvez sélectionner plusieurs symptômes.</p>
               <Accordion type="single" collapsible className="space-y-3">
                 {symptomCategories.map((cat) => (
                   <AccordionItem key={cat.label} value={cat.label} className="border border-border rounded-xl overflow-hidden bg-card">
