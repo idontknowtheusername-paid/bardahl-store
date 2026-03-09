@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SEOHead } from '@/components/SEOHead';
 import { Mail, Phone, Clock, Send, MessageCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,8 +75,15 @@ export default function Contact() {
   };
 
   return (
-    <div className="py-12 md:py-20">
-      <div className="container">
+    <>
+      <SEOHead
+        title="Contact | Autopassion BJ - Distributeur Bardahl à Parakou"
+        description="Contactez Autopassion BJ par WhatsApp, téléphone ou email. Votre distributeur Bardahl à Parakou répond rapidement à vos questions."
+        keywords="contact autopassion, bardahl parakou, service client, whatsapp, bénin"
+        url="/contact"
+      />
+      <div className="py-12 md:py-20">
+        <div className="container">
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl font-medium mb-4">
             Contactez-nous
@@ -253,5 +261,6 @@ export default function Contact() {
         </section>
       </div>
     </div>
+    </>
   );
 }

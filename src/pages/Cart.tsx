@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
@@ -15,7 +16,14 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="py-20">
+      <>
+        <SEOHead
+          title="Panier | Autopassion BJ"
+          description="Votre panier d'achat Autopassion BJ"
+          url="/cart"
+          noindex={true}
+        />
+        <div className="py-20">
         <div className="container max-w-2xl text-center">
           <ShoppingBag className="h-20 w-20 mx-auto text-muted-foreground/30 mb-6" />
           <h1 className="font-serif text-3xl font-medium mb-4">
@@ -29,11 +37,19 @@ export default function Cart() {
           </Button>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="py-8 md:py-12">
+    <>
+      <SEOHead
+        title="Panier | Autopassion BJ"
+        description="Votre panier d'achat Autopassion BJ"
+        url="/cart"
+        noindex={true}
+      />
+      <div className="py-8 md:py-12">
       <div className="container">
         <h1 className="font-serif text-3xl md:text-4xl font-medium mb-8">
           Votre Panier
@@ -172,5 +188,6 @@ export default function Cart() {
         </div>
       </div>
     </div>
+    </>
   );
 }

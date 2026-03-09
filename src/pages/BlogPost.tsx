@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { SEOHead } from '@/components/SEOHead'
 import { supabase } from '@/integrations/supabase/client'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -128,7 +129,16 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead
+        title={`${post.title} | Blog Autopassion BJ`}
+        description={post.excerpt || post.title}
+        keywords={post.tags?.join(', ') || 'blog, automobile, autopassion'}
+        image={post.featured_image || undefined}
+        url={`/blog/${post.slug}`}
+        type="article"
+      />
+      <div className="min-h-screen bg-background">
       <div className="bg-muted/30 py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -223,5 +233,6 @@ export default function BlogPost() {
         </div>
       )}
     </div>
+    </>
   )
 }

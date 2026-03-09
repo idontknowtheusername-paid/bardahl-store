@@ -1,13 +1,17 @@
-import { Helmet } from 'react-helmet-async';
+import { SEOHead } from '@/components/SEOHead';
+import { StructuredData } from '@/components/StructuredData';
 import { Heart, Award, Truck, Users, Car, Wrench, Stethoscope, BookOpen } from 'lucide-react';
 
 export default function About() {
   return (
     <>
-      <Helmet>
-        <title>À Propos | Autopassion BJ</title>
-        <meta name="description" content="Découvrez Autopassion BJ, votre plateforme automobile digitale au Bénin : e-commerce, diagnostic IA, carnet d'entretien et conseils personnalisés." />
-      </Helmet>
+      <SEOHead
+        title="À Propos | Autopassion BJ - Distributeur Bardahl au Bénin"
+        description="Autopassion BJ, votre distributeur officiel Bardahl au Bénin. Huiles moteur, additifs et produits d'entretien automobile de qualité à Parakou."
+        keywords="autopassion bj, bardahl bénin, distributeur bardahl, huiles moteur, parakou"
+        url="/about"
+      />
+      <StructuredData type="organization" />
 
       <main className="min-h-screen">
         {/* Hero Section */}

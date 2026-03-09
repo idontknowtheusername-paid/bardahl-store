@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { SEOHead } from '@/components/SEOHead';
 import { Wrench, Droplets, Shield, Fuel, Cog, Thermometer, Pipette, Sparkles, ChevronRight } from 'lucide-react';
 
 const maintenanceSections = [
@@ -72,10 +72,12 @@ const maintenanceSections = [
 export default function Entretien() {
   return (
     <>
-      <Helmet>
-        <title>Entretien véhicule | Autopassion BJ</title>
-        <meta name="description" content="Entretenir son moteur coûte moins cher que le réparer. Découvrez nos solutions d'entretien automobile." />
-      </Helmet>
+      <SEOHead
+        title="Entretien Véhicule | Autopassion BJ - Guide complet"
+        description="Entretenir son moteur coûte moins cher que le réparer. Découvrez nos solutions d'entretien automobile : vidange, nettoyage, protection et maintenance."
+        keywords="entretien véhicule, vidange moteur, maintenance auto, protection moteur, autopassion, bénin"
+        url="/entretien"
+      />
 
       {/* Hero */}
       <section className="bg-secondary text-secondary-foreground py-12 md:py-16">

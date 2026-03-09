@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 
@@ -69,7 +70,14 @@ export default function Categories() {
   const t = useTranslation();
 
   return (
-    <div className="py-12 md:py-20">
+    <>
+      <SEOHead
+        title="Nos Gammes | Autopassion BJ - Produits Bardahl au Bénin"
+        description="Découvrez notre gamme complète de produits Bardahl : huiles moteur, additifs, liquides de refroidissement, filtres et accessoires automobiles."
+        keywords="gammes bardahl, huiles moteur, additifs, transmission, entretien auto, filtres, bénin"
+        url="/categories"
+      />
+      <div className="py-12 md:py-20">
       <div className="container">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Nos Gammes</h1>
@@ -97,5 +105,6 @@ export default function Categories() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { SEOHead } from '@/components/SEOHead';
 import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw, Thermometer, Wind, Car, Disc3, Plug, Wrench, Droplets, Shield, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
@@ -219,10 +219,12 @@ Utilise des emojis et formate bien la réponse.`;
 
   return (
     <>
-      <Helmet>
-        <title>Diagnostic auto intelligent | Autopassion BJ</title>
-        <meta name="description" content="Diagnostiquez les problèmes de votre voiture en quelques secondes grâce à notre assistant intelligent." />
-      </Helmet>
+      <SEOHead
+        title="Diagnostic Auto Intelligent | Autopassion BJ - Assistant IA"
+        description="Diagnostiquez les problèmes de votre voiture en quelques secondes grâce à notre assistant intelligent par IA. Analyse des symptômes et recommandations personnalisées."
+        keywords="diagnostic auto, assistant ia, problème voiture, symptômes moteur, autopassion, bénin"
+        url="/diagnostic"
+      />
 
       <div className="min-h-[70vh] bg-muted/30">
         {/* Hero */}

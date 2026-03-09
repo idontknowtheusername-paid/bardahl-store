@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SEOHead } from '@/components/SEOHead'
 import { supabase } from '@/integrations/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -86,7 +87,15 @@ export default function Blog() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead
+        title="Blog | Autopassion BJ - Conseils entretien auto et actualités Bardahl"
+        description="Découvrez nos conseils d'entretien automobile, guides pratiques et actualités sur les produits Bardahl. Nouveaux articles chaque semaine."
+        keywords="blog automobile, conseils entretien, bardahl, huiles moteur, autopassion, bénin"
+        url="/blog"
+        type="website"
+      />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -178,5 +187,6 @@ export default function Blog() {
         </div>
       </div>
     </div>
+    </>
   )
 }

@@ -1,3 +1,5 @@
+import { SEOHead } from '@/components/SEOHead';
+import { StructuredData } from '@/components/StructuredData';
 import { HeroSection } from '@/components/home/HeroSection';
 import { PopularProductsSection } from '@/components/home/PopularProductsSection';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
@@ -8,6 +10,9 @@ import { NewsletterSection } from '@/components/home/NewsletterSection';
 const Index = () => {
   return (
     <>
+      <SEOHead />
+      <StructuredData type="organization" />
+      <StructuredData type="website" />
       <HeroSection />
       <PopularProductsSection />
       <CategoriesSection />

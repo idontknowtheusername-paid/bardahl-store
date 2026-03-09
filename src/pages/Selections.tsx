@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { ArrowRight } from 'lucide-react';
 
 const collections = [
@@ -38,7 +39,14 @@ const collections = [
 
 export default function Selections() {
   return (
-    <div className="py-12 md:py-20">
+    <>
+      <SEOHead
+        title="Nos Sélections | Autopassion BJ - Collections Bardahl"
+        description="Découvrez nos sélections de produits Bardahl : haute performance, entretien complet, technologie avancée et économie durable."
+        keywords="sélections, collections, bardahl, haute performance, entretien, autopassion"
+        url="/selections"
+      />
+      <div className="py-12 md:py-20">
       <div className="container">
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl font-medium mb-4">
@@ -80,5 +88,6 @@ export default function Selections() {
         </div>
       </div>
     </div>
+    </>
   );
 }

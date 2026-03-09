@@ -1,4 +1,5 @@
 import { useTranslation } from '@/context/LanguageContext';
+import { SEOHead } from '@/components/SEOHead';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const faqData = [
@@ -36,7 +37,14 @@ export default function FAQ() {
   const t = useTranslation();
 
   return (
-    <div className="py-12 md:py-20">
+    <>
+      <SEOHead
+        title="FAQ | Autopassion BJ - Questions sur les produits Bardahl"
+        description="Retrouvez les réponses aux questions fréquentes sur nos produits Bardahl, la livraison, le paiement et nos services au Bénin."
+        keywords="faq, questions, aide, bardahl, autopassion, bénin"
+        url="/faq"
+      />
+      <div className="py-12 md:py-20">
       <div className="container max-w-3xl">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-extrabold mb-4">{t.faqTitle}</h1>
@@ -57,5 +65,6 @@ export default function FAQ() {
         </Accordion>
       </div>
     </div>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
@@ -54,7 +55,14 @@ export default function CategoryDetail() {
   }
 
   return (
-    <div className="py-8 md:py-12">
+    <>
+      <SEOHead
+        title={`${categoryInfo.name} | Autopassion BJ`}
+        description={categoryInfo.description}
+        keywords={`${categoryInfo.name.toLowerCase()}, bardahl, produits automobiles, bénin, autopassion`}
+        url={`/categories/${slug}`}
+      />
+      <div className="py-8 md:py-12">
       <div className="container">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -91,5 +99,6 @@ export default function CategoryDetail() {
         )}
       </div>
     </div>
+    </>
   );
 }

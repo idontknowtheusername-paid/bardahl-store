@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { ProductCard } from '@/components/product/ProductCard';
 import { products } from '@/data/products';
 
@@ -31,10 +32,17 @@ export default function SelectionDetail() {
 
   if (!collection) {
     return (
-      <div className="py-20 text-center">
+      <>
+        <SEOHead
+          title="Sélection | Autopassion BJ"
+          description="Sélection de produits automobiles"
+          url={`/selections/${slug}`}
+        />
+        <div className="py-20 text-center">
         <h1 className="font-serif text-3xl mb-4">Sélection non trouvée</h1>
         <p className="text-muted-foreground">Cette sélection n'existe pas.</p>
       </div>
+      </>
     );
   }
 
@@ -43,7 +51,15 @@ export default function SelectionDetail() {
   const collectionProducts = products.slice(0, 12);
 
   return (
-    <div>
+    <>
+      <SEOHead
+        title={`${collection.name} | Autopassion BJ`}
+        description={collection.description}
+        keywords={`${collection.name.toLowerCase()}, sélection, produits auto, autopassion`}
+        url={`/selections/${slug}`}
+        image={collection.image}
+      />
+      <div>
       {/* Hero Section */}
       <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
         <img
@@ -75,5 +91,6 @@ export default function SelectionDetail() {
         </div>
       </div>
     </div>
+    </>
   );
 }

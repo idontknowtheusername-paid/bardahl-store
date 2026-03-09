@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
 import { ChevronRight, Check, Truck, Zap, Store, Loader2, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -403,17 +404,32 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="py-20 text-center">
+      <>
+        <SEOHead
+          title="Commande | Autopassion BJ"
+          description="Finalisez votre commande"
+          url="/checkout"
+          noindex={true}
+        />
+        <div className="py-20 text-center">
         <h1 className="text-2xl font-medium mb-4">Votre panier est vide</h1>
         <Button asChild>
           <Link to="/collections">Découvrir nos collections</Link>
         </Button>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="py-8 md:py-12">
+    <>
+      <SEOHead
+        title="Commande | Autopassion BJ"
+        description="Finalisez votre commande"
+        url="/checkout"
+        noindex={true}
+      />
+      <div className="py-8 md:py-12">
       <div className="container max-w-5xl">
         {/* Steps */}
         <div className="flex items-center justify-center gap-4 mb-12">
@@ -870,5 +886,6 @@ export default function Checkout() {
         </div>
       </div>
     </div>
+    </>
   );
 }

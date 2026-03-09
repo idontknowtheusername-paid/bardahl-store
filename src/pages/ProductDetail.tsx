@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { SEOHead } from '@/components/SEOHead';
+import { StructuredData } from '@/components/StructuredData';
 import { ChevronRight, Minus, Plus, Share2, ShoppingBag, Star, ChevronDown, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/format';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -316,7 +318,40 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="py-8 md:py-12">
+    <>
+      <SEOHead
+        title={`${product.name} | Autopassion BJ`}
+        description={product.description}
+        keywords={`${product.name}, ${product.category}, bardahl, ${product.composition || ''}, bénin, autopassion`}
+        image={product.images[0]}
+        url={`/produits/${product.slug}`}
+        type="product"
+      />
+      <StructuredData
+        type="product"
+        data={{
+          name: product.name,
+          description: product.description,
+          image: product.images[0],
+          price: product.price,
+          currency: 'XOF',
+          sku: product.id,
+          slug: product.slug,
+          availability: hasStock() ? 'InStock' : 'OutOfStock',
+        }}
+      />
+      <StructuredData
+        type="breadcrumb"
+        data={{
+          items: [
+            { name: 'Accueil', url: '/' },
+            { name: 'Catégories', url: '/categories' },
+            { name: product.category, url: `/categories/${product.style}` },
+            { name: product.name, url: `/produits/${product.slug}` },
+          ],
+        }}
+      />
+      <div className="py-8 md:py-12">
       <div className="container">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -503,6 +538,7 @@ export default function ProductDetail() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

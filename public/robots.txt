@@ -1,6 +1,21 @@
 User-agent: *
 Allow: /
-Disallow: /api/
-Disallow: /checkout/callback
 
+# Pages à ne pas indexer
+Disallow: /api/
+Disallow: /checkout
+Disallow: /cart
+Disallow: /mon-espace
+Disallow: /admin
+Disallow: /confirmation/
+Disallow: /qr/
+
+# Fichiers et dossiers techniques
+Disallow: /*.json$
+Disallow: /supabase/
+
+# Crawl delay pour éviter la surcharge
+Crawl-delay: 1
+
+# Sitemap
 Sitemap: https://autopassionbj.com/sitemap.xml

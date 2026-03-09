@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { SEOHead } from '@/components/SEOHead';
 import { useNewArrivals } from '@/hooks/use-supabase-api';
 import { getNewProducts } from '@/data/products';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -9,7 +10,14 @@ export default function NewArrivals() {
 
   if (isLoading) {
     return (
-      <div className="py-12 md:py-20">
+      <>
+        <SEOHead
+          title="Nouveautés | Autopassion BJ - Derniers produits automobiles"
+          description="Découvrez nos derniers produits automobiles : huiles moteur, additifs et accessoires fraîchement arrivés."
+          keywords="nouveautés, nouveaux produits, huiles moteur, additifs, autopassion"
+          url="/new-arrivals"
+        />
+        <div className="py-12 md:py-20">
         <div className="container">
           <div className="text-center mb-12">
             <span className="text-rose text-sm font-medium tracking-widest uppercase">
@@ -26,12 +34,19 @@ export default function NewArrivals() {
           <ProductGridSkeleton count={8} />
         </div>
       </div>
+      </>
     );
   }
 
   if (!products || products.length === 0) {
     return (
-      <div className="py-12 md:py-20">
+      <>
+        <SEOHead
+          title="Nouveautés | Autopassion BJ"
+          description="Découvrez nos derniers produits automobiles"
+          url="/new-arrivals"
+        />
+        <div className="py-12 md:py-20">
         <div className="container">
           <div className="text-center">
             <h1 className="font-serif text-4xl md:text-5xl font-medium mb-4">
@@ -43,11 +58,19 @@ export default function NewArrivals() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="py-12 md:py-20">
+    <>
+      <SEOHead
+        title="Nouveautés | Autopassion BJ - Derniers produits Bardahl"
+        description="Découvrez les derniers produits Bardahl arrivés en stock : huiles moteur, additifs et accessoires automobiles."
+        keywords="nouveautés, nouveaux produits, bardahl, huiles moteur, additifs, autopassion"
+        url="/new-arrivals"
+      />
+      <div className="py-12 md:py-20">
       <div className="container">
         <div className="text-center mb-12">
           <span className="text-rose text-sm font-medium tracking-widest uppercase">
@@ -74,5 +97,6 @@ export default function NewArrivals() {
         </div>
       </div>
     </div>
+    </>
   );
 }
