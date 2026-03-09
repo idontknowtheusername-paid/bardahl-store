@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { chatWithAssistant } from '@/lib/mistral';
 import { toast } from 'sonner';
+
 // Simple markdown-like rendering for bold and lists
 function SimpleMarkdown({ content }: { content: string }) {
   const lines = content.split('\n');
@@ -35,7 +36,8 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '👋 Bonjour ! Je suis votre assistant de gestion **Bardahl Bénin**. Je peux vous aider à :\n\n- 📊 Analyser vos ventes et stocks\n- 📦 Gérer vos commandes\n- ✍️ Rédiger des descriptions produits\n- 💡 Vous conseiller sur votre activité\n\nComment puis-je vous aider ?',
+      content:
+        '👋 Bonjour ! Je suis votre assistant de gestion **AutoPassion BJ**. Je peux vous aider à :\n\n- 📊 Analyser vos ventes et stocks\n- 📦 Gérer vos commandes\n- ✍️ Rédiger des descriptions produits\n- 💡 Vous proposer des actions prioritaires\n\nComment puis-je vous aider ?',
       timestamp: new Date(),
     },
   ]);
@@ -61,20 +63,37 @@ export function ChatWidget() {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
       const response = await chatWithAssistant(msg, window.location.pathname);
-      
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-      }]);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: response,
+          timestamp: new Date(),
+        },
+      ]);
     } catch (error) {
-      toast.error('Erreur lors de la communication avec l\'assistant');
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Erreur lors de la communication avec l\'assistant';
+
+      toast.error(errorMessage);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `⚠️ ${errorMessage}`,
+          timestamp: new Date(),
+        },
+      ]);
+
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -82,27 +101,37 @@ export function ChatWidget() {
   }, [input, isLoading]);
 
   const clearChat = () => {
-    setMessages([{
-      role: 'assistant',
-      content: '💬 Conversation réinitialisée. Comment puis-je vous aider ?',
-      timestamp: new Date(),
-    }]);
+    setMessages([
+      {
+        role: 'assistant',
+        content: '💬 Conversation réinitialisée. Que souhaitez-vous piloter aujourd\'hui sur AutoPassion ? ',
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   const quickActions = [
-    '📊 Résumé du tableau de bord',
-    '📦 Commandes en attente',
-    '⚠️ Alertes stock faible',
+    '📊 Résumé des KPIs du jour',
+    '📦 Commandes à traiter en priorité',
+    '⚠️ Produits en stock faible',
   ];
 
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center z-50 group"
-        title="Assistant Admin Bardahl"
+        className="fixed bottom-6 right-6 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2.5 pl-3 pr-4 z-50 group"
+        title="Assistant Admin AutoPassion"
       >
-        <Bot className="h-6 w-6 group-hover:scale-110 transition-transform" />
+        <span className="h-8 w-8 rounded-full bg-primary-foreground/15 flex items-center justify-center">
+          <Bot className="h-4 w-4 group-hover:scale-110 transition-transform" />
+        </span>
+        <span className="text-sm font-medium">Assistant AutoPassion</span>
+        {messages.length > 1 && (
+          <span className="bg-primary-foreground text-primary text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">
+            {messages.length - 1}
+          </span>
+        )}
       </button>
     );
   }
@@ -127,13 +156,13 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-background border rounded-lg shadow-2xl flex flex-col z-50">
+    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-background border rounded-lg shadow-2xl flex flex-col z-50 max-w-[calc(100vw-1.5rem)]">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5" />
           <div>
-            <h3 className="font-medium text-sm">Assistant Bardahl</h3>
+            <h3 className="font-medium text-sm">Assistant AutoPassion</h3>
             <span className="text-xs opacity-80">Gestion & Conseils</span>
           </div>
         </div>
@@ -235,7 +264,7 @@ export function ChatWidget() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ex: Quels produits sont en rupture ?"
+            placeholder="Ex: Donne-moi les 3 priorités de ce matin"
             disabled={isLoading}
             className="flex-1 text-sm"
           />
@@ -251,3 +280,4 @@ export function ChatWidget() {
     </div>
   );
 }
+
