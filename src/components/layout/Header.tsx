@@ -245,6 +245,7 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-1">
+              <ThemeToggle />
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">

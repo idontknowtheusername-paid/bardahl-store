@@ -130,6 +130,7 @@ const App = () => {
         </CurrencyProvider>
       </LanguageProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   </HelmetProvider>
 );
 };
