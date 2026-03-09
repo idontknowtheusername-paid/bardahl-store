@@ -150,12 +150,21 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
 
           {/* User section */}
-          <div className="border-t p-4">
+          <div className="border-t p-4 space-y-2">
             {!collapsed && (
               <p className="text-sm text-muted-foreground truncate mb-2">
                 {user?.email}
               </p>
             )}
+            <Button
+              variant="ghost"
+              size={collapsed ? 'icon' : 'default'}
+              className={cn('w-full justify-start', collapsed && 'justify-center px-2')}
+              onClick={() => setIsDark(!isDark)}
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {!collapsed && <span className="ml-2">{isDark ? 'Mode clair' : 'Mode sombre'}</span>}
+            </Button>
             <Button
               variant="ghost"
               className={cn('w-full justify-start', collapsed && 'justify-center px-2')}
