@@ -68,6 +68,16 @@ export default function Dashboard() {
       const monthRevenue = (monthOrders || []).filter(o => o.payment_status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
       const monthOrderCount = monthOrders?.length || 0;
 
+      // Visites ce mois
+      const { count: monthVisits } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString());
+
+      const { count: totalVisits } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true });
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
