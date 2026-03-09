@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download, Bell,
+  DollarSign, BarChart3, Eye, UserCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
