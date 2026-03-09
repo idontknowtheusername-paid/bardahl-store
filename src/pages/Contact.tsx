@@ -151,8 +151,7 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Horaires</h3>
                 <p className="text-muted-foreground text-sm">
-                  Lundi - Samedi : 8h - 20h<br />
-                  Dimanche : 10h - 18h
+                  Lundi - Samedi : 09h - 13h / 15h - 19h
                 </p>
               </div>
             </div>
