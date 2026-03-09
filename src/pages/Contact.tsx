@@ -124,17 +124,10 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Téléphone</h3>
                 <a
-                  href="tel:+22996786284"
+                  href="tel:+2290196786284"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +229 96 78 62 84
-                </a>
-                <br />
-                <a
-                  href="tel:+22962216766"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  +229 62 21 67 66
+                  +229 01 96 78 62 84
                 </a>
               </div>
             </div>
