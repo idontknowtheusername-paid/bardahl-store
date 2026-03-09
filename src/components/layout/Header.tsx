@@ -112,7 +112,7 @@ export function Header() {
                         <Globe className="h-3 w-3 inline mr-1" />
                         Language
                       </p>
-                      {languages.map(lang => (
+                      {languages.filter(l => l.code === 'fr' || l.code === 'en').map(lang => (
                         <button
                           key={lang.code}
                           onClick={() => { setLanguage(lang.code); setShowLangMenu(false); }}
