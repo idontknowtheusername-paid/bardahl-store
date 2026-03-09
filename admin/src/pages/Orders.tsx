@@ -23,23 +23,31 @@ const ORDER_STATUSES = [
   { value: 'refunded', label: 'Remboursée', color: 'bg-gray-100 text-gray-800' },
 ];
 
+const PAGE_SIZE = 5;
+
 export default function Orders() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(0);
   const queryClient = useQueryClient();
 
-  const { data: orders, isLoading } = useQuery({
+  const { data: ordersData, isLoading } = useQuery({
     queryKey: ['orders', search, statusFilter],
     queryFn: async () => {
-      let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+      let query = supabase.from('orders').select('*', { count: 'exact' }).order('created_at', { ascending: false });
       if (search) query = query.or(`order_number.ilike.%${search}%,customer_email.ilike.%${search}%,customer_phone.ilike.%${search}%`);
       if (statusFilter && statusFilter !== 'all') query = query.eq('status', statusFilter);
-      const { data, error } = await query;
+      const { data, error, count } = await query;
       if (error) throw error;
-      return data;
+      return { data: data || [], count: count || 0 };
     },
   });
+
+  const allOrders = ordersData?.data || [];
+  const totalCount = ordersData?.count || 0;
+  const orders = allOrders.slice(0, (page + 1) * PAGE_SIZE);
+  const hasMore = orders.length < allOrders.length;
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
