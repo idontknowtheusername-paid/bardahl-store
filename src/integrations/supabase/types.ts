@@ -342,13 +342,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "lubrication_plans_recommended_product_id_fkey"
-            columns: ["recommended_product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "lubrication_plans_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: true
@@ -500,13 +493,6 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "oil_change_reminders_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
         ]
       }
       order_items: {
@@ -552,13 +538,6 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -1404,6 +1383,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_product_cascade: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
       get_user_email: { Args: never; Returns: string }
       get_user_phone: { Args: never; Returns: string }
       has_role: {
