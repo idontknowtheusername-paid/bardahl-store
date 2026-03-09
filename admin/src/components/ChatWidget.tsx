@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
-import { Sparkles, X, Send, Loader2, Minimize2 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Bot, X, Send, Loader2, Minimize2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { chatWithAssistant } from '@/lib/mistral';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -17,7 +18,7 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Bonjour ! Je suis votre assistant administrateur. Comment puis-je vous aider aujourd\'hui ?',
+      content: '👋 Bonjour ! Je suis votre assistant de gestion **Bardahl Bénin**. Je peux vous aider à :\n\n- 📊 Analyser vos ventes et stocks\n- 📦 Gérer vos commandes\n- ✍️ Rédiger des descriptions produits\n- 💡 Vous conseiller sur votre activité\n\nComment puis-je vous aider ?',
       timestamp: new Date(),
     },
   ]);
@@ -33,12 +34,13 @@ export function ChatWidget() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = useCallback(async (text?: string) => {
+    const msg = text || input.trim();
+    if (!msg || isLoading) return;
 
     const userMessage: Message = {
       role: 'user',
-      content: input,
+      content: msg,
       timestamp: new Date(),
     };
 
@@ -47,30 +49,43 @@ export function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await chatWithAssistant(input, window.location.pathname);
+      const response = await chatWithAssistant(msg, window.location.pathname);
       
-      const assistantMessage: Message = {
+      setMessages(prev => [...prev, {
         role: 'assistant',
         content: response,
         timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      }]);
     } catch (error) {
       toast.error('Erreur lors de la communication avec l\'assistant');
       console.error(error);
     } finally {
       setIsLoading(false);
     }
+  }, [input, isLoading]);
+
+  const clearChat = () => {
+    setMessages([{
+      role: 'assistant',
+      content: '💬 Conversation réinitialisée. Comment puis-je vous aider ?',
+      timestamp: new Date(),
+    }]);
   };
+
+  const quickActions = [
+    '📊 Résumé du tableau de bord',
+    '📦 Commandes en attente',
+    '⚠️ Alertes stock faible',
+  ];
 
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-rose text-white shadow-lg hover:bg-rose/90 transition-all flex items-center justify-center z-50"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center z-50 group"
+        title="Assistant Admin Bardahl"
       >
-        <Sparkles className="h-6 w-6" />
+        <Bot className="h-6 w-6 group-hover:scale-110 transition-transform" />
       </button>
     );
   }
@@ -80,12 +95,12 @@ export function ChatWidget() {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setIsMinimized(false)}
-          className="h-14 px-4 rounded-full bg-rose text-white shadow-lg hover:bg-rose/90 transition-all flex items-center gap-2"
+          className="h-14 px-4 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2"
         >
-          <Sparkles className="h-5 w-5" />
+          <Bot className="h-5 w-5" />
           <span className="text-sm font-medium">Assistant</span>
           {messages.length > 1 && (
-            <span className="bg-white text-rose text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            <span className="bg-primary-foreground text-primary text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {messages.length - 1}
             </span>
           )}
@@ -97,16 +112,28 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-background border rounded-lg shadow-2xl flex flex-col z-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-rose text-white rounded-t-lg">
+      <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
-          <h3 className="font-medium">Assistant Admin</h3>
+          <Bot className="h-5 w-5" />
+          <div>
+            <h3 className="font-medium text-sm">Assistant Bardahl</h3>
+            <span className="text-xs opacity-80">Gestion & Conseils</span>
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            onClick={clearChat}
+            title="Nouvelle conversation"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
             onClick={() => setIsMinimized(true)}
           >
             <Minimize2 className="h-4 w-4" />
@@ -114,7 +141,7 @@ export function ChatWidget() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />
@@ -130,14 +157,20 @@ export function ChatWidget() {
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
+              className={`max-w-[85%] rounded-lg p-3 ${
                 message.role === 'user'
-                  ? 'bg-rose text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : 'bg-muted text-foreground'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-              <span className="text-xs opacity-70 mt-1 block">
+              {message.role === 'assistant' ? (
+                <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:mb-1 [&>ul]:mb-1 [&>ol]:mb-1">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              )}
+              <span className="text-xs opacity-60 mt-1 block">
                 {message.timestamp.toLocaleTimeString('fr-FR', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -146,10 +179,27 @@ export function ChatWidget() {
             </div>
           </div>
         ))}
+
+        {/* Quick actions on first message only */}
+        {messages.length === 1 && !isLoading && (
+          <div className="flex flex-wrap gap-2">
+            {quickActions.map((action) => (
+              <button
+                key={action}
+                onClick={() => handleSend(action)}
+                className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted transition-colors"
+              >
+                {action}
+              </button>
+            ))}
+          </div>
+        )}
+
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-muted rounded-lg p-3">
+            <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-xs text-muted-foreground">Analyse en cours...</span>
             </div>
           </div>
         )}
@@ -168,9 +218,9 @@ export function ChatWidget() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Posez votre question..."
+            placeholder="Ex: Quels produits sont en rupture ?"
             disabled={isLoading}
-            className="flex-1"
+            className="flex-1 text-sm"
           />
           <Button
             type="submit"
