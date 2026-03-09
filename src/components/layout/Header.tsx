@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { languages } from '@/i18n';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { searchProducts } from '@/data/products';
 import type { Product } from '@/types/product';
 
