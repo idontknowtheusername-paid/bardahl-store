@@ -211,11 +211,11 @@ export default function Invoices() {
     const phone = order.customer_phone?.replace(/\D/g, '') || ''
     const invoiceNumber = `FAC-${order.order_number.replace('CMD-', '')}`
     const message = encodeURIComponent(
-      `Bonjour ${order.customer_name || ''},\n\nVoici votre facture Bardahl :\n` +
+      `Bonjour ${order.customer_name || ''},\n\nVoici votre facture AutoPassion BJ :\n` +
       `📋 Facture N° : ${invoiceNumber}\n` +
       `🛒 Commande : ${order.order_number}\n` +
       `💰 Total : ${(order.total || 0).toFixed(0)} FCFA\n\n` +
-      `Merci pour votre confiance !\nL'équipe Bardahl`
+      `Merci pour votre confiance !\nL'équipe AutoPassion BJ`
     )
     const url = phone
       ? `https://wa.me/${phone}?text=${message}`
