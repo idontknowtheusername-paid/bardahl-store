@@ -1404,6 +1404,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_product_cascade: {
+        Args: { p_product_id: string }
+        Returns: undefined
+      }
       get_user_email: { Args: never; Returns: string }
       get_user_phone: { Args: never; Returns: string }
       has_role: {
