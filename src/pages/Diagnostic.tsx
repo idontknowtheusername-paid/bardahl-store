@@ -287,10 +287,10 @@ Utilise des emojis et formate bien la réponse.`;
                   </AccordionItem>
                 ))}
               </Accordion>
-              {selectedSymptom && (
+              {selectedSymptoms.length > 0 && (
                 <div className="text-center mt-8 sticky bottom-4">
-                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg">
-                    Continuer <ArrowRight className="h-4 w-4 ml-2" />
+                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg text-base">
+                    Continuer ({selectedSymptoms.length} symptôme{selectedSymptoms.length > 1 ? 's' : ''}) <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
                 </div>
               )}
