@@ -79,7 +79,7 @@ export default function OrderDetail() {
         const { error: emailError } = await supabase.functions.invoke('send-email', {
           body: {
             to: order.customer_email,
-            subject: `Votre commande ${order.order_number} a été expédiée - Bardahl`,
+            subject: `Votre commande ${order.order_number} a été expédiée - AutoPassion BJ`,
             template: 'order_shipped',
             data: {
               customerName: order.customer_name,
