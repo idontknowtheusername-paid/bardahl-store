@@ -6,7 +6,7 @@ const HIDDEN_PATHS = ['/panier', '/checkout'];
 export function FloatingActions() {
   const { pathname } = useLocation();
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
-  const whatsappNumber = '22996786284';
+  const whatsappNumber = '2290196786284';
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour, je souhaite passer une commande")}`;
 
   const actions = [

@@ -30,56 +30,16 @@ function CategoryCardSkeleton() {
 
 // Map product_type to display info
 const PRODUCT_TYPE_INFO: Record<string, { name: string; image: string; description: string }> = {
-  'huiles-moteur': {
-    name: 'Huiles Moteur',
-    image: categoryHuiles,
-    description: 'Huiles moteur haute performance',
-  },
-  'transmission': {
-    name: 'Huiles boîtes & Transmission',
-    image: categoryTransmission,
-    description: 'Huiles de transmission et liquides de frein',
-  },
-  'additifs': {
-    name: 'Additifs & Traitements',
-    image: categoryAdditifs,
-    description: 'Additifs moteur et carburant',
-  },
-  'liquides': {
-    name: 'Liquide de refroidissement & lave-glace',
-    image: categoryLiquides,
-    description: 'Liquides de refroidissement et antigel',
-  },
-  'purifiant-desodorisant': {
-    name: 'Purifiant & désodorisant',
-    image: categoryPurifiant,
-    description: 'Purifiants d\'air et désodorisants habitacle',
-  },
-  'entretien': {
-    name: 'Entretien & Nettoyage',
-    image: categoryEntretien,
-    description: 'Produits d\'entretien automobile',
-  },
-  'special-atelier': {
-    name: 'Spécial atelier',
-    image: categoryAtelier,
-    description: 'Produits professionnels pour atelier',
-  },
-  'packs-entretien': {
-    name: 'Packs entretien',
-    image: categoryPacks,
-    description: 'Packs complets pour votre véhicule',
-  },
-  'accessoires-electronique': {
-    name: 'Accessoires & Électronique auto',
-    image: categoryAccessoires,
-    description: 'Accessoires et équipements électroniques',
-  },
-  'filtres': {
-    name: 'Filtres',
-    image: categoryFiltres,
-    description: 'Filtres à huile, gasoil, air et plus',
-  },
+  'huiles-moteur': { name: 'Huiles Moteur', image: categoryHuiles, description: 'Huiles moteur haute performance' },
+  'transmission': { name: 'Huiles boîtes & Transmission', image: categoryTransmission, description: 'Huiles de transmission et liquides de frein' },
+  'additifs': { name: 'Additifs & Traitements', image: categoryAdditifs, description: 'Additifs moteur et carburant' },
+  'liquides': { name: 'Liquide de refroidissement & lave-glace', image: categoryLiquides, description: 'Liquides de refroidissement et antigel' },
+  'purifiant-desodorisant': { name: 'Purifiant & désodorisant', image: categoryPurifiant, description: 'Purifiants d\'air et désodorisants habitacle' },
+  'entretien': { name: 'Entretien & Nettoyage', image: categoryEntretien, description: 'Produits d\'entretien automobile' },
+  'special-atelier': { name: 'Spécial atelier', image: categoryAtelier, description: 'Produits professionnels pour atelier' },
+  'packs-entretien': { name: 'Packs entretien', image: categoryPacks, description: 'Packs complets pour votre véhicule' },
+  'accessoires-electronique': { name: 'Accessoires & Électronique auto', image: categoryAccessoires, description: 'Accessoires et équipements électroniques' },
+  'filtres': { name: 'Filtres', image: categoryFiltres, description: 'Filtres à huile, gasoil, air et plus' },
 };
 
 export function CategoriesSection() {
@@ -87,21 +47,11 @@ export function CategoriesSection() {
   const { data: products, isLoading } = useProducts();
 
   const displayCollections = useMemo(() => {
-    // Always show all product types, even if no products yet
     const allTypes = Object.keys(PRODUCT_TYPE_INFO);
-
     return allTypes.map(type => {
       const info = PRODUCT_TYPE_INFO[type];
       const productCount = products?.filter(p => p.style === type).length || 0;
-
-      return {
-        id: type,
-        slug: type,
-        name: info.name,
-        description: info.description,
-        image: info.image,
-        productCount,
-      };
+      return { id: type, slug: type, name: info.name, description: info.description, image: info.image, productCount };
     });
   }, [products]);
 
@@ -122,17 +72,15 @@ export function CategoriesSection() {
     <section className="py-12 md:py-16 bg-muted/30">
       <div className="container">
         <div className="text-center mb-10">
-          <span className="text-primary text-sm font-bold tracking-widest uppercase">{t.catalog}</span>
-          <h2 className="text-3xl md:text-4xl font-extrabold mt-2">{t.ourCategories}</h2>
+          <span className="text-primary text-sm font-bold tracking-widest uppercase">NOS GAMMES</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-2">Choisissez la solution adaptée à votre moteur</h2>
+          <p className="text-muted-foreground text-base mt-3 max-w-2xl mx-auto">
+            Chaque moteur a ses besoins. Découvrez nos solutions pour améliorer la performance, protéger votre moteur et réduire les pannes.
+          </p>
         </div>
         <Carousel
           opts={{ align: 'start', loop: true }}
-          plugins={[
-            Autoplay({
-              delay: 3000,
-              stopOnInteraction: true,
-            }),
-          ]}
+          plugins={[Autoplay({ delay: 3000, stopOnInteraction: true })]}
           className="w-full"
         >
           <CarouselContent className="-ml-4">
@@ -145,9 +93,9 @@ export function CategoriesSection() {
                     className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-secondary/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="font-bold text-sm md:text-base text-white">{collection.name}</h3>
-                    <div className="flex items-center gap-1 text-primary text-xs font-bold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {t.viewProducts} <ArrowRight className="h-3 w-3" />
+                    <h3 className="font-bold text-base md:text-lg text-white">{collection.name}</h3>
+                    <div className="flex items-center gap-1 text-primary text-sm font-bold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {t.viewProducts} <ArrowRight className="h-3.5 w-3.5" />
                     </div>
                   </div>
                 </Link>

@@ -113,7 +113,7 @@ export default function MonEspace() {
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-white truncate">
-                    {profile?.full_name} 👋
+                    Bienvenu, {profile?.full_name} 👋
                   </h1>
                   <p className="text-secondary-foreground/60 text-xs truncate">
                     {profile?.phone} {profile?.email && `· ${profile.email}`}

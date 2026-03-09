@@ -101,7 +101,7 @@ function extractProductSlugs(text: string): string[] {
 }
 
 export default function Diagnostic() {
-  const [selectedSymptom, setSelectedSymptom] = useState<string | null>(null);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [step, setStep] = useState(1);
   const [fuelType, setFuelType] = useState<string>('');
   const [mileage, setMileage] = useState<string>('');
@@ -113,6 +113,8 @@ export default function Diagnostic() {
 
   const { data: allProducts } = useProducts({ limit: 200 });
 
+  const selectedSymptom = selectedSymptoms[0] || null;
+
   const recommendedProducts = useMemo(() => {
     if (!diagnosticResult || !allProducts?.length) return [];
     const slugs = extractProductSlugs(diagnosticResult);
@@ -121,32 +123,40 @@ export default function Diagnostic() {
       .filter(Boolean) as NonNullable<typeof allProducts>[number][];
   }, [diagnosticResult, allProducts]);
 
+  const toggleSymptom = (id: string) => {
+    setSelectedSymptoms(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
+  };
+
   const handleStartDiagnostic = () => {
-    if (!selectedSymptom) return;
+    if (selectedSymptoms.length === 0) return;
     setStep(2);
   };
 
   const handleSubmitInfo = async () => {
-    if (!fuelType || !selectedSymptom) return;
+    if (!fuelType || selectedSymptoms.length === 0) return;
     setStep(3);
     setIsLoading(true);
     setError('');
     setDiagnosticResult('');
 
-    const symptomData = allSymptoms.find(s => s.id === selectedSymptom);
-    const symptomLabel = symptomData?.label || selectedSymptom;
-    const symptomDesc = symptomData?.description || '';
+    const symptomDetails = selectedSymptoms.map(id => {
+      const s = allSymptoms.find(x => x.id === id);
+      return s ? `${s.label} (${s.description})` : id;
+    }).join('\n- ');
 
     const diagnosticMessage = `DIAGNOSTIC AUTO - Analyse structurée demandée.
 
-Symptôme principal : ${symptomLabel}
-Description : ${symptomDesc}
+Symptômes signalés :
+- ${symptomDetails}
+
 Type de carburant : ${fuelType}
 Kilométrage : ${mileage || 'Non précisé'}
 Année du véhicule : ${year || 'Non précisée'}
 
 Fais un diagnostic structuré avec :
-1. **Diagnostic probable** : explique la cause probable du problème
+1. **Diagnostic probable** : explique la cause probable du/des problème(s)
 2. **Solutions recommandées** : liste les produits Autopassion/Bardahl adaptés avec leur lien (/produits/slug). UTILISE IMPÉRATIVEMENT le guide diagnostic problèmes/solutions pour recommander les bons produits.
 3. **Conseil entretien** : un conseil préventif
 
@@ -209,7 +219,7 @@ Utilise des emojis et formate bien la réponse.`;
 
   const resetDiagnostic = () => {
     setStep(1);
-    setSelectedSymptom(null);
+    setSelectedSymptoms([]);
     setFuelType('');
     setMileage('');
     setYear('');
@@ -220,9 +230,9 @@ Utilise des emojis et formate bien la réponse.`;
   return (
     <>
       <SEOHead
-        title="Diagnostic Auto Intelligent | Autopassion BJ - Assistant IA"
-        description="Diagnostiquez les problèmes de votre voiture en quelques secondes grâce à notre assistant intelligent par IA. Analyse des symptômes et recommandations personnalisées."
-        keywords="diagnostic auto, assistant ia, problème voiture, symptômes moteur, autopassion, bénin"
+        title="Diagnostic Auto Rapide | Autopassion BJ"
+        description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées."
+        keywords="diagnostic auto, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
         url="/diagnostic"
       />
 
@@ -230,15 +240,15 @@ Utilise des emojis et formate bien la réponse.`;
         {/* Hero */}
         <section className="bg-secondary text-secondary-foreground py-12 md:py-16">
           <div className="container text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-4">
-              <Stethoscope className="h-3.5 w-3.5" />
-              Diagnostic intelligent
+            <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-sm font-bold px-4 py-2 rounded-full mb-4">
+              <Stethoscope className="h-4 w-4" />
+              Diagnostic rapide
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
-              Votre voiture a un problème ?
+              Diagnostiquez votre voiture en 1 minute
             </h1>
             <p className="text-secondary-foreground/70 text-lg max-w-lg mx-auto">
-              Sélectionnez le symptôme et découvrez les solutions recommandées par nos experts.
+              Sélectionnez le(s) symptôme(s) de votre voiture et découvrez les solutions recommandées.
             </p>
           </div>
         </section>
@@ -247,7 +257,8 @@ Utilise des emojis et formate bien la réponse.`;
           {/* Step 1: Symptom selection by category */}
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-xl font-bold text-center mb-8">Quel problème a votre voiture ?</h2>
+              <h2 className="text-xl font-bold text-center mb-2">Quel(s) problème(s) a votre voiture ?</h2>
+              <p className="text-sm text-muted-foreground text-center mb-8">Vous pouvez sélectionner plusieurs symptômes.</p>
               <Accordion type="single" collapsible className="space-y-3">
                 {symptomCategories.map((cat) => (
                   <AccordionItem key={cat.label} value={cat.label} className="border border-border rounded-xl overflow-hidden bg-card">
@@ -259,16 +270,16 @@ Utilise des emojis et formate bien la réponse.`;
                         {cat.symptoms.map((symptom) => (
                           <button
                             key={symptom.id}
-                            onClick={() => setSelectedSymptom(symptom.id)}
+                            onClick={() => toggleSymptom(symptom.id)}
                             className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
-                              selectedSymptom === symptom.id
+                              selectedSymptoms.includes(symptom.id)
                                 ? 'border-primary bg-primary/5 shadow-md'
                                 : 'border-border bg-background hover:border-primary/30'
                             }`}
                           >
-                            <symptom.icon className={`h-6 w-6 mx-auto mb-2 ${selectedSymptom === symptom.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                            <h4 className="font-bold text-xs mb-1">{symptom.label}</h4>
-                            <p className="text-[10px] text-muted-foreground leading-tight">{symptom.description}</p>
+                            <symptom.icon className={`h-7 w-7 mx-auto mb-2 ${selectedSymptoms.includes(symptom.id) ? 'text-primary' : 'text-muted-foreground'}`} />
+                            <h4 className="font-bold text-sm mb-1">{symptom.label}</h4>
+                            <p className="text-xs text-muted-foreground leading-tight">{symptom.description}</p>
                           </button>
                         ))}
                       </div>
@@ -276,10 +287,10 @@ Utilise des emojis et formate bien la réponse.`;
                   </AccordionItem>
                 ))}
               </Accordion>
-              {selectedSymptom && (
+              {selectedSymptoms.length > 0 && (
                 <div className="text-center mt-8 sticky bottom-4">
-                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg">
-                    Continuer <ArrowRight className="h-4 w-4 ml-2" />
+                  <Button size="lg" onClick={handleStartDiagnostic} className="bg-primary text-primary-foreground font-bold px-8 shadow-lg text-base">
+                    Continuer ({selectedSymptoms.length} symptôme{selectedSymptoms.length > 1 ? 's' : ''}) <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
                 </div>
               )}
@@ -291,7 +302,7 @@ Utilise des emojis et formate bien la réponse.`;
             <div className="max-w-md mx-auto">
               <h2 className="text-xl font-bold text-center mb-2">Quelques informations sur votre véhicule</h2>
               <p className="text-center text-sm text-muted-foreground mb-8">
-                Symptôme : <span className="font-semibold text-primary">{allSymptoms.find(s => s.id === selectedSymptom)?.label}</span>
+                Symptôme(s) : <span className="font-semibold text-primary">{selectedSymptoms.map(id => allSymptoms.find(s => s.id === id)?.label).filter(Boolean).join(', ')}</span>
               </p>
               <div className="space-y-4">
                 <div>

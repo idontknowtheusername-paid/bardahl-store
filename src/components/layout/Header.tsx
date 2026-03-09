@@ -152,14 +152,14 @@ export function Header() {
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-7 w-7" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20">
                 <SheetHeader>
                   <SheetTitle className="text-left">
-                    <span className="text-accent font-extrabold text-xl tracking-tight">AUTO</span>
-                    <span className="text-primary font-extrabold text-xl tracking-tight">PASSION</span>
+                    <span className="text-accent font-extrabold text-2xl tracking-tight">AUTO</span>
+                    <span className="text-primary font-extrabold text-2xl tracking-tight">PASSION</span>
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="mt-8 flex flex-col gap-1">
@@ -170,7 +170,7 @@ export function Header() {
                           <div className="flex items-center">
                             <Link to={href} onClick={() => setIsMenuOpen(false)}
                               className="flex-1 px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
-                              {Icon && <Icon className="h-4 w-4" />}
+                              {Icon && <Icon className="h-5 w-5" />}
                               {label}
                             </Link>
                             <button onClick={() => setMobileSubOpen(!mobileSubOpen)}
@@ -182,7 +182,7 @@ export function Header() {
                             <div className="pl-6 flex flex-col gap-0.5 animate-in slide-in-from-top-2">
                               {productCategories.map(cat => (
                                 <Link key={cat.href} to={cat.href} onClick={() => setIsMenuOpen(false)}
-                                  className="px-3 py-2 rounded text-xs text-secondary-foreground/70 hover:text-primary transition-colors">
+                                  className="px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
                                   {cat.label}
                                 </Link>
                               ))}
@@ -192,7 +192,7 @@ export function Header() {
                       ) : (
                         <Link to={href} onClick={() => setIsMenuOpen(false)}
                           className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
-                          {Icon && <Icon className="h-4 w-4" />}
+                          {Icon && <Icon className="h-5 w-5" />}
                           {label}
                         </Link>
                       )}
@@ -209,11 +209,11 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            {/* Logo */}
+            {/* Logo — bigger */}
             <Link to="/" className="flex items-center gap-1">
-              <span className="text-accent font-extrabold text-xl md:text-2xl tracking-tight">AUTO</span>
-              <span className="text-primary font-extrabold text-xl md:text-2xl tracking-tight">PASSION</span>
-              <span className="text-secondary-foreground/50 text-[10px] font-bold ml-1 hidden sm:inline">BJ</span>
+              <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
+              <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
+              <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>
             </Link>
 
             {/* Desktop Nav */}
@@ -224,9 +224,9 @@ export function Header() {
                   onMouseLeave={() => hasSubmenu && setShowProductsMenu(false)}
                 >
                   <Link to={href}
-                    className="text-xs xl:text-sm font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-accent transition-colors whitespace-nowrap flex items-center gap-1">
+                    className="text-sm xl:text-base font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-accent transition-colors whitespace-nowrap flex items-center gap-1">
                     {label}
-                    {hasSubmenu && <ChevronDown className="h-3 w-3" />}
+                    {hasSubmenu && <ChevronDown className="h-3.5 w-3.5" />}
                   </Link>
                   {hasSubmenu && showProductsMenu && (
                     <div className="absolute top-full left-0 mt-2 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[260px] z-50">
@@ -249,7 +249,7 @@ export function Header() {
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">
-                    <Search className="h-5 w-5" />
+                    <Search className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="top" className="h-auto max-h-[80vh]">
@@ -258,9 +258,9 @@ export function Header() {
                   </SheetHeader>
                   <form onSubmit={handleSearchSubmit} className="mt-4">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                       <Input type="search" placeholder={t.searchPlaceholder} value={searchQuery}
-                        onChange={(e) => handleSearch(e.target.value)} className="pl-10" autoFocus />
+                        onChange={(e) => handleSearch(e.target.value)} className="pl-10 text-base" autoFocus />
                     </div>
                   </form>
                   {searchResults.length > 0 && (
@@ -270,9 +270,9 @@ export function Header() {
                         {searchResults.slice(0, 8).map((product) => (
                           <button key={product.id} onClick={() => handleProductClick(product.slug)}
                             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors text-left">
-                            <img src={product.images[0]} alt={product.name} className="w-12 h-12 object-cover rounded" />
+                            <img src={product.images[0]} alt={product.name} className="w-14 h-14 object-cover rounded" />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">{product.name}</p>
+                              <p className="font-medium text-base truncate">{product.name}</p>
                               <p className="text-sm text-muted-foreground">{formatPrice(product.price)}</p>
                             </div>
                           </button>
@@ -288,7 +288,7 @@ export function Header() {
 
               <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent"
                 onClick={() => setIsCartOpen(true)}>
-                <ShoppingBag className="h-5 w-5" />
+                <ShoppingBag className="h-6 w-6" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-bold animate-scale-in">
                     {totalItems}

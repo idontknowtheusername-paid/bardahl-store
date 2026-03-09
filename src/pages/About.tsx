@@ -42,7 +42,7 @@ export default function About() {
                   </p>
                   <p>
                     Notre mission : offrir à chaque automobiliste béninois les outils et produits
-                    nécessaires pour prendre soin de son véhicule — huiles moteur, additifs,
+                    nécessaires pour comprendre et prendre soin de son véhicule — huiles moteur, additifs,
                     graisses, liquides de refroidissement et bien plus.
                   </p>
                   <p>

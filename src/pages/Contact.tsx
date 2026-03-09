@@ -28,15 +28,15 @@ const faqs = [
   },
   {
     question: "Quels sont les délais de livraison ?",
-    answer: "Parakou et environs : 24-48h. Autres villes du Bénin : 2-4 jours. Afrique de l'Ouest : 5-10 jours selon la destination."
+    answer: "Parakou : 2 heures. Autres villes du Bénin : 24 heures. Afrique internationale : 2-3 jours. France : 2-3 jours."
   },
   {
     question: "Comment retourner un produit ?",
-    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
+    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
-    answer: "Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires, et le paiement à la livraison (Parakou et environs uniquement)."
+    answer: "Nous acceptons MTN Mobile Money, Moov Money et le paiement à la livraison (Parakou et environs uniquement)."
   },
   {
     question: "Les produits sont-ils authentiques ?",
@@ -104,12 +104,12 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">WhatsApp (Recommandé)</h3>
                 <a
-                  href="https://wa.me/22996786284"
+                  href="https://wa.me/2290196786284"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700 transition-colors font-medium"
                 >
-                  +229 96 78 62 84
+                  +229 01 96 78 62 84
                 </a>
                 <p className="text-xs text-muted-foreground mt-1">
                   Réponse rapide garantie
@@ -124,17 +124,10 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Téléphone</h3>
                 <a
-                  href="tel:+22996786284"
+                  href="tel:+2290196786284"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +229 96 78 62 84
-                </a>
-                <br />
-                <a
-                  href="tel:+22962216766"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  +229 62 21 67 66
+                  +229 01 96 78 62 84
                 </a>
               </div>
             </div>
@@ -158,8 +151,7 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Horaires</h3>
                 <p className="text-muted-foreground text-sm">
-                  Lundi - Samedi : 8h - 20h<br />
-                  Dimanche : 10h - 18h
+                  Lundi - Samedi : 09h - 13h / 15h - 19h
                 </p>
               </div>
             </div>

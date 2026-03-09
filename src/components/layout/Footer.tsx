@@ -66,7 +66,7 @@ export function Footer() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center text-xs text-secondary-foreground/50">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> 01 BP 369 Parakou</span>
-            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {settings?.contact_phone || '96 78 62 84 / 62 21 67 66'}</span>
+            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {settings?.contact_phone || '01 96 78 62 84'}</span>
             <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {settings?.contact_email || 'contact@autopassionbj.com'}</span>
           </div>
         </div>

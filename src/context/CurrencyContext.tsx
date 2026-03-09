@@ -24,9 +24,8 @@ async function detectCurrency(): Promise<Currency> {
     const data = await res.json();
     const code = data.country_code?.toUpperCase();
     if (code && EUR_COUNTRIES.includes(code)) return 'EUR';
-    if (code && FCFA_COUNTRIES.includes(code)) return 'FCFA';
-    // Default to EUR for other countries
-    return 'EUR';
+    // Default to FCFA for all other countries
+    return 'FCFA';
   } catch {
     return 'EUR';
   }
