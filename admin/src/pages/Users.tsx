@@ -44,6 +44,7 @@ export default function Users() {
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
+        .in('role', ['admin', 'editor', 'viewer'])
         .order('created_at', { ascending: false })
 
       if (error) throw error
