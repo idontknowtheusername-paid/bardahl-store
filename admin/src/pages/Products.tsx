@@ -54,14 +54,15 @@ export default function Products() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('products').delete().eq('id', id);
+      const { error } = await supabase.rpc('delete_product_cascade', { p_product_id: id });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success(t.products.productDeleted);
     },
-    onError: () => {
+    onError: (err: any) => {
+      console.error('Delete error:', err);
       toast.error(t.common.deleteError);
     },
   });
