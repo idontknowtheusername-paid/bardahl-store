@@ -28,15 +28,15 @@ const faqs = [
   },
   {
     question: "Quels sont les délais de livraison ?",
-    answer: "Parakou et environs : 24-48h. Autres villes du Bénin : 2-4 jours. Afrique de l'Ouest : 5-10 jours selon la destination."
+    answer: "Parakou : 2 heures. Autres villes du Bénin : 24 heures. Afrique internationale : 2-3 jours. France : 2-3 jours."
   },
   {
     question: "Comment retourner un produit ?",
-    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
+    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
-    answer: "Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires, et le paiement à la livraison (Parakou et environs uniquement)."
+    answer: "Nous acceptons MTN Mobile Money, Moov Money et le paiement à la livraison (Parakou et environs uniquement)."
   },
   {
     question: "Les produits sont-ils authentiques ?",
