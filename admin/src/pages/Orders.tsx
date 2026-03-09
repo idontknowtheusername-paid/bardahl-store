@@ -272,6 +272,21 @@ export default function Orders() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Load more */}
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <Button variant="outline" onClick={() => setPage(p => p + 1)}>
+            Charger plus ({orders.length}/{allOrders.length})
+          </Button>
+        </div>
+      )}
+
+      {!hasMore && allOrders.length > PAGE_SIZE && (
+        <p className="text-center text-sm text-muted-foreground pt-2">
+          Toutes les commandes affichées ({allOrders.length})
+        </p>
+      )}
     </div>
   );
 }

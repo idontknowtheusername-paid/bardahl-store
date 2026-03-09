@@ -219,6 +219,41 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Second row of KPIs */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Panier moyen</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{formatPrice(stats?.averageOrderValue || 0)}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Taux de conversion</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{(stats?.conversionRate || 0).toFixed(1)}%</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Clients inscrits</CardTitle>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{stats?.totalCustomers || 0}</div></CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Ce mois</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.monthOrderCount || 0} <span className="text-sm font-normal text-muted-foreground">commandes</span></div>
+            <p className="text-xs text-muted-foreground">{formatPrice(stats?.monthRevenue || 0)} de CA</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Reminders widget */}
       {(reminderStats?.due || 0) > 0 && (
         <Link to="/reminders">
