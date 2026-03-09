@@ -113,6 +113,8 @@ export default function Diagnostic() {
 
   const { data: allProducts } = useProducts({ limit: 200 });
 
+  const selectedSymptom = selectedSymptoms[0] || null;
+
   const recommendedProducts = useMemo(() => {
     if (!diagnosticResult || !allProducts?.length) return [];
     const slugs = extractProductSlugs(diagnosticResult);
