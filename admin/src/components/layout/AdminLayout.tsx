@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -24,6 +24,8 @@ import {
   Receipt,
   Users as UsersIcon,
   Bell,
+  Moon,
+  Sun,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
