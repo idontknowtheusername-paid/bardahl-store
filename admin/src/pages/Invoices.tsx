@@ -285,7 +285,7 @@ export default function Invoices() {
                 Facturation
               </CardTitle>
               <CardDescription>
-                Générez, envoyez et partagez vos factures Bardahl
+                Générez, envoyez et partagez vos factures AutoPassion BJ
               </CardDescription>
             </div>
           </div>
