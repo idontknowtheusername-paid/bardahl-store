@@ -24,6 +24,7 @@ import BlogPosts from '@/pages/BlogPosts';
 import Users from '@/pages/Users';
 import Invoices from '@/pages/Invoices';
 import Reminders from '@/pages/Reminders';
+import Finances from '@/pages/Finances';
 
 const queryClient = new QueryClient({
   defaultOptions: {
