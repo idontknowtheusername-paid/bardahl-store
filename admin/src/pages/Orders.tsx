@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Search, Eye, Download, Trash2 } from 'lucide-react';
+import { Search, Eye, Download, Trash2, Loader2 } from 'lucide-react';
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
@@ -32,22 +32,36 @@ export default function Orders() {
   const [page, setPage] = useState(0);
   const queryClient = useQueryClient();
 
-  const { data: ordersData, isLoading } = useQuery({
-    queryKey: ['orders', search, statusFilter],
+  // Server-side paginated query
+  const { data: ordersData, isLoading, isFetching } = useQuery({
+    queryKey: ['orders', search, statusFilter, page],
     queryFn: async () => {
-      let query = supabase.from('orders').select('*', { count: 'exact' }).order('created_at', { ascending: false });
-      if (search) query = query.or(`order_number.ilike.%${search}%,customer_email.ilike.%${search}%,customer_phone.ilike.%${search}%`);
-      if (statusFilter && statusFilter !== 'all') query = query.eq('status', statusFilter);
+      const from = 0;
+      const to = (page + 1) * PAGE_SIZE - 1;
+      
+      let query = supabase
+        .from('orders')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (search) {
+        query = query.or(`order_number.ilike.%${search}%,customer_email.ilike.%${search}%,customer_phone.ilike.%${search}%`);
+      }
+      if (statusFilter && statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
+
       const { data, error, count } = await query;
       if (error) throw error;
       return { data: data || [], count: count || 0 };
     },
+    placeholderData: (prev) => prev,
   });
 
-  const allOrders = ordersData?.data || [];
+  const orders = ordersData?.data || [];
   const totalCount = ordersData?.count || 0;
-  const orders = allOrders.slice(0, (page + 1) * PAGE_SIZE);
-  const hasMore = orders.length < allOrders.length;
+  const hasMore = orders.length < totalCount;
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -65,7 +79,6 @@ export default function Orders() {
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (id: string) => {
-      // Delete order items first
       await supabase.from('order_items').delete().eq('order_id', id);
       const { error } = await supabase.from('orders').delete().eq('id', id);
       if (error) throw error;
@@ -114,11 +127,8 @@ export default function Orders() {
   const someSelected = selectedIds.size > 0;
 
   const toggleSelectAll = () => {
-    if (allSelected) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(allIds));
-    }
+    if (allSelected) setSelectedIds(new Set());
+    else setSelectedIds(new Set(allIds));
   };
 
   const toggleSelect = (id: string) => {
@@ -126,6 +136,19 @@ export default function Orders() {
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setSelectedIds(next);
+  };
+
+  // Reset page when filters change
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(0);
+    setSelectedIds(new Set());
+  };
+
+  const handleStatusFilter = (value: string) => {
+    setStatusFilter(value);
+    setPage(0);
+    setSelectedIds(new Set());
   };
 
   return (
@@ -169,9 +192,9 @@ export default function Orders() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Rechercher..." value={search} onChange={(e) => handleSearch(e.target.value)} className="pl-9" />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={handleStatusFilter}>
           <SelectTrigger className="w-48"><SelectValue placeholder="Filtrer par statut" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les statuts</SelectItem>
@@ -185,11 +208,7 @@ export default function Orders() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
-                <Checkbox
-                  checked={allSelected}
-                  onCheckedChange={toggleSelectAll}
-                  aria-label="Tout sélectionner"
-                />
+                <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} aria-label="Tout sélectionner" />
               </TableHead>
               <TableHead>Commande</TableHead>
               <TableHead>Date</TableHead>
@@ -202,18 +221,19 @@ export default function Orders() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={8} className="text-center py-8">Chargement...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-8">
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Chargement...
+                </div>
+              </TableCell></TableRow>
             ) : orders?.length === 0 ? (
               <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Aucune commande</TableCell></TableRow>
             ) : (
               orders?.map((order) => (
                 <TableRow key={order.id} className={selectedIds.has(order.id) ? 'bg-muted/50' : ''}>
                   <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(order.id)}
-                      onCheckedChange={() => toggleSelect(order.id)}
-                      aria-label={`Sélectionner ${order.order_number}`}
-                    />
+                    <Checkbox checked={selectedIds.has(order.id)} onCheckedChange={() => toggleSelect(order.id)} aria-label={`Sélectionner ${order.order_number}`} />
                   </TableCell>
                   <TableCell className="font-medium">{order.order_number}</TableCell>
                   <TableCell className="text-muted-foreground">{formatDateShort(order.created_at)}</TableCell>
@@ -273,18 +293,22 @@ export default function Orders() {
         </Table>
       </div>
 
-      {/* Load more */}
+      {/* Load more with server-side pagination */}
       {hasMore && (
         <div className="flex justify-center pt-4">
-          <Button variant="outline" onClick={() => setPage(p => p + 1)}>
-            Charger plus ({orders.length}/{allOrders.length})
+          <Button variant="outline" onClick={() => setPage(p => p + 1)} disabled={isFetching}>
+            {isFetching ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Chargement...</>
+            ) : (
+              <>Charger plus ({orders.length}/{totalCount})</>
+            )}
           </Button>
         </div>
       )}
 
-      {!hasMore && allOrders.length > PAGE_SIZE && (
+      {!hasMore && orders.length > 0 && (
         <p className="text-center text-sm text-muted-foreground pt-2">
-          Toutes les commandes affichées ({allOrders.length})
+          Toutes les commandes affichées ({totalCount})
         </p>
       )}
     </div>
