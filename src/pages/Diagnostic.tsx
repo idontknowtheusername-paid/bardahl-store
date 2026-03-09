@@ -240,15 +240,15 @@ Utilise des emojis et formate bien la réponse.`;
         {/* Hero */}
         <section className="bg-secondary text-secondary-foreground py-12 md:py-16">
           <div className="container text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-4">
-              <Stethoscope className="h-3.5 w-3.5" />
-              Diagnostic intelligent
+            <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-sm font-bold px-4 py-2 rounded-full mb-4">
+              <Stethoscope className="h-4 w-4" />
+              Diagnostic rapide
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
-              Votre voiture a un problème ?
+              Diagnostiquez votre voiture en 1 minute
             </h1>
             <p className="text-secondary-foreground/70 text-lg max-w-lg mx-auto">
-              Sélectionnez le symptôme et découvrez les solutions recommandées par nos experts.
+              Sélectionnez le(s) symptôme(s) de votre voiture et découvrez les solutions recommandées.
             </p>
           </div>
         </section>
