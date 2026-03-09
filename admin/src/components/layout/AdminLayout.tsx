@@ -26,6 +26,7 @@ import {
   Bell,
   Moon,
   Sun,
+  PiggyBank,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
