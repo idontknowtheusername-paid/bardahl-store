@@ -31,7 +31,7 @@ interface BlogPost {
 
 const SUGGESTED_TOPICS = [
   'Comment choisir la bonne huile moteur pour votre véhicule',
-  'Les avantages des huiles synthétiques Bardahl',
+  'Les avantages des huiles synthétiques pour votre moteur',
   'Guide complet des additifs moteur',
   'Entretien de la boîte de vitesses',
   'Viscosité des huiles moteur : normes SAE et ACEA',

@@ -68,6 +68,16 @@ export default function Dashboard() {
       const monthRevenue = (monthOrders || []).filter(o => o.payment_status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
       const monthOrderCount = monthOrders?.length || 0;
 
+      // Visites ce mois
+      const { count: monthVisits } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString());
+
+      const { count: totalVisits } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true });
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -108,6 +118,8 @@ export default function Dashboard() {
         unreadMessages: unreadMessages || 0,
         monthRevenue,
         monthOrderCount,
+        monthVisits: monthVisits || 0,
+        totalVisits: totalVisits || 0,
       };
     },
     refetchInterval: 30000,
@@ -244,12 +256,12 @@ export default function Dashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Ce mois</CardTitle>
+            <CardTitle className="text-sm font-medium">Visites ce mois</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.monthOrderCount || 0} <span className="text-sm font-normal text-muted-foreground">commandes</span></div>
-            <p className="text-xs text-muted-foreground">{formatPrice(stats?.monthRevenue || 0)} de CA</p>
+            <div className="text-2xl font-bold">{stats?.monthVisits || 0} <span className="text-sm font-normal text-muted-foreground">visiteurs</span></div>
+            <p className="text-xs text-muted-foreground">{stats?.totalVisits || 0} visites au total</p>
           </CardContent>
         </Card>
       </div>

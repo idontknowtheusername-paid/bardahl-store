@@ -81,8 +81,8 @@ function generateInvoiceHTML(order: Order): string {
     <div class="invoice">
       <div class="header">
         <div>
-          <div class="brand">BARDAHL</div>
-          <div class="brand-sub">Lubrifiants & Solutions Automobile</div>
+          <div class="brand">AUTOPASSION</div>
+          <div class="brand-sub">Lubrifiants & Solutions Automobile - Bénin</div>
         </div>
         <div class="invoice-badge">FACTURE</div>
       </div>
@@ -128,7 +128,7 @@ function generateInvoiceHTML(order: Order): string {
       ${order.payment_status === 'paid' ? '<div style="text-align:right; margin-top:20px;"><div class="paid-stamp">PAYÉ</div></div>' : ''}
 
       <div class="footer">
-        <p>BARDAHL - Lubrifiants & Solutions Automobile</p>
+        <p>AUTOPASSION BJ - Lubrifiants & Solutions Automobile</p>
         <p style="margin-top:4px;">Merci pour votre confiance. Pour toute question, contactez-nous.</p>
         <p style="margin-top:8px; color:#ccc;">Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
       </div>
@@ -189,7 +189,7 @@ export default function Invoices() {
       const { error } = await supabase.functions.invoke('send-email', {
         body: {
           to: order.customer_email,
-          subject: `Votre facture ${invoiceNumber} - Bardahl`,
+          subject: `Votre facture ${invoiceNumber} - AutoPassion BJ`,
           template: 'order_confirmation',
           data: {
             customerName: order.customer_name,
@@ -211,11 +211,11 @@ export default function Invoices() {
     const phone = order.customer_phone?.replace(/\D/g, '') || ''
     const invoiceNumber = `FAC-${order.order_number.replace('CMD-', '')}`
     const message = encodeURIComponent(
-      `Bonjour ${order.customer_name || ''},\n\nVoici votre facture Bardahl :\n` +
+      `Bonjour ${order.customer_name || ''},\n\nVoici votre facture AutoPassion BJ :\n` +
       `📋 Facture N° : ${invoiceNumber}\n` +
       `🛒 Commande : ${order.order_number}\n` +
       `💰 Total : ${(order.total || 0).toFixed(0)} FCFA\n\n` +
-      `Merci pour votre confiance !\nL'équipe Bardahl`
+      `Merci pour votre confiance !\nL'équipe AutoPassion BJ`
     )
     const url = phone
       ? `https://wa.me/${phone}?text=${message}`
@@ -285,7 +285,7 @@ export default function Invoices() {
                 Facturation
               </CardTitle>
               <CardDescription>
-                Générez, envoyez et partagez vos factures Bardahl
+                Générez, envoyez et partagez vos factures AutoPassion BJ
               </CardDescription>
             </div>
           </div>

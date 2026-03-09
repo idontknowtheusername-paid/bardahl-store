@@ -243,7 +243,7 @@ export default function Reminders() {
                 </div>
                 <div>
                   <Label>Produit recommandé</Label>
-                  <Input value={newReminder.product_title} onChange={e => setNewReminder({ ...newReminder, product_title: e.target.value })} placeholder="Huile Bardahl 5W-30" />
+                  <Input value={newReminder.product_title} onChange={e => setNewReminder({ ...newReminder, product_title: e.target.value })} placeholder="Huile moteur 5W-30" />
                 </div>
               </div>
               <DialogFooter>
