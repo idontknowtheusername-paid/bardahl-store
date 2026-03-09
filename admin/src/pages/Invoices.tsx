@@ -128,7 +128,7 @@ function generateInvoiceHTML(order: Order): string {
       ${order.payment_status === 'paid' ? '<div style="text-align:right; margin-top:20px;"><div class="paid-stamp">PAYÉ</div></div>' : ''}
 
       <div class="footer">
-        <p>BARDAHL - Lubrifiants & Solutions Automobile</p>
+        <p>AUTOPASSION BJ - Lubrifiants & Solutions Automobile</p>
         <p style="margin-top:4px;">Merci pour votre confiance. Pour toute question, contactez-nous.</p>
         <p style="margin-top:8px; color:#ccc;">Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
       </div>
