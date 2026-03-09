@@ -216,7 +216,7 @@ export default function Settings() {
                 type="email"
                 value={(formData as any).admin_email || ''}
                 onChange={(e) => setFormData({ ...formData, admin_email: e.target.value } as any)}
-                placeholder="admin@bardahl.com"
+                placeholder="admin@autopassion.bj"
               />
               <p className="text-xs text-muted-foreground mt-1">Reçoit les alertes de nouvelles commandes</p>
             </div>
