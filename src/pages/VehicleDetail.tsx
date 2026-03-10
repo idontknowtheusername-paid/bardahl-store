@@ -80,6 +80,8 @@ export default function VehicleDetail() {
   const [planEngineCleaner, setPlanEngineCleaner] = useState('');
   const [planGearboxCleaner, setPlanGearboxCleaner] = useState('');
   const [planRadiatorCleaner, setPlanRadiatorCleaner] = useState('');
+  const [autoFilled, setAutoFilled] = useState(false);
+  const [viscositySuggestion, setViscositySuggestion] = useState<string | null>(null);
 
   // Alert preferences
   const [alertReminder, setAlertReminder] = useState<any>(null);
