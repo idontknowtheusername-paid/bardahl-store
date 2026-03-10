@@ -423,27 +423,47 @@ export default function VehicleDetail() {
                   <form onSubmit={handleSavePlan} className="bg-card border border-border rounded-xl p-4 shadow-card">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Huile moteur</label>
+                        <label className="block text-sm font-semibold mb-1">🛢️ Huile moteur</label>
                         <input type="text" value={planEngine} onChange={e => setPlanEngine(e.target.value)} placeholder="Ex: 5W-30" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Huile boîte</label>
+                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant moteur</label>
+                        <input type="text" value={planEngineCleaner} onChange={e => setPlanEngineCleaner(e.target.value)} placeholder="Ex: Bardahl Engine Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1">⚙️ Huile boîte</label>
                         <input type="text" value={planGearbox} onChange={e => setPlanGearbox(e.target.value)} placeholder="Ex: 75W-90" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Quantité moteur</label>
+                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant boîte</label>
+                        <input type="text" value={planGearboxCleaner} onChange={e => setPlanGearboxCleaner(e.target.value)} placeholder="Ex: Bardahl Gearbox Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1">📏 Quantité moteur</label>
                         <input type="text" value={planQtyEngine} onChange={e => setPlanQtyEngine(e.target.value)} placeholder="Ex: 4.5L" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Quantité boîte</label>
+                        <label className="block text-sm font-semibold mb-1">📏 Quantité boîte</label>
                         <input type="text" value={planQtyGearbox} onChange={e => setPlanQtyGearbox(e.target.value)} placeholder="Ex: 2L" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Fréquence (km)</label>
+                        <label className="block text-sm font-semibold mb-1">❄️ Liquide de refroidissement</label>
+                        <input type="text" value={planCoolant} onChange={e => setPlanCoolant(e.target.value)} placeholder="Ex: G12+" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1">🔴 Liquide de frein</label>
+                        <input type="text" value={planBrakeFluid} onChange={e => setPlanBrakeFluid(e.target.value)} placeholder="Ex: DOT 4" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant radiateur</label>
+                        <input type="text" value={planRadiatorCleaner} onChange={e => setPlanRadiatorCleaner(e.target.value)} placeholder="Ex: Bardahl Radiator Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-1">📅 Fréquence (km)</label>
                         <input type="number" value={planFreqKm} onChange={e => setPlanFreqKm(e.target.value)} placeholder="10000" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-1">Fréquence (mois)</label>
+                        <label className="block text-sm font-semibold mb-1">📅 Fréquence (mois)</label>
                         <input type="number" value={planFreqMonths} onChange={e => setPlanFreqMonths(e.target.value)} placeholder="6" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
                       </div>
                     </div>
