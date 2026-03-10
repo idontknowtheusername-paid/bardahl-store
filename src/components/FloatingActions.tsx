@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Stethoscope, MessageCircle } from 'lucide-react';
 
@@ -5,17 +6,32 @@ const HIDDEN_PATHS = ['/panier', '/checkout'];
 
 export function FloatingActions() {
   const { pathname } = useLocation();
+  const [showFullText, setShowFullText] = useState(true);
+
+  useEffect(() => {
+    // Après 4 secondes, on réduit le texte
+    const timer = setTimeout(() => {
+      setShowFullText(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
+
   const whatsappNumber = '2290196786284';
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour, je souhaite passer une commande")}`;
 
   const actions = [
     {
-      label: 'Commandez sur WhatsApp',
+      label: showFullText ? 'Commandez sur WhatsApp' : 'WhatsApp',
+      fullLabel: 'Commandez sur WhatsApp',
+      shortLabel: 'WhatsApp',
       icon: MessageCircle,
       href: whatsappUrl,
       color: 'bg-green-500 hover:bg-green-600 text-white',
       external: true,
+      isWhatsApp: true,
     },
     {
       label: 'Diagnostic',
@@ -45,7 +61,7 @@ export function FloatingActions() {
               target="_blank"
               rel="noopener noreferrer"
               className={className}
-              title={action.label}
+              title={action.fullLabel || action.label}
             >
               {content}
             </a>
