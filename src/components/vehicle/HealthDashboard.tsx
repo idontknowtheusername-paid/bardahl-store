@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Disc3, CircleDot, Shield, FileCheck, Receipt, ChevronDown } from 'lucide-react';
+import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Filter, Disc3, CircleDot, Shield, FileCheck, Receipt, ChevronDown, Cog } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
