@@ -30,6 +30,11 @@ interface LubricationPlan {
   oil_quantity_gearbox: string | null;
   change_frequency_km: number | null;
   change_frequency_months: number | null;
+  coolant_type: string | null;
+  brake_fluid_type: string | null;
+  engine_cleaner: string | null;
+  gearbox_cleaner: string | null;
+  radiator_cleaner: string | null;
 }
 
 export default function QRView() {
