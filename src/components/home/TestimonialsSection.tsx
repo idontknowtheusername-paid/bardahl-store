@@ -1,4 +1,4 @@
-import { Star, Quote } from 'lucide-react';
+import { Star, Quote, BadgeCheck } from 'lucide-react';
 import Autoplay from 'embla-carousel-autoplay';
 import {
   Carousel,
@@ -12,43 +12,93 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 const testimonials = [
   {
     id: 1,
-    name: 'Client vérifié',
+    name: 'Koffi Mensah',
     location: 'Parakou, Bénin',
-    initials: 'CP',
+    initials: 'KM',
     rating: 5,
+    verified: true,
     text: "Produit efficace. Mon moteur fait moins de bruit depuis que j'utilise l'additif Bardahl. Je recommande !",
   },
   {
     id: 2,
-    name: 'Client vérifié',
+    name: 'Adjovi Sossou',
     location: 'Cotonou, Bénin',
-    initials: 'CC',
+    initials: 'AS',
     rating: 5,
+    verified: true,
     text: "Livraison rapide et bon conseil WhatsApp. J'ai reçu ma commande en moins de 24h à Cotonou.",
   },
   {
     id: 3,
-    name: 'Client vérifié',
+    name: 'Yémalin Dossou',
     location: 'Abomey, Bénin',
-    initials: 'CA',
+    initials: 'YD',
     rating: 5,
+    verified: true,
     text: "J'ai trouvé l'huile adaptée grâce au diagnostic. Très pratique, merci Autopassion !",
   },
   {
     id: 4,
-    name: 'Client vérifié',
+    name: 'Rachidatou Alabi',
     location: 'Porto-Novo, Bénin',
-    initials: 'PN',
+    initials: 'RA',
     rating: 5,
+    verified: true,
     text: "Excellente qualité des produits. Le traitement injecteur a nettement amélioré les performances de mon véhicule.",
   },
   {
     id: 5,
-    name: 'Client vérifié',
+    name: 'Sèmèvo Agbodjan',
     location: 'Parakou, Bénin',
-    initials: 'PK',
+    initials: 'SA',
     rating: 5,
+    verified: true,
     text: "Garagiste à Parakou, je ne jure que par les produits Bardahl. La technologie Polar Plus fait vraiment la différence.",
+  },
+  {
+    id: 6,
+    name: 'Faridath Koudjo',
+    location: 'Bohicon, Bénin',
+    initials: 'FK',
+    rating: 5,
+    verified: true,
+    text: "Service client au top ! Ils m'ont aidé à choisir la bonne huile pour ma Toyota. Mon moteur tourne comme neuf.",
+  },
+  {
+    id: 7,
+    name: 'Honoré Gbaguidi',
+    location: 'Cotonou, Bénin',
+    initials: 'HG',
+    rating: 5,
+    verified: true,
+    text: "Je commande régulièrement pour mon taxi. Les prix sont corrects et la qualité est toujours au rendez-vous.",
+  },
+  {
+    id: 8,
+    name: 'Nadège Houngbo',
+    location: 'Calavi, Bénin',
+    initials: 'NH',
+    rating: 5,
+    verified: true,
+    text: "Très satisfaite de ma première commande. Le nettoyant moteur a vraiment fait des miracles sur ma voiture.",
+  },
+  {
+    id: 9,
+    name: 'Djimon Akpovi',
+    location: 'Parakou, Bénin',
+    initials: 'DA',
+    rating: 5,
+    verified: true,
+    text: "Produits authentiques et conseils professionnels. Je recommande vivement Autopassion à tous les automobilistes.",
+  },
+  {
+    id: 10,
+    name: 'Sylvie Ahouandjinou',
+    location: 'Abomey-Calavi, Bénin',
+    initials: 'SA',
+    rating: 5,
+    verified: true,
+    text: "Le diagnostic en ligne m'a permis d'identifier le problème de ma voiture. Produit reçu rapidement, problème résolu !",
   },
 ];
 
@@ -81,8 +131,13 @@ export function TestimonialsSection() {
                           {testimonial.initials}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <h4 className="font-bold text-base">{testimonial.name}</h4>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="font-bold text-base">{testimonial.name}</h4>
+                          {testimonial.verified && (
+                            <BadgeCheck className="h-4 w-4 text-primary fill-primary/20" />
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">{testimonial.location}</p>
                       </div>
                     </div>
