@@ -80,6 +80,8 @@ export default function VehicleDetail() {
   const [planEngineCleaner, setPlanEngineCleaner] = useState('');
   const [planGearboxCleaner, setPlanGearboxCleaner] = useState('');
   const [planRadiatorCleaner, setPlanRadiatorCleaner] = useState('');
+  const [autoFilled, setAutoFilled] = useState(false);
+  const [viscositySuggestion, setViscositySuggestion] = useState<string | null>(null);
 
   // Alert preferences
   const [alertReminder, setAlertReminder] = useState<any>(null);
@@ -414,13 +416,79 @@ export default function VehicleDetail() {
               <TabsContent value="lubrification" className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><Droplets className="h-5 w-5 text-primary" /> Plan de lubrification</h2>
-                  <Button size="sm" variant="outline" onClick={() => setShowEditPlan(!showEditPlan)}>
+                  <Button size="sm" variant="outline" onClick={async () => {
+                    if (!showEditPlan) {
+                      // Auto-fill from vehicle_specifications
+                      if (vehicle.brand && vehicle.model) {
+                        let query = supabase.from('vehicle_specifications' as any).select('*')
+                          .eq('brand', vehicle.brand)
+                          .eq('model', vehicle.model);
+                        if (vehicle.year) {
+                          query = query.or(`year_start.is.null,year_start.lte.${vehicle.year}`)
+                            .or(`year_end.is.null,year_end.gte.${vehicle.year}`);
+                        }
+                        const { data } = await query.order('year_start', { ascending: false }).limit(1);
+                        const spec = (data as any)?.[0];
+                        if (spec && !plan) {
+                          setPlanEngine(spec.oil_type_engine || '');
+                          setPlanGearbox(spec.oil_type_gearbox || '');
+                          setPlanQtyEngine(spec.oil_quantity_engine || '');
+                          setPlanQtyGearbox(spec.oil_quantity_gearbox || '');
+                          setPlanFreqKm(spec.change_frequency_km?.toString() || '');
+                          setPlanFreqMonths(spec.change_frequency_months?.toString() || '');
+                          setPlanCoolant(spec.coolant_type || '');
+                          setPlanBrakeFluid(spec.brake_fluid_type || '');
+                          setPlanEngineCleaner(spec.engine_cleaner || '');
+                          setPlanGearboxCleaner(spec.gearbox_cleaner || '');
+                          setPlanRadiatorCleaner(spec.radiator_cleaner || '');
+                          setViscositySuggestion(spec.recommended_viscosity_tropical || null);
+                          setAutoFilled(true);
+                        }
+                      }
+                    }
+                    setShowEditPlan(!showEditPlan);
+                  }}>
                     {plan ? 'Modifier' : 'Configurer'}
                   </Button>
                 </div>
 
                 {showEditPlan && (
                   <form onSubmit={handleSavePlan} className="bg-card border border-border rounded-xl p-4 shadow-card">
+                    {autoFilled && (
+                      <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-primary/10 border border-primary/20">
+                        <span className="text-xs font-semibold text-primary">✨ Pré-rempli automatiquement</span>
+                        <button type="button" className="text-xs text-primary hover:underline font-medium" onClick={async () => {
+                          if (!vehicle.brand || !vehicle.model) return;
+                          let query = supabase.from('vehicle_specifications' as any).select('*')
+                            .eq('brand', vehicle.brand).eq('model', vehicle.model);
+                          if (vehicle.year) {
+                            query = query.or(`year_start.is.null,year_start.lte.${vehicle.year}`)
+                              .or(`year_end.is.null,year_end.gte.${vehicle.year}`);
+                          }
+                          const { data } = await query.order('year_start', { ascending: false }).limit(1);
+                          const spec = (data as any)?.[0];
+                          if (spec) {
+                            setPlanEngine(spec.oil_type_engine || '');
+                            setPlanGearbox(spec.oil_type_gearbox || '');
+                            setPlanQtyEngine(spec.oil_quantity_engine || '');
+                            setPlanQtyGearbox(spec.oil_quantity_gearbox || '');
+                            setPlanFreqKm(spec.change_frequency_km?.toString() || '');
+                            setPlanFreqMonths(spec.change_frequency_months?.toString() || '');
+                            setPlanCoolant(spec.coolant_type || '');
+                            setPlanBrakeFluid(spec.brake_fluid_type || '');
+                            setPlanEngineCleaner(spec.engine_cleaner || '');
+                            setPlanGearboxCleaner(spec.gearbox_cleaner || '');
+                            setPlanRadiatorCleaner(spec.radiator_cleaner || '');
+                            toast.success('Valeurs réinitialisées depuis la base');
+                          }
+                        }}>🔄 Réinitialiser</button>
+                      </div>
+                    )}
+                    {viscositySuggestion && (
+                      <div className="mb-3 p-2 rounded-lg bg-accent/50 border border-accent text-xs">
+                        💡 Viscosité tropicale recommandée : <strong>{viscositySuggestion}</strong>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-sm font-semibold mb-1">🛢️ Huile moteur</label>
