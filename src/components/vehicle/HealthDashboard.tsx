@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Disc3, CircleDot, Shield, FileCheck, Receipt, ChevronDown } from 'lucide-react';
+import { CheckCircle, AlertTriangle, AlertOctagon, Droplets, Battery, Filter, Disc3, CircleDot, Shield, FileCheck, Receipt, ChevronDown, Cog } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -17,15 +17,15 @@ interface HealthDashboardProps {
 }
 
 const HEALTH_ITEMS = [
-  { type: 'Vidange moteur', icon: Droplets, label: 'Vidange moteur' },
-  { type: 'Vidange boîte', icon: Droplets, label: 'Vidange boîte' },
-  { type: 'Remplacement batterie', icon: Battery, label: 'Batterie' },
-  { type: 'Remplacement filtres', icon: Disc3, label: 'Filtres' },
-  { type: 'Freins', icon: CircleDot, label: 'Freins' },
-  { type: 'Pneus', icon: CircleDot, label: 'Pneus' },
-  { type: 'Assurance', icon: Shield, label: 'Assurance' },
-  { type: 'Visite technique', icon: FileCheck, label: 'Visite technique' },
-  { type: 'TVM', icon: Receipt, label: 'TVM' },
+  { type: 'Vidange moteur', icon: Droplets, label: 'Vidange moteur', emoji: '🛢️' },
+  { type: 'Vidange boîte', icon: Cog, label: 'Vidange boîte', emoji: '⚙️' },
+  { type: 'Remplacement batterie', icon: Battery, label: 'Batterie', emoji: '🔋' },
+  { type: 'Remplacement filtres', icon: Filter, label: 'Filtres', emoji: '🔧' },
+  { type: 'Freins', icon: Disc3, label: 'Freins', emoji: '🛑' },
+  { type: 'Pneus', icon: CircleDot, label: 'Pneus', emoji: '🛞' },
+  { type: 'Assurance', icon: Shield, label: 'Assurance', emoji: '🛡️' },
+  { type: 'Visite technique', icon: FileCheck, label: 'Visite technique', emoji: '📋' },
+  { type: 'TVM', icon: Receipt, label: 'TVM', emoji: '🧾' },
 ];
 
 type Status = 'ok' | 'warning' | 'urgent' | 'unknown';
@@ -115,7 +115,10 @@ export default function HealthDashboard({ records }: HealthDashboardProps) {
                     key={item.type}
                     className={`rounded-lg border p-2 text-center transition-all ${cfg.bg}`}
                   >
-                    <Icon className={`h-4 w-4 mx-auto mb-1 ${cfg.color}`} />
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <span className="text-sm">{item.emoji}</span>
+                      <Icon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                    </div>
                     <p className="text-[10px] font-semibold truncate">{item.label}</p>
                     <p className={`text-[9px] mt-0.5 ${cfg.color} font-medium`}>
                       {item.status === 'unknown' ? '—' : item.label}

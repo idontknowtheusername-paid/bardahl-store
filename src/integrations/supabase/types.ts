@@ -329,42 +329,57 @@ export type Database = {
       }
       lubrication_plans: {
         Row: {
+          brake_fluid_type: string | null
           change_frequency_km: number | null
           change_frequency_months: number | null
+          coolant_type: string | null
           created_at: string
+          engine_cleaner: string | null
+          gearbox_cleaner: string | null
           id: string
           oil_quantity_engine: string | null
           oil_quantity_gearbox: string | null
           oil_type_engine: string | null
           oil_type_gearbox: string | null
+          radiator_cleaner: string | null
           recommended_product_id: string | null
           reminder_frequency_months: number | null
           updated_at: string
           vehicle_id: string
         }
         Insert: {
+          brake_fluid_type?: string | null
           change_frequency_km?: number | null
           change_frequency_months?: number | null
+          coolant_type?: string | null
           created_at?: string
+          engine_cleaner?: string | null
+          gearbox_cleaner?: string | null
           id?: string
           oil_quantity_engine?: string | null
           oil_quantity_gearbox?: string | null
           oil_type_engine?: string | null
           oil_type_gearbox?: string | null
+          radiator_cleaner?: string | null
           recommended_product_id?: string | null
           reminder_frequency_months?: number | null
           updated_at?: string
           vehicle_id: string
         }
         Update: {
+          brake_fluid_type?: string | null
           change_frequency_km?: number | null
           change_frequency_months?: number | null
+          coolant_type?: string | null
           created_at?: string
+          engine_cleaner?: string | null
+          gearbox_cleaner?: string | null
           id?: string
           oil_quantity_engine?: string | null
           oil_quantity_gearbox?: string | null
           oil_type_engine?: string | null
           oil_type_gearbox?: string | null
+          radiator_cleaner?: string | null
           recommended_product_id?: string | null
           reminder_frequency_months?: number | null
           updated_at?: string
