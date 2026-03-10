@@ -11,17 +11,17 @@ export function FloatingActions() {
 
   const actions = [
     {
-      label: 'Diagnostic',
-      icon: Stethoscope,
-      href: '/diagnostic',
-      color: 'bg-primary hover:bg-primary/90 text-primary-foreground',
-    },
-    {
-      label: 'WhatsApp',
+      label: 'Commandez sur WhatsApp',
       icon: MessageCircle,
       href: whatsappUrl,
       color: 'bg-green-500 hover:bg-green-600 text-white',
       external: true,
+    },
+    {
+      label: 'Diagnostic',
+      icon: Stethoscope,
+      href: '/diagnostic',
+      color: 'bg-primary hover:bg-primary/90 text-primary-foreground',
     },
   ];
 

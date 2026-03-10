@@ -51,7 +51,7 @@ export function HeroSection() {
             </div>
 
             {/* 3 Main CTAs — on one line */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center">
               <Button
                 size="lg"
                 onClick={() => setModalOpen(true)}
@@ -82,17 +82,6 @@ export function HeroSection() {
                 </Link>
               </Button>
             </div>
-
-            {/* WhatsApp CTA */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold text-base px-6 py-3 rounded-full shadow-lg transition-all mb-8"
-            >
-              <MessageCircle className="h-5 w-5" />
-              Commandez sur WhatsApp
-            </a>
 
             {/* Trust badges */}
             <div className="flex flex-wrap gap-5 justify-center">
