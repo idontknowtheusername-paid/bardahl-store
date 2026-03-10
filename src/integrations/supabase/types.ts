@@ -1388,6 +1388,75 @@ export type Database = {
           },
         ]
       }
+      vehicle_specifications: {
+        Row: {
+          brake_fluid_type: string | null
+          brand: string
+          change_frequency_km: number | null
+          change_frequency_months: number | null
+          coolant_type: string | null
+          created_at: string
+          engine_cleaner: string | null
+          engine_type: string | null
+          gearbox_cleaner: string | null
+          id: string
+          model: string
+          oil_quantity_engine: string | null
+          oil_quantity_gearbox: string | null
+          oil_type_engine: string | null
+          oil_type_gearbox: string | null
+          radiator_cleaner: string | null
+          recommended_viscosity_tropical: string | null
+          updated_at: string
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          brake_fluid_type?: string | null
+          brand: string
+          change_frequency_km?: number | null
+          change_frequency_months?: number | null
+          coolant_type?: string | null
+          created_at?: string
+          engine_cleaner?: string | null
+          engine_type?: string | null
+          gearbox_cleaner?: string | null
+          id?: string
+          model: string
+          oil_quantity_engine?: string | null
+          oil_quantity_gearbox?: string | null
+          oil_type_engine?: string | null
+          oil_type_gearbox?: string | null
+          radiator_cleaner?: string | null
+          recommended_viscosity_tropical?: string | null
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          brake_fluid_type?: string | null
+          brand?: string
+          change_frequency_km?: number | null
+          change_frequency_months?: number | null
+          coolant_type?: string | null
+          created_at?: string
+          engine_cleaner?: string | null
+          engine_type?: string | null
+          gearbox_cleaner?: string | null
+          id?: string
+          model?: string
+          oil_quantity_engine?: string | null
+          oil_quantity_gearbox?: string | null
+          oil_type_engine?: string | null
+          oil_type_gearbox?: string | null
+          radiator_cleaner?: string | null
+          recommended_viscosity_tropical?: string | null
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_site_settings: {
