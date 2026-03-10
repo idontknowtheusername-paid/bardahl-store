@@ -130,6 +130,11 @@ export default function VehicleDetail() {
       setPlanQtyGearbox(p.oil_quantity_gearbox || '');
       setPlanFreqKm(p.change_frequency_km?.toString() || '');
       setPlanFreqMonths(p.change_frequency_months?.toString() || '');
+      setPlanCoolant(p.coolant_type || '');
+      setPlanBrakeFluid(p.brake_fluid_type || '');
+      setPlanEngineCleaner(p.engine_cleaner || '');
+      setPlanGearboxCleaner(p.gearbox_cleaner || '');
+      setPlanRadiatorCleaner(p.radiator_cleaner || '');
     }
     setLoading(false);
   }, [id]);
