@@ -4,6 +4,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw, Thermometer, Wind, Car, Disc3, Plug, Wrench, Droplets, Shield, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
+import DiagnosticTTS from '@/components/diagnostic/DiagnosticTTS';
 import { useProducts } from '@/hooks/use-supabase-api';
 import { ProductCard } from '@/components/product/ProductCard';
 import {
