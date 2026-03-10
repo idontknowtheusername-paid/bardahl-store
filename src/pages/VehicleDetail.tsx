@@ -220,6 +220,11 @@ export default function VehicleDetail() {
       oil_quantity_gearbox: planQtyGearbox || null,
       change_frequency_km: planFreqKm ? parseInt(planFreqKm) : null,
       change_frequency_months: planFreqMonths ? parseInt(planFreqMonths) : null,
+      coolant_type: planCoolant || null,
+      brake_fluid_type: planBrakeFluid || null,
+      engine_cleaner: planEngineCleaner || null,
+      gearbox_cleaner: planGearboxCleaner || null,
+      radiator_cleaner: planRadiatorCleaner || null,
     };
     if (plan) {
       await supabase.from('lubrication_plans').update(payload as any).eq('id', plan.id);
