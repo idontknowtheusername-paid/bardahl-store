@@ -49,7 +49,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 // Mode maintenance - Mettre à true pour activer
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const App = () => {
   // Si mode maintenance activé, afficher uniquement la page de maintenance
