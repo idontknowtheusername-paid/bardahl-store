@@ -13,7 +13,7 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-secondary" style={{ height: '70vh' }}>
+      <section className="relative min-h-[75vh] flex items-center overflow-hidden bg-secondary" style={{ height: '70vh' }}>
         <div className="container relative z-10 py-14 md:py-16">
           <div className="max-w-3xl mx-auto text-center animate-slide-up">
             {/* Badge */}
@@ -51,7 +51,7 @@ export function HeroSection() {
             </div>
 
             {/* 3 Main CTAs — on one line */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
               <Button
                 size="lg"
                 onClick={() => setModalOpen(true)}
@@ -81,22 +81,6 @@ export function HeroSection() {
                   <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-            </div>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap gap-5 justify-center">
-              <div className="flex items-center gap-2 text-white/60 text-sm">
-                <Truck className="h-4 w-4 text-accent" />
-                <span>Livraison rapide</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/60 text-sm">
-                <Shield className="h-4 w-4 text-accent" />
-                <span>Paiement sécurisé Mobile Money</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/60 text-sm">
-                <Award className="h-4 w-4 text-accent" />
-                <span>Produits authentiques</span>
-              </div>
             </div>
           </div>
         </div>

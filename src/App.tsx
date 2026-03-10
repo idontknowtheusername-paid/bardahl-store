@@ -48,8 +48,10 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Mode maintenance - Mettre à true pour activer
-const MAINTENANCE_MODE = false;
+// Mode maintenance - Contrôlé par variable d'environnement
+// En local: VITE_MAINTENANCE_MODE=false (ou non défini)
+// En production: VITE_MAINTENANCE_MODE=true
+const MAINTENANCE_MODE = import.meta.env.VITE_MAINTENANCE_MODE === 'true';
 
 const App = () => {
   // Si mode maintenance activé, afficher uniquement la page de maintenance

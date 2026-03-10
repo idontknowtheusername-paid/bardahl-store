@@ -9,12 +9,22 @@ export function FloatingActions() {
   const [showFullText, setShowFullText] = useState(true);
 
   useEffect(() => {
-    // Après 4 secondes, on réduit le texte
-    const timer = setTimeout(() => {
-      setShowFullText(false);
-    }, 4000);
+    // Animation en boucle toutes les 20 secondes
+    const interval = setInterval(() => {
+      setShowFullText(true);
 
-    return () => clearTimeout(timer);
+      // Après 6 secondes, on réduit le texte
+      setTimeout(() => {
+        setShowFullText(false);
+      }, 6000);
+    }, 20000);
+
+    // Premier cycle au chargement
+    setTimeout(() => {
+      setShowFullText(false);
+    }, 6000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
