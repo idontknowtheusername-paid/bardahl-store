@@ -416,7 +416,38 @@ export default function VehicleDetail() {
               <TabsContent value="lubrification" className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold flex items-center gap-2"><Droplets className="h-5 w-5 text-primary" /> Plan de lubrification</h2>
-                  <Button size="sm" variant="outline" onClick={() => setShowEditPlan(!showEditPlan)}>
+                  <Button size="sm" variant="outline" onClick={async () => {
+                    if (!showEditPlan) {
+                      // Auto-fill from vehicle_specifications
+                      if (vehicle.brand && vehicle.model) {
+                        let query = supabase.from('vehicle_specifications' as any).select('*')
+                          .eq('brand', vehicle.brand)
+                          .eq('model', vehicle.model);
+                        if (vehicle.year) {
+                          query = query.or(`year_start.is.null,year_start.lte.${vehicle.year}`)
+                            .or(`year_end.is.null,year_end.gte.${vehicle.year}`);
+                        }
+                        const { data } = await query.order('year_start', { ascending: false }).limit(1);
+                        const spec = (data as any)?.[0];
+                        if (spec && !plan) {
+                          setPlanEngine(spec.oil_type_engine || '');
+                          setPlanGearbox(spec.oil_type_gearbox || '');
+                          setPlanQtyEngine(spec.oil_quantity_engine || '');
+                          setPlanQtyGearbox(spec.oil_quantity_gearbox || '');
+                          setPlanFreqKm(spec.change_frequency_km?.toString() || '');
+                          setPlanFreqMonths(spec.change_frequency_months?.toString() || '');
+                          setPlanCoolant(spec.coolant_type || '');
+                          setPlanBrakeFluid(spec.brake_fluid_type || '');
+                          setPlanEngineCleaner(spec.engine_cleaner || '');
+                          setPlanGearboxCleaner(spec.gearbox_cleaner || '');
+                          setPlanRadiatorCleaner(spec.radiator_cleaner || '');
+                          setViscositySuggestion(spec.recommended_viscosity_tropical || null);
+                          setAutoFilled(true);
+                        }
+                      }
+                    }
+                    setShowEditPlan(!showEditPlan);
+                  }}>
                     {plan ? 'Modifier' : 'Configurer'}
                   </Button>
                 </div>
