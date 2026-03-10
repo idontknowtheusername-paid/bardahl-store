@@ -17,15 +17,15 @@ interface HealthDashboardProps {
 }
 
 const HEALTH_ITEMS = [
-  { type: 'Vidange moteur', icon: Droplets, label: 'Vidange moteur' },
-  { type: 'Vidange boîte', icon: Droplets, label: 'Vidange boîte' },
-  { type: 'Remplacement batterie', icon: Battery, label: 'Batterie' },
-  { type: 'Remplacement filtres', icon: Disc3, label: 'Filtres' },
-  { type: 'Freins', icon: CircleDot, label: 'Freins' },
-  { type: 'Pneus', icon: CircleDot, label: 'Pneus' },
-  { type: 'Assurance', icon: Shield, label: 'Assurance' },
-  { type: 'Visite technique', icon: FileCheck, label: 'Visite technique' },
-  { type: 'TVM', icon: Receipt, label: 'TVM' },
+  { type: 'Vidange moteur', icon: Droplets, label: 'Vidange moteur', emoji: '🛢️' },
+  { type: 'Vidange boîte', icon: Cog, label: 'Vidange boîte', emoji: '⚙️' },
+  { type: 'Remplacement batterie', icon: Battery, label: 'Batterie', emoji: '🔋' },
+  { type: 'Remplacement filtres', icon: Filter, label: 'Filtres', emoji: '🔧' },
+  { type: 'Freins', icon: Disc3, label: 'Freins', emoji: '🛑' },
+  { type: 'Pneus', icon: CircleDot, label: 'Pneus', emoji: '🛞' },
+  { type: 'Assurance', icon: Shield, label: 'Assurance', emoji: '🛡️' },
+  { type: 'Visite technique', icon: FileCheck, label: 'Visite technique', emoji: '📋' },
+  { type: 'TVM', icon: Receipt, label: 'TVM', emoji: '🧾' },
 ];
 
 type Status = 'ok' | 'warning' | 'urgent' | 'unknown';
