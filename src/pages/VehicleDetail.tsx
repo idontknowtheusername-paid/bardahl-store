@@ -75,6 +75,11 @@ export default function VehicleDetail() {
   const [planQtyGearbox, setPlanQtyGearbox] = useState('');
   const [planFreqKm, setPlanFreqKm] = useState('');
   const [planFreqMonths, setPlanFreqMonths] = useState('');
+  const [planCoolant, setPlanCoolant] = useState('');
+  const [planBrakeFluid, setPlanBrakeFluid] = useState('');
+  const [planEngineCleaner, setPlanEngineCleaner] = useState('');
+  const [planGearboxCleaner, setPlanGearboxCleaner] = useState('');
+  const [planRadiatorCleaner, setPlanRadiatorCleaner] = useState('');
 
   // Alert preferences
   const [alertReminder, setAlertReminder] = useState<any>(null);
