@@ -50,37 +50,57 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* 3 Main CTAs — on one line */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
-              <Button
-                size="lg"
-                onClick={() => setModalOpen(true)}
-                className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base px-6 group shadow-lg w-full sm:w-auto"
-              >
-                <Search className="h-5 w-5 mr-2" />
-                Trouver mon huile
-              </Button>
-              <Button
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base px-6 group w-full sm:w-auto"
-                asChild
-              >
-                <Link to="/diagnostic">
-                  <Stethoscope className="h-5 w-5 mr-2" />
-                  Diagnostic rapide
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                className="border border-white/25 text-white hover:border-white/50 font-semibold backdrop-blur-sm bg-transparent hover:bg-white/10 text-base px-6 group w-full sm:w-auto"
-                asChild
-              >
-                <Link to="/entretien">
-                  <Wrench className="h-5 w-5 mr-2" />
-                  Entretenir mon moteur
-                  <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
+            {/* 3 Main CTAs — responsive layout */}
+            <div className="flex flex-col gap-3 mb-8 justify-center">
+              {/* Mobile: 2 buttons on first row */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  size="lg"
+                  onClick={() => setModalOpen(true)}
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base px-6 group shadow-lg w-full sm:w-auto"
+                >
+                  <Search className="h-5 w-5 mr-2" />
+                  Trouver mon huile
+                </Button>
+                <Button
+                  size="lg"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-base px-6 group w-full sm:w-auto"
+                  asChild
+                >
+                  <Link to="/diagnostic">
+                    <Stethoscope className="h-5 w-5 mr-2" />
+                    Diagnostic
+                  </Link>
+                </Button>
+              </div>
+              {/* Third button centered below on mobile, inline on desktop */}
+              <div className="flex justify-center sm:hidden">
+                <Button
+                  size="lg"
+                  className="border border-white/25 text-white hover:border-white/50 font-semibold backdrop-blur-sm bg-transparent hover:bg-white/10 text-base px-6 group w-full"
+                  asChild
+                >
+                  <Link to="/entretien">
+                    <Wrench className="h-5 w-5 mr-2" />
+                    Entretenir mon moteur
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+              </div>
+              {/* Desktop: show third button inline */}
+              <div className="hidden sm:flex justify-center -mt-3">
+                <Button
+                  size="lg"
+                  className="border border-white/25 text-white hover:border-white/50 font-semibold backdrop-blur-sm bg-transparent hover:bg-white/10 text-base px-6 group"
+                  asChild
+                >
+                  <Link to="/entretien">
+                    <Wrench className="h-5 w-5 mr-2" />
+                    Entretenir mon moteur
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -10,22 +10,20 @@ import { useLanguage } from '@/context/LanguageContext';
 import { languages } from '@/i18n';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { searchProducts } from '@/data/products';
+import { SeasonalBanner } from './SeasonalBanner';
 import type { Product } from '@/types/product';
 
 export function Header() {
   const { totalItems, setIsCartOpen } = useCart();
-  const { currency, setCurrency, formatPrice } = useCurrency();
-  const { language, setLanguage, t } = useLanguage();
+  const { formatPrice } = useCurrency();
+  const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [showLangMenu, setShowLangMenu] = useState(false);
   const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [mobileSubOpen, setMobileSubOpen] = useState(false);
   const navigate = useNavigate();
-
-  const currentLang = languages.find(l => l.code === language);
 
   const productCategories = [
     { label: 'Huiles moteur', href: '/categories/huile-moteur' },
@@ -82,67 +80,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Promo Bar */}
-      <div className="bg-primary text-primary-foreground">
-        <div className="container">
-          <div className="flex items-center justify-between sm:justify-center py-2 text-sm relative">
-            <div className="flex items-center gap-2 font-semibold">
-              <Truck className="h-4 w-4" />
-              <span>{t.freeShipping}</span>
-            </div>
-
-            <div className="sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2">
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-white gap-1 text-xs h-6 px-2 font-medium"
-                  onClick={() => setShowLangMenu(!showLangMenu)}
-                >
-                  <span className="text-base">{currentLang?.flag}</span>
-                  <span className="hidden sm:inline">{currentLang?.name}</span>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-
-                {showLangMenu && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowLangMenu(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[180px]">
-                      <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
-                        <Globe className="h-3 w-3 inline mr-1" />
-                        Language
-                      </p>
-                      {languages.filter(l => l.code === 'fr' || l.code === 'en').map(lang => (
-                        <button
-                          key={lang.code}
-                          onClick={() => { setLanguage(lang.code); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted flex items-center gap-2 ${language === lang.code ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
-                        >
-                          <span>{lang.flag}</span>
-                          <span>{lang.name}</span>
-                        </button>
-                      ))}
-                      <div className="border-t border-border my-2" />
-                      <p className="text-xs font-bold text-foreground px-2 py-1 uppercase tracking-wider">
-                        {t.currency}
-                      </p>
-                      {(['EUR', 'FCFA'] as const).map(c => (
-                        <button
-                          key={c}
-                          onClick={() => { setCurrency(c); setShowLangMenu(false); }}
-                          className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-muted ${currency === c ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
-                        >
-                          {c === 'EUR' ? '€ Euro' : 'FCFA Franc CFA'}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Seasonal Promo Banner */}
+      <SeasonalBanner />
 
       {/* Main Header */}
       <div className="bg-secondary text-secondary-foreground border-b border-secondary/20">
