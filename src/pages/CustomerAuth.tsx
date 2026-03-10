@@ -105,7 +105,7 @@ export default function CustomerAuth() {
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
               </div>
               <h1 className="text-2xl font-extrabold text-foreground">
-                {mode === 'login' ? 'Bon retour !' : 'Bienvenue'}
+                {mode === 'login' ? 'Bienvenu !' : 'Bienvenu'}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 {mode === 'login' ? 'Accédez à votre espace véhicule.' : 'Créez votre compte en 30 secondes.'}

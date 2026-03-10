@@ -8,7 +8,6 @@ import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { languages } from '@/i18n';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { searchProducts } from '@/data/products';
 import { SeasonalBanner } from './SeasonalBanner';
 import type { Product } from '@/types/product';
@@ -184,7 +183,6 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-1">
-              <ThemeToggle />
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">

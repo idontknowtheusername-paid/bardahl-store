@@ -13,7 +13,7 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-secondary" style={{ height: '70vh' }}>
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-secondary" style={{ height: '100vh' }}>
         <div className="container relative z-10 py-14 md:py-16">
           <div className="max-w-3xl mx-auto text-center animate-slide-up">
             {/* Badge */}
