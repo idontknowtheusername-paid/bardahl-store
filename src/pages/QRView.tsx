@@ -149,12 +149,17 @@ export default function QRView() {
             <section>
               <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><Droplets className="h-5 w-5 text-primary" /> Plan de lubrification</h2>
               <div className="bg-card border border-border rounded-xl p-5 grid grid-cols-2 gap-4 text-sm">
-                {plan.oil_type_engine && <div><span className="text-muted-foreground text-xs block">Huile moteur</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
-                {plan.oil_type_gearbox && <div><span className="text-muted-foreground text-xs block">Huile boîte</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
-                {plan.oil_quantity_engine && <div><span className="text-muted-foreground text-xs block">Qté moteur</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
-                {plan.oil_quantity_gearbox && <div><span className="text-muted-foreground text-xs block">Qté boîte</span><span className="font-semibold">{plan.oil_quantity_gearbox}</span></div>}
-                {plan.change_frequency_km && <div><span className="text-muted-foreground text-xs block">Fréquence</span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
-                {plan.change_frequency_months && <div><span className="text-muted-foreground text-xs block">Fréquence</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
+                {plan.oil_type_engine && <div><span className="text-muted-foreground text-xs block">🛢️ Huile moteur</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
+                {plan.engine_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant moteur</span><span className="font-semibold">{plan.engine_cleaner}</span></div>}
+                {plan.oil_type_gearbox && <div><span className="text-muted-foreground text-xs block">⚙️ Huile boîte</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
+                {plan.gearbox_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant boîte</span><span className="font-semibold">{plan.gearbox_cleaner}</span></div>}
+                {plan.oil_quantity_engine && <div><span className="text-muted-foreground text-xs block">📏 Qté moteur</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
+                {plan.oil_quantity_gearbox && <div><span className="text-muted-foreground text-xs block">📏 Qté boîte</span><span className="font-semibold">{plan.oil_quantity_gearbox}</span></div>}
+                {plan.coolant_type && <div><span className="text-muted-foreground text-xs block">❄️ Liquide refroidissement</span><span className="font-semibold">{plan.coolant_type}</span></div>}
+                {plan.brake_fluid_type && <div><span className="text-muted-foreground text-xs block">🔴 Liquide de frein</span><span className="font-semibold">{plan.brake_fluid_type}</span></div>}
+                {plan.radiator_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant radiateur</span><span className="font-semibold">{plan.radiator_cleaner}</span></div>}
+                {plan.change_frequency_km && <div><span className="text-muted-foreground text-xs block">📅 Fréquence</span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
+                {plan.change_frequency_months && <div><span className="text-muted-foreground text-xs block">📅 Fréquence</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
               </div>
             </section>
           )}

@@ -383,9 +383,12 @@ Utilise des emojis et formate bien la réponse.`;
                 )}
 
                 {diagnosticResult && (
-                  <div className="prose prose-sm max-w-none dark:prose-invert [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h2]:text-base [&>h3]:text-sm">
-                    <ReactMarkdown>{diagnosticResult}</ReactMarkdown>
-                  </div>
+                  <>
+                    <DiagnosticTTS text={diagnosticResult} />
+                    <div className="prose prose-sm max-w-none dark:prose-invert [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h2]:text-base [&>h3]:text-sm">
+                      <ReactMarkdown>{diagnosticResult}</ReactMarkdown>
+                    </div>
+                  </>
                 )}
 
                 {/* Recommended products carousel */}

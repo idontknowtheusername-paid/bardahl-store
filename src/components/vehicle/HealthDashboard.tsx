@@ -115,7 +115,10 @@ export default function HealthDashboard({ records }: HealthDashboardProps) {
                     key={item.type}
                     className={`rounded-lg border p-2 text-center transition-all ${cfg.bg}`}
                   >
-                    <Icon className={`h-4 w-4 mx-auto mb-1 ${cfg.color}`} />
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <span className="text-sm">{item.emoji}</span>
+                      <Icon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                    </div>
                     <p className="text-[10px] font-semibold truncate">{item.label}</p>
                     <p className={`text-[9px] mt-0.5 ${cfg.color} font-medium`}>
                       {item.status === 'unknown' ? '—' : item.label}
