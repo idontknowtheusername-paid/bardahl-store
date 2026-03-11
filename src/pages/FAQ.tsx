@@ -21,7 +21,7 @@ const faqData = [
   },
   {
     q: 'Quels modes de paiement acceptez-vous ?',
-    a: 'Nous acceptons MTN Mobile Money, Moov Money, les virements bancaires et le paiement à la livraison (Parakou et environs uniquement).',
+    a: 'Nous acceptons MTN Mobile Money, Moov Money et le paiement à la livraison (Parakou et environs uniquement).',
   },
   {
     q: 'Qu\'est-ce que le carnet d\'entretien digital ?',

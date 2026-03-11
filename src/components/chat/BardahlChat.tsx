@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { X, Send, Loader2, Minimize2, Trash2, User } from 'lucide-react';
+import { X, Send, Loader2, Minimize2, Trash2, User, CheckCircle2, XCircle, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import temiAvatar from '@/assets/temi-avatar.png';
 import ReactMarkdown from 'react-markdown';
@@ -10,6 +10,7 @@ type QuickAction = { label: string; msg?: string; isWhatsApp?: boolean };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
 const HIDDEN_PATHS = ['/panier', '/checkout'];
+const CONSENT_KEY = 'bardahl-chat-consent';
 
 function getSessionId() {
   let sid = sessionStorage.getItem('bardahl-chat-session');
@@ -18,6 +19,14 @@ function getSessionId() {
     sessionStorage.setItem('bardahl-chat-session', sid);
   }
   return sid;
+}
+
+function hasConsent(): boolean {
+  return localStorage.getItem(CONSENT_KEY) === 'true';
+}
+
+function setConsent(value: boolean) {
+  localStorage.setItem(CONSENT_KEY, value.toString());
 }
 
 async function streamChat({
@@ -85,7 +94,7 @@ async function streamChat({
 
 const WELCOME_MSG: Msg = {
   role: 'assistant',
-  content: "Bonjour ! 👋 Je suis **Témi**, votre assistant auto Autopassion.\n\nComment puis-je vous aider aujourd'hui ?",
+  content: "Salut ! 👋 Je suis **Témi**, votre assistant d'Autopassion BJ.\n\nComment puis-je vous aider aujourd'hui ?",
 };
 
 const QUICK_ACTIONS: QuickAction[] = [
@@ -99,12 +108,21 @@ export function BardahlChat() {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showConsent, setShowConsent] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([WELCOME_MSG]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Check consent when opening chat
+  useEffect(() => {
+    if (isOpen && !hasConsent()) {
+      setShowConsent(true);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -164,6 +182,16 @@ export function BardahlChat() {
     sessionStorage.removeItem('bardahl-chat-session');
   };
 
+  const handleAcceptConsent = () => {
+    setConsent(true);
+    setShowConsent(false);
+  };
+
+  const handleRefuseConsent = () => {
+    setIsOpen(false);
+    setShowConsent(false);
+  };
+
   const isHidden = HIDDEN_PATHS.some(p => pathname.startsWith(p));
 
   // Floating button — bottom-right, compact
@@ -197,22 +225,102 @@ export function BardahlChat() {
   }
 
   return (
-    <div className="fixed bottom-4 right-2 sm:right-4 z-50 w-[calc(100vw-1rem)] sm:w-[380px] max-w-[calc(100vw-1rem)] h-[min(560px,calc(100vh-6rem))] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-secondary text-secondary-foreground shrink-0">
+    <div className={`fixed z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen
+      ? 'inset-4 w-auto h-auto'
+      : 'bottom-4 right-2 sm:right-4 w-[calc(100vw-1rem)] sm:w-[380px] max-w-[calc(100vw-1rem)] h-[min(560px,calc(100vh-6rem))]'
+      }`}>
+      {/* Consent Screen */}
+      {showConsent ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10 -z-10" />
+
+          {/* Avatar with glow */}
+          <div className="relative mb-4 animate-in zoom-in duration-700 delay-100">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+            <img src={temiAvatar} alt="Témi" className="h-16 w-16 rounded-full object-cover relative shadow-xl ring-4 ring-primary/10" />
+          </div>
+
+          {/* Title with gradient */}
+          <h2 className="text-xl font-extrabold mb-1 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-in slide-in-from-top duration-500 delay-200">
+            Bienvenue sur AutoPassion BJ
+          </h2>
+
+          <p className="text-sm text-muted-foreground mb-3 animate-in fade-in duration-500 delay-300">
+            Notre assistant intelligent peut vous aider à :
+          </p>
+
+          {/* Features Grid - Compact */}
+          <div className="grid grid-cols-2 gap-1.5 mb-3 w-full max-w-sm text-xs animate-in fade-in slide-in-from-bottom-2 duration-500 delay-400">
+            {[
+              ' Diagnostiquer certaines pannes ',
+              'obtenir des conseils d’entretien',
+              'comprendre les produits et additifs',
+              'suivre votre carnet d’entretien'
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-2 text-left hover:bg-card/80 hover:border-primary/30 hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
+                style={{ animationDelay: `${500 + i * 100}ms` }}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-primary animate-pulse shrink-0" />
+                  <span className="leading-tight">{feature}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Privacy Notice - Compact */}
+          <div className="bg-gradient-to-br from-muted/80 to-muted/50 backdrop-blur-sm rounded-lg p-2.5 mb-4 text-xs border border-border/50 shadow-lg w-full max-w-sm animate-in fade-in duration-500 delay-800">
+            <div className="flex items-center justify-center gap-1 mb-1.5">
+              <span className="text-sm">🔒</span>
+              <span className="font-bold text-xs text-foreground">Confidentialité</span>
+            </div>
+            <p className="text-muted-foreground mb-1 leading-relaxed">
+              En continuant la discussion, vous acceptez que vos messages soient traités par notre assistant afin d’améliorer votre expérience.
+            </p>
+            <p className="font-semibold text-foreground">
+              Merci de ne pas partager d’informations sensibles
+            </p>
+          </div>
+
+          {/* Action Buttons - Compact */}
+          <div className="flex flex-col gap-2 w-full max-w-sm animate-in fade-in slide-in-from-bottom duration-500 delay-1000">
+            <Button
+              onClick={handleAcceptConsent}
+              className="w-full gap-2 h-10 text-sm font-semibold bg-gradient-to-r from-primary to-secondary hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group"
+            >
+              <CheckCircle2 className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              🚗 Démarrer la conversation
+            </Button>
+            <Button
+              onClick={handleRefuseConsent}
+              variant="outline"
+              className="w-full gap-2 h-9 text-xs hover:bg-muted/50 hover:border-primary/30 transition-all duration-300"
+            >
+              <XCircle className="h-3.5 w-3.5" />
+              Refuser
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 bg-secondary text-secondary-foreground shrink-0">
         <div className="flex items-center gap-2">
           <img src={temiAvatar} alt="Témi" className="h-7 w-7 rounded-full object-cover" />
           <div>
             <h3 className="text-sm font-bold leading-none">Témi</h3>
-            <span className="text-[10px] opacity-70">Votre assistant auto</span>
+                  <span className="text-xs opacity-70">Votre assistant auto</span>
           </div>
         </div>
         <div className="flex gap-0.5">
           <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={clearChat} title="Nouvelle conversation">
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsMinimized(true)}>
-            <Minimize2 className="h-3.5 w-3.5" />
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsFullscreen(!isFullscreen)} title={isFullscreen ? "Réduire" : "Plein écran"}>
+                  {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
           </Button>
           <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsOpen(false)}>
             <X className="h-3.5 w-3.5" />
@@ -302,6 +410,8 @@ export function BardahlChat() {
           </Button>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

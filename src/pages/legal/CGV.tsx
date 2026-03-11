@@ -37,7 +37,6 @@ export default function CGV() {
             <p className="text-muted-foreground leading-relaxed">
               Le paiement s'effectue par :<br />
               - Mobile Money (MTN MoMo, Moov Money)<br />
-              - Virement bancaire<br />
               - Paiement à la livraison (Parakou et environs uniquement)<br />
               La commande est validée après réception du paiement ou confirmation pour les paiements 
               à la livraison.

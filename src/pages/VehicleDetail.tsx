@@ -421,11 +421,10 @@ export default function VehicleDetail() {
                       // Auto-fill from vehicle_specifications
                       if (vehicle.brand && vehicle.model) {
                         let query = supabase.from('vehicle_specifications' as any).select('*')
-                          .eq('brand', vehicle.brand)
-                          .eq('model', vehicle.model);
+                          .ilike('brand', vehicle.brand)
+                          .ilike('model', `%${vehicle.model}%`);
                         if (vehicle.year) {
-                          query = query.or(`year_start.is.null,year_start.lte.${vehicle.year}`)
-                            .or(`year_end.is.null,year_end.gte.${vehicle.year}`);
+                          query = query.lte('year_start', vehicle.year).gte('year_end', vehicle.year);
                         }
                         const { data } = await query.order('year_start', { ascending: false }).limit(1);
                         const spec = (data as any)?.[0];
@@ -460,10 +459,9 @@ export default function VehicleDetail() {
                         <button type="button" className="text-xs text-primary hover:underline font-medium" onClick={async () => {
                           if (!vehicle.brand || !vehicle.model) return;
                           let query = supabase.from('vehicle_specifications' as any).select('*')
-                            .eq('brand', vehicle.brand).eq('model', vehicle.model);
+                            .ilike('brand', vehicle.brand).ilike('model', `%${vehicle.model}%`);
                           if (vehicle.year) {
-                            query = query.or(`year_start.is.null,year_start.lte.${vehicle.year}`)
-                              .or(`year_end.is.null,year_end.gte.${vehicle.year}`);
+                            query = query.lte('year_start', vehicle.year).gte('year_end', vehicle.year);
                           }
                           const { data } = await query.order('year_start', { ascending: false }).limit(1);
                           const spec = (data as any)?.[0];
