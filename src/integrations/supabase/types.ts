@@ -921,6 +921,7 @@ export type Database = {
           available_sizes: string[] | null
           capacity: string | null
           care_instructions: string | null
+          click_count: number | null
           compare_at_price: number | null
           composition: string | null
           created_at: string | null
@@ -931,6 +932,7 @@ export type Database = {
           is_new: boolean | null
           price: number
           product_type: string | null
+          sales_count: number | null
           short_description: string | null
           sku: string | null
           slug: string
@@ -938,6 +940,7 @@ export type Database = {
           style: string | null
           title: string
           updated_at: string | null
+          view_count: number | null
           viscosity: string | null
           weight: number | null
         }
@@ -949,6 +952,7 @@ export type Database = {
           available_sizes?: string[] | null
           capacity?: string | null
           care_instructions?: string | null
+          click_count?: number | null
           compare_at_price?: number | null
           composition?: string | null
           created_at?: string | null
@@ -959,6 +963,7 @@ export type Database = {
           is_new?: boolean | null
           price?: number
           product_type?: string | null
+          sales_count?: number | null
           short_description?: string | null
           sku?: string | null
           slug: string
@@ -966,6 +971,7 @@ export type Database = {
           style?: string | null
           title: string
           updated_at?: string | null
+          view_count?: number | null
           viscosity?: string | null
           weight?: number | null
         }
@@ -977,6 +983,7 @@ export type Database = {
           available_sizes?: string[] | null
           capacity?: string | null
           care_instructions?: string | null
+          click_count?: number | null
           compare_at_price?: number | null
           composition?: string | null
           created_at?: string | null
@@ -987,6 +994,7 @@ export type Database = {
           is_new?: boolean | null
           price?: number
           product_type?: string | null
+          sales_count?: number | null
           short_description?: string | null
           sku?: string | null
           slug?: string
@@ -994,6 +1002,7 @@ export type Database = {
           style?: string | null
           title?: string
           updated_at?: string | null
+          view_count?: number | null
           viscosity?: string | null
           weight?: number | null
         }
@@ -1530,6 +1539,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_product_click: {
+        Args: { product_id: string }
+        Returns: undefined
+      }
+      increment_product_view: {
+        Args: { product_id: string }
+        Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
       lookup_customer_email: { Args: { identifier: string }; Returns: string }
