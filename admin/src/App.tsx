@@ -14,6 +14,7 @@ import ProductEdit from '@/pages/ProductEdit';
 import Orders from '@/pages/Orders';
 import OrderDetail from '@/pages/OrderDetail';
 import Customers from '@/pages/Customers';
+import CustomerDetail from '@/pages/CustomerDetail';
 import PromoCodes from '@/pages/PromoCodes';
 import Media from '@/pages/Media';
 import Newsletter from '@/pages/Newsletter';
