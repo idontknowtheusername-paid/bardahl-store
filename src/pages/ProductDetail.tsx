@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/carousel';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
-import { getProductBySlug, getRelatedProducts } from '@/data/products';
+import { getProductBySlug } from '@/data/products';
+import type { Product } from '@/types/product';
 import { useProduct } from '@/hooks/use-supabase-api';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -242,7 +243,7 @@ export default function ProductDetail() {
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
 
-  const relatedProducts = product ? getRelatedProducts(product) : [];
+  // relatedProducts now handled by RelatedProducts component below
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -509,23 +510,8 @@ export default function ProductDetail() {
         {/* Recommended Products - "Souvent achetés ensemble" */}
         <RecommendedProducts currentProduct={product} />
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <section className="mt-12 md:mt-16">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8">Vous aimerez aussi</h2>
-            <Carousel opts={{ align: "start", loop: true }} className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {relatedProducts.map(p => (
-                  <CarouselItem key={p.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
-                    <ProductCard product={p} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex -left-4 bg-background border-border hover:bg-muted" />
-              <CarouselNext className="hidden md:flex -right-4 bg-background border-border hover:bg-muted" />
-            </Carousel>
-          </section>
-        )}
+        {/* Related Products - "Vous aimerez aussi" */}
+        <RelatedProducts currentProduct={product} />
 
         {/* Image Zoom Modal */}
         {isZoomed && (
@@ -542,33 +528,47 @@ export default function ProductDetail() {
   );
 }
 
+// Complementary product types map — NEVER recommend same type
+const COMPLEMENTARY_TYPES: Record<string, string[]> = {
+  'huile-moteur': ['nettoyant-moteur', 'additif', 'filtre', 'nettoyant-injecteur'],
+  'huile-boite': ['nettoyant-boite', 'additif-transmission', 'atf-flush'],
+  'additif': ['nettoyant-moteur', 'filtre', 'nettoyant-injecteur'],
+  'nettoyant-moteur': ['huile-moteur', 'additif', 'filtre'],
+  'nettoyant-injecteur': ['additif', 'nettoyant-moteur', 'filtre'],
+  'nettoyant-boite': ['huile-boite', 'additif-transmission'],
+  'filtre': ['huile-moteur', 'additif', 'nettoyant-moteur'],
+  'liquide-refroidissement': ['nettoyant-radiateur', 'nettoyant-moteur'],
+  'nettoyant-radiateur': ['liquide-refroidissement', 'nettoyant-moteur'],
+  'liquide-frein': ['nettoyant-frein', 'additif'],
+  'nettoyant-frein': ['liquide-frein', 'additif'],
+  'graisse': ['additif', 'nettoyant-moteur'],
+};
+
+// Get the current product_type from the product (style field holds product_type from DB)
+function getProductType(product: any): string {
+  return product.style || product.product_type || '';
+}
+
 // Recommended products component - "Souvent achetés ensemble"
 function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
   const [recommended, setRecommended] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchRecommended = async () => {
-      // Get products of same product_type or complementary types
-      const complementaryTypes: Record<string, string[]> = {
-        'huile-moteur': ['additif', 'nettoyant-moteur', 'filtre'],
-        'additif': ['huile-moteur', 'nettoyant-injecteur'],
-        'nettoyant-moteur': ['huile-moteur', 'additif'],
-        'nettoyant-injecteur': ['additif', 'huile-moteur'],
-        'liquide-refroidissement': ['nettoyant-moteur'],
-      };
+      const currentType = getProductType(currentProduct);
+      const complementaryList = COMPLEMENTARY_TYPES[currentType] || [];
 
-      const currentType = currentProduct.style || currentProduct.composition || '';
-      const relatedTypes = complementaryTypes[currentType] || [];
-
+      // Fetch products that are NOT the same type as current
       const { data } = await supabase
         .from('products')
         .select('id, title, slug, price, compare_at_price, is_new, product_type')
         .eq('is_active', true)
         .neq('id', currentProduct.id)
-        .limit(8);
+        .neq('product_type', currentType) // NEVER same type
+        .limit(20);
 
       if (data && data.length > 0) {
-        // Get images for these products
+        // Get images
         const ids = data.map(p => p.id);
         const { data: images } = await supabase
           .from('product_images')
@@ -581,11 +581,13 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
           if (!imageMap.has(img.product_id)) imageMap.set(img.product_id, img.image_url);
         });
 
-        // Sort: complementary types first
+        // Sort: complementary types first, then others
         const sorted = data.sort((a, b) => {
-          const aMatch = relatedTypes.includes(a.product_type || '') ? 0 : 1;
-          const bMatch = relatedTypes.includes(b.product_type || '') ? 0 : 1;
-          return aMatch - bMatch;
+          const aIdx = complementaryList.indexOf(a.product_type || '');
+          const bIdx = complementaryList.indexOf(b.product_type || '');
+          const aScore = aIdx >= 0 ? aIdx : 999;
+          const bScore = bIdx >= 0 ? bIdx : 999;
+          return aScore - bScore;
         }).slice(0, 6);
 
         setRecommended(sorted.map(p => ({
@@ -618,6 +620,115 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
                   {p.compare_at_price && <span className="text-xs text-muted-foreground line-through">{p.compare_at_price?.toLocaleString()} FCFA</span>}
                 </div>
               </Link>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden md:flex -left-4 bg-background border-border hover:bg-muted" />
+        <CarouselNext className="hidden md:flex -right-4 bg-background border-border hover:bg-muted" />
+      </Carousel>
+    </section>
+  );
+}
+
+// Related products - "Vous aimerez aussi" — also excludes same product_type
+function RelatedProducts({ currentProduct }: { currentProduct: any }) {
+  const [related, setRelated] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      const currentType = getProductType(currentProduct);
+
+      // Get products of different type, prioritizing complementary
+      const { data } = await supabase
+        .from('products')
+        .select('id, title, slug, price, compare_at_price, is_new, is_featured, product_type, available_sizes, available_colors, composition, style, care_instructions, short_description, description, stock, viscosity, capacity, api_norm, acea_norm')
+        .eq('is_active', true)
+        .neq('id', currentProduct.id)
+        .neq('product_type', currentType) // NEVER same type
+        .limit(12);
+
+      if (data && data.length > 0) {
+        const ids = data.map(p => p.id);
+        
+        const [{ data: images }, { data: cats }] = await Promise.all([
+          supabase.from('product_images').select('product_id, image_url').in('product_id', ids).order('display_order', { ascending: true }),
+          supabase.from('product_categories').select('product_id, categories(id, title, slug)').in('product_id', ids),
+        ]);
+
+        const imageMap = new Map<string, string[]>();
+        images?.forEach(img => {
+          const arr = imageMap.get(img.product_id) || [];
+          arr.push(img.image_url);
+          imageMap.set(img.product_id, arr);
+        });
+
+        const catMap = new Map<string, string>();
+        cats?.forEach((c: any) => {
+          if (!catMap.has(c.product_id) && c.categories) catMap.set(c.product_id, c.categories.slug);
+        });
+
+        const complementaryList = COMPLEMENTARY_TYPES[currentType] || [];
+        const sorted = data.sort((a, b) => {
+          const aIdx = complementaryList.indexOf(a.product_type || '');
+          const bIdx = complementaryList.indexOf(b.product_type || '');
+          const aScore = aIdx >= 0 ? aIdx : 999;
+          const bScore = bIdx >= 0 ? bIdx : 999;
+          return aScore - bScore;
+        }).slice(0, 8);
+
+        const transformed = sorted.map(p => {
+          const prodImages = imageMap.get(p.id) || ['https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=800&q=80'];
+          let colors: { name: string; hex: string }[] = [];
+          try {
+            const parsed = typeof p.available_colors === 'string' ? JSON.parse(p.available_colors) : p.available_colors;
+            colors = Array.isArray(parsed) ? parsed : [];
+          } catch { colors = []; }
+          if (colors.length === 0) colors = [{ name: 'Standard', hex: '#1a1a1a' }];
+
+          const sizes = (p.available_sizes || ['Standard']).map((s: string) => ({ size: s, available: true }));
+
+          return {
+            id: p.id,
+            slug: p.slug,
+            name: p.title,
+            price: p.price,
+            originalPrice: p.compare_at_price || undefined,
+            images: prodImages,
+            category: catMap.get(p.id) || 'autres',
+            collection: '',
+            colors,
+            sizes,
+            description: p.description || p.short_description || '',
+            composition: p.composition || '',
+            care: p.care_instructions || '',
+            style: p.product_type || p.style || '',
+            isNew: p.is_new || false,
+            isBestseller: p.is_featured || false,
+            stock: { global: p.stock || 0 },
+            viscosity: p.viscosity || undefined,
+            capacity: p.capacity || undefined,
+            apiNorm: p.api_norm || undefined,
+            aceaNorm: p.acea_norm || undefined,
+          } as Product;
+        });
+
+        setRelated(transformed);
+      }
+    };
+
+    fetchRelated();
+  }, [currentProduct.id]);
+
+  if (related.length === 0) return null;
+
+  return (
+    <section className="mt-12 md:mt-16">
+      <h2 className="text-2xl md:text-3xl font-bold mb-8">Vous aimerez aussi</h2>
+      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {related.map(p => (
+            <CarouselItem key={p.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <ProductCard product={p} />
             </CarouselItem>
           ))}
         </CarouselContent>
