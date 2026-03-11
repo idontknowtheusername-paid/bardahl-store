@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/carousel';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
-import { getProductBySlug, getRelatedProducts } from '@/data/products';
+import { getProductBySlug } from '@/data/products';
+import type { Product } from '@/types/product';
 import { useProduct } from '@/hooks/use-supabase-api';
 import { supabase } from '@/integrations/supabase/client';
 
