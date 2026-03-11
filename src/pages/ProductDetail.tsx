@@ -509,23 +509,8 @@ export default function ProductDetail() {
         {/* Recommended Products - "Souvent achetés ensemble" */}
         <RecommendedProducts currentProduct={product} />
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <section className="mt-12 md:mt-16">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8">Vous aimerez aussi</h2>
-            <Carousel opts={{ align: "start", loop: true }} className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {relatedProducts.map(p => (
-                  <CarouselItem key={p.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
-                    <ProductCard product={p} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex -left-4 bg-background border-border hover:bg-muted" />
-              <CarouselNext className="hidden md:flex -right-4 bg-background border-border hover:bg-muted" />
-            </Carousel>
-          </section>
-        )}
+        {/* Related Products - "Vous aimerez aussi" */}
+        <RelatedProducts currentProduct={product} />
 
         {/* Image Zoom Modal */}
         {isZoomed && (
