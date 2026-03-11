@@ -242,7 +242,7 @@ export default function ProductDetail() {
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
 
-  const relatedProducts = product ? getRelatedProducts(product) : [];
+  // relatedProducts now handled by RelatedProducts component below
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
