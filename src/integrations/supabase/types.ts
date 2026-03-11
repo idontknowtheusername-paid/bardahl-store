@@ -397,6 +397,9 @@ export type Database = {
       }
       maintenance_records: {
         Row: {
+          admin_validated: boolean | null
+          admin_validated_at: string | null
+          admin_validated_by: string | null
           created_at: string
           id: string
           last_date: string | null
@@ -408,6 +411,9 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
+          admin_validated?: boolean | null
+          admin_validated_at?: string | null
+          admin_validated_by?: string | null
           created_at?: string
           id?: string
           last_date?: string | null
@@ -419,6 +425,9 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
+          admin_validated?: boolean | null
+          admin_validated_at?: string | null
+          admin_validated_by?: string | null
           created_at?: string
           id?: string
           last_date?: string | null

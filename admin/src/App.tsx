@@ -14,6 +14,7 @@ import ProductEdit from '@/pages/ProductEdit';
 import Orders from '@/pages/Orders';
 import OrderDetail from '@/pages/OrderDetail';
 import Customers from '@/pages/Customers';
+import CustomerDetail from '@/pages/CustomerDetail';
 import PromoCodes from '@/pages/PromoCodes';
 import Media from '@/pages/Media';
 import Newsletter from '@/pages/Newsletter';
@@ -56,6 +57,7 @@ function App() {
                         <Route path="/orders" element={<Orders />} />
                         <Route path="/orders/:id" element={<OrderDetail />} />
                         <Route path="/customers" element={<Customers />} />
+                        <Route path="/customers/:id" element={<CustomerDetail />} />
                         <Route path="/promo-codes" element={<PromoCodes />} />
                         <Route path="/media" element={<Media />} />
                         <Route path="/newsletter" element={<Newsletter />} />
