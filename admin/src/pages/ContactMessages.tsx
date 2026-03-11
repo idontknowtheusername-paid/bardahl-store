@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Table,
@@ -258,6 +259,9 @@ export default function ContactMessages() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Message de {selectedMessage?.name}</DialogTitle>
+            <DialogDescription>
+              Détails du message et réponse
+            </DialogDescription>
           </DialogHeader>
           {selectedMessage && (
             <MessageDetail

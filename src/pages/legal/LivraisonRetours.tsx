@@ -1,4 +1,5 @@
 import { Truck, Package, RefreshCw, Clock } from 'lucide-react';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 
 export default function LivraisonRetours() {
   return (
@@ -123,6 +124,15 @@ export default function LivraisonRetours() {
           </p>
         </section>
       </div>
+
+      {/* Popular Products Carousel */}
+      <PopularProductsCarousel
+        title="Produits populaires"
+        description="Découvrez les produits les plus appréciés par nos clients"
+        showDescription={true}
+        showSeeAll={true}
+        limit={6}
+      />
     </div>
   );
 }

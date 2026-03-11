@@ -1,5 +1,6 @@
 import { SEOHead } from '@/components/SEOHead';
 import { StructuredData } from '@/components/StructuredData';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 import { Heart, Award, Truck, Users, Car, Wrench, Stethoscope, BookOpen } from 'lucide-react';
 
 export default function About() {
@@ -157,6 +158,15 @@ export default function About() {
             </div>
           </div>
         </section>
+
+        {/* Popular Products Carousel */}
+        <PopularProductsCarousel
+          title="Nos produits les plus appréciés"
+          description="Découvrez les best-sellers qui font la réputation d'Autopassion BJ"
+          showDescription={true}
+          showSeeAll={true}
+          limit={6}
+        />
 
         {/* CTA */}
         <section className="py-16 md:py-24 bg-primary text-primary-foreground">

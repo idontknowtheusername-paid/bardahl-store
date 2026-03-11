@@ -174,3 +174,12 @@ export function useContactSubmit() {
       api.submitContactMessage(data),
   });
 }
+export function usePopularProducts() {
+  return useQuery({
+    queryKey: ['products', 'popular'],
+    queryFn: async () => {
+      const data = await api.getPopularProducts(6);
+      return data?.map(transformProduct) || [];
+    },
+  });
+}

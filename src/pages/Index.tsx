@@ -1,12 +1,14 @@
 import { SEOHead } from '@/components/SEOHead';
 import { StructuredData } from '@/components/StructuredData';
 import { HeroSection } from '@/components/home/HeroSection';
+import { TrustSection } from '@/components/home/TrustSection';
+import { FeaturesSection } from '@/components/home/FeaturesSection';
 import { PopularProductsSection } from '@/components/home/PopularProductsSection';
+import { FeaturedProductsSection } from '@/components/home/FeaturedProductsSection';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { CategorySections } from '@/components/home/CategorySections';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { WhatsAppSection } from '@/components/home/WhatsAppSection';
-import { TrustSection } from '@/components/home/TrustSection';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
 
 const Index = () => {
@@ -21,11 +23,13 @@ const Index = () => {
       <StructuredData type="website" />
       <HeroSection />
       <PopularProductsSection />
+      <FeaturedProductsSection />
       <CategoriesSection />
       <CategorySections />
       <TestimonialsSection />
       <WhatsAppSection />
       <TrustSection />
+      <FeaturesSection />
       <NewsletterSection />
     </>
   );

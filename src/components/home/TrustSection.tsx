@@ -12,10 +12,10 @@ const certifications = [
 
 export function TrustSection() {
   return (
-    <section className="py-12 md:py-16 border-t border-border bg-muted/30">
+    <section className="py-12 md:py-16 bg-muted/30">
       <div className="container">
         <div className="text-center mb-8">
-          <h3 className="text-xl md:text-2xl font-bold">Certifications & Confiance</h3>
+          <h3 className="text-xl md:text-2xl font-bold">Produits certifiés</h3>
           <p className="text-muted-foreground mt-2 text-sm">
             Des produits conformes aux normes internationales les plus strictes
           </p>

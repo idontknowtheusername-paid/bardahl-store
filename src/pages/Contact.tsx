@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SEOHead } from '@/components/SEOHead';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 import { Mail, Phone, Clock, Send, MessageCircle, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -251,6 +252,15 @@ export default function Contact() {
             </Accordion>
           </div>
         </section>
+
+          {/* Popular Products Carousel */}
+          <PopularProductsCarousel
+            title="Produits populaires"
+            description="Découvrez les produits les plus appréciés par nos clients"
+            showDescription={true}
+            showSeeAll={true}
+            limit={6}
+          />
       </div>
     </div>
     </>

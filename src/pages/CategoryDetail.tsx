@@ -3,6 +3,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 import { useProducts } from '@/hooks/use-supabase-api';
 import { useMemo } from 'react';
 
@@ -97,6 +98,16 @@ export default function CategoryDetail() {
               </Link>
             </div>
         )}
+
+          {/* Popular Products Carousel */}
+          <PopularProductsCarousel
+            title="Produits populaires"
+            description="Découvrez les best-sellers de notre boutique"
+            showDescription={true}
+            showSeeAll={true}
+            limit={6}
+            className="mt-16"
+          />
       </div>
     </div>
     </>

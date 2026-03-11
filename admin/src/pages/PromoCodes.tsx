@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
@@ -125,6 +126,9 @@ export default function PromoCodes() {
               <DialogTitle>
                 {editingCode ? 'Modifier le code promo' : 'Nouveau code promo'}
               </DialogTitle>
+              <DialogDescription>
+                {editingCode ? 'Modifiez les détails du code promo existant' : 'Créez un nouveau code promo pour vos clients'}
+              </DialogDescription>
             </DialogHeader>
             <PromoCodeForm
               code={editingCode}

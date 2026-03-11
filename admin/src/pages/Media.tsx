@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Upload, Search, Trash2, Copy, Image as ImageIcon, X, CheckSquare, Square } from 'lucide-react';
 import { toast } from 'sonner';
@@ -414,6 +415,9 @@ export default function Media() {
                 <X className="h-4 w-4" />
               </Button>
             </DialogTitle>
+            <DialogDescription>
+              Aperçu de l'image sélectionnée
+            </DialogDescription>
           </DialogHeader>
           {selectedImage && (
             <div className="space-y-4">

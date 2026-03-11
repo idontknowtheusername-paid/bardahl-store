@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, Truck, ChevronDown, Globe, Car, Wrench, Stethoscope } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Truck, ChevronDown, Globe, Car, Wrench, Stethoscope, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -231,6 +231,12 @@ export function Header() {
                     {totalItems}
                   </span>
                 )}
+              </Button>
+
+              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent" asChild>
+                <Link to="/mon-espace">
+                  <User className="h-6 w-6" />
+                </Link>
               </Button>
             </div>
           </div>

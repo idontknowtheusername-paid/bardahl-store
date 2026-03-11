@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 
 const PRODUCT_TYPES = [
   {
@@ -104,6 +105,15 @@ export default function Categories() {
           ))}
         </div>
       </div>
+
+        {/* Popular Products Carousel */}
+        <PopularProductsCarousel
+          title="Produits populaires dans toutes les catégories"
+          description="Découvrez les best-sellers de notre boutique"
+          showDescription={true}
+          showSeeAll={false}
+          limit={6}
+        />
     </div>
     </>
   );

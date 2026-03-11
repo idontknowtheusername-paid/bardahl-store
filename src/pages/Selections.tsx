@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { ArrowRight } from 'lucide-react';
+import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
 
 const collections = [
   {
@@ -87,6 +88,15 @@ export default function Selections() {
           ))}
         </div>
       </div>
+
+        {/* Popular Products Carousel */}
+        <PopularProductsCarousel
+          title="Produits populaires dans nos sélections"
+          description="Découvrez les best-sellers de notre boutique"
+          showDescription={true}
+          showSeeAll={true}
+          limit={6}
+        />
     </div>
     </>
   );

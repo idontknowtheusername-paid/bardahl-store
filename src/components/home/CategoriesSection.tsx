@@ -74,7 +74,7 @@ export function CategoriesSection() {
         <div className="text-center mb-10">
           <span className="text-primary text-sm font-bold tracking-widest uppercase">NOS GAMMES</span>
           <h2 className="text-3xl md:text-4xl font-extrabold mt-2">Choisissez la solution adaptée à votre moteur</h2>
-          <p className="text-muted-foreground text-base mt-3 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base mt-3 max-w-2xl mx-auto hidden md:block">
             Chaque moteur a ses besoins. Découvrez nos solutions pour améliorer la performance, protéger votre moteur et réduire les pannes.
           </p>
         </div>

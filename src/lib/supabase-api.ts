@@ -195,3 +195,37 @@ export async function submitContactMessage(message: {
   if (error) throw error;
   return data;
 }
+
+// =====================================================
+// POPULAR PRODUCTS
+// =====================================================
+
+export async function getPopularProducts(limit: number = 6) {
+  const { data, error } = await db
+    .from('products')
+    .select(`
+      *,
+      product_images (image_url, alt_text, display_order)
+    `)
+    .eq('is_active', true)
+    .order('sales_count', { ascending: false, nullsLast: true })
+    .order('view_count', { ascending: false, nullsLast: true })
+    .order('click_count', { ascending: false, nullsLast: true })
+    .order('is_featured', { ascending: false }) // Fallback pour les produits sans données
+    .limit(limit);
+
+  if (error) throw error;
+  return data;
+}
+
+// Increment product view count
+export async function incrementProductView(productId: string) {
+  const { error } = await db.rpc('increment_product_view', { product_id: productId });
+  if (error) throw error;
+}
+
+// Increment product click count
+export async function incrementProductClick(productId: string) {
+  const { error } = await db.rpc('increment_product_click', { product_id: productId });
+  if (error) throw error;
+}

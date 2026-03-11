@@ -24,7 +24,7 @@ import {
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
 import { getProductBySlug, getRelatedProducts } from '@/data/products';
-import { useProduct } from '@/hooks/use-supabase-api';
+import { useProduct, usePopularProducts } from '@/hooks/use-supabase-api';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Review {
@@ -509,6 +509,9 @@ export default function ProductDetail() {
         {/* Recommended Products - "Souvent achetés ensemble" */}
         <RecommendedProducts currentProduct={product} />
 
+          {/* Popular Products */}
+          <PopularProductsInDetail />
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <section className="mt-12 md:mt-16">
@@ -608,24 +611,62 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
 
   if (recommended.length === 0) return null;
 
+  // Transform recommended data to Product format
+  const recommendedProducts = recommended.map(p => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.title,
+    price: p.price,
+    originalPrice: p.compare_at_price || undefined,
+    images: [p.image || '/placeholder.svg'],
+    category: p.product_type || 'autres',
+    collection: '',
+    colors: [{ name: 'Standard', hex: '#1a1a1a' }],
+    sizes: [{ size: 'Standard', available: true }],
+    cupSizes: [],
+    description: '',
+    composition: '',
+    care: '',
+    style: p.product_type || 'Classique',
+    isNew: p.is_new || false,
+    isBestseller: false,
+    stock: { global: 1 },
+  }));
+
   return (
     <section className="mt-16 md:mt-24">
       <h2 className="text-2xl md:text-3xl font-bold mb-2">Souvent achetés ensemble</h2>
       <p className="text-muted-foreground text-sm mb-8">Les clients qui ont acheté ce produit prennent aussi</p>
       <Carousel opts={{ align: "start", loop: true }} className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
-          {recommended.map(p => (
-            <CarouselItem key={p.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
-              <Link to={`/produits/${p.slug}`} className="group block">
-                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3">
-                  <img src={p.image} alt={p.title} className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform" />
-                </div>
-                <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{p.title}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="font-bold text-primary">{p.price?.toLocaleString()} FCFA</span>
-                  {p.compare_at_price && <span className="text-xs text-muted-foreground line-through">{p.compare_at_price?.toLocaleString()} FCFA</span>}
-                </div>
-              </Link>
+          {recommendedProducts.map((product, index) => (
+            <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <ProductCard product={product} className="animate-slide-up"
+                style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden md:flex -left-4 bg-background border-border hover:bg-muted" />
+        <CarouselNext className="hidden md:flex -right-4 bg-background border-border hover:bg-muted" />
+      </Carousel>
+    </section>
+  );
+}
+function PopularProductsInDetail() {
+  const { data: products, isLoading } = usePopularProducts();
+
+  if (isLoading || !products || products.length === 0) return null;
+
+  return (
+    <section className="mt-16 md:mt-24">
+      <h2 className="text-2xl md:text-3xl font-bold mb-2">Produits populaires</h2>
+      <p className="text-muted-foreground text-sm mb-8 hidden md:block">Découvrez les produits les plus appréciés par nos clients</p>
+      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {products.map((product, index) => (
+            <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <ProductCard product={product} className="animate-slide-up"
+                style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties} />
             </CarouselItem>
           ))}
         </CarouselContent>
