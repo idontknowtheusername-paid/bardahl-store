@@ -66,14 +66,24 @@ const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '2
 const PRODUCT_TYPES = [
   { value: 'huiles-moteur', label: 'Huiles Moteur' },
   { value: 'transmission', label: 'Huiles boîtes & Transmission' },
-  { value: 'additifs', label: 'Additifs & Traitements' },
+  { value: 'additifs', label: 'Additifs & Traitements', subcategories: [
+    { value: 'additif-essence', label: 'Additif carburant Essence' },
+    { value: 'additif-diesel', label: 'Additif moteur Diesel' },
+    { value: 'additif-moteur', label: 'Additif moteur' },
+  ]},
   { value: 'liquides', label: 'Liquide de refroidissement & lave-glace' },
   { value: 'purifiant-desodorisant', label: 'Purifiant & désodorisant' },
   { value: 'entretien', label: 'Entretien & Nettoyage' },
   { value: 'special-atelier', label: 'Spécial atelier' },
   { value: 'packs-entretien', label: 'Packs entretien' },
   { value: 'accessoires-electronique', label: 'Accessoires & Électronique auto' },
-  { value: 'filtres', label: 'Filtres' },
+  { value: 'filtres', label: 'Filtres', subcategories: [
+    { value: 'filtres-a-huile', label: 'Filtres à huile' },
+    { value: 'filtres-a-air', label: 'Filtres à air' },
+    { value: 'filtres-gasoil', label: 'Filtres gasoil' },
+    { value: 'filtres-hydrauliques', label: 'Filtres hydrauliques' },
+  ]},
+  { value: 'epi', label: 'EPI (Équipement de Protection)' },
 ];
 
 // Sortable Image Component
@@ -371,7 +381,7 @@ export default function ProductEdit() {
           available_cup_sizes: null,
           composition: null,
           care_instructions: null,
-          style: null,
+          style: (data as any).style || null,
         };
 
         let productId = id;
@@ -524,6 +534,29 @@ export default function ProductEdit() {
                   <p className="text-sm text-destructive">{form.formState.errors.product_type.message}</p>
                 )}
               </div>
+
+              {/* Subcategory dropdown for Filtres and Additifs */}
+              {(() => {
+                const selectedType = PRODUCT_TYPES.find(t => t.value === form.watch('product_type'));
+                if (!selectedType || !('subcategories' in selectedType) || !(selectedType as any).subcategories) return null;
+                const subs = (selectedType as any).subcategories as { value: string; label: string }[];
+                return (
+                  <div className="space-y-2">
+                    <Label>Sous-catégorie</Label>
+                    <Select value={form.watch('style') || ''} onValueChange={(v) => form.setValue('style' as any, v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une sous-catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucune</SelectItem>
+                        {subs.map((sub: any) => (
+                          <SelectItem key={sub.value} value={sub.value}>{sub.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
 
               <div className="space-y-2">
                 <Label htmlFor="short_description">Description courte</Label>

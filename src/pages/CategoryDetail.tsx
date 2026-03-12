@@ -4,6 +4,8 @@ import { ChevronRight } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { PopularProductsCarousel } from '@/components/product/PopularProductsCarousel';
+import { PacksCarousel } from '@/components/product/PacksCarousel';
+import { FilterEquivalenceModal } from '@/components/product/FilterEquivalenceModal';
 import { useProducts } from '@/hooks/use-supabase-api';
 import { useMemo } from 'react';
 
@@ -76,11 +78,16 @@ export default function CategoryDetail() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{categoryInfo.name}</h1>
-          <p className="text-muted-foreground">{categoryInfo.description}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {products.length} produit{products.length > 1 ? 's' : ''}
-          </p>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{categoryInfo.name}</h1>
+              <p className="text-muted-foreground">{categoryInfo.description}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {products.length} produit{products.length > 1 ? 's' : ''}
+              </p>
+            </div>
+            {slug === 'filtres' && <FilterEquivalenceModal />}
+          </div>
         </div>
 
         {/* Products Grid */}
@@ -98,6 +105,9 @@ export default function CategoryDetail() {
               </Link>
             </div>
         )}
+
+          {/* Packs recommandés carousel */}
+          <PacksCarousel className="mt-16" />
 
           {/* Popular Products Carousel */}
           <PopularProductsCarousel

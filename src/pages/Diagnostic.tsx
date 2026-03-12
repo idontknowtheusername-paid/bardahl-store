@@ -231,9 +231,9 @@ Utilise des emojis et formate bien la réponse.`;
   return (
     <>
       <SEOHead
-        title="Diagnostic Auto Rapide | Autopassion BJ"
+        title="Diagnostic Moteur Rapide | Autopassion BJ"
         description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées."
-        keywords="diagnostic auto, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
+        keywords="diagnostic moteur, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
         url="/diagnostic"
       />
 
@@ -243,7 +243,7 @@ Utilise des emojis et formate bien la réponse.`;
           <div className="container text-center">
             <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-sm font-bold px-4 py-2 rounded-full mb-4">
               <Stethoscope className="h-4 w-4" />
-              Diagnostic rapide
+              Diagnostic moteur
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
               Diagnostiquez votre voiture en 1 minute
@@ -419,6 +419,22 @@ Utilise des emojis et formate bien la réponse.`;
 
                 {(!isLoading || diagnosticResult) && (
                   <>
+                    {/* Oil recommendation block */}
+                    <div className="mt-6 p-4 rounded-xl bg-accent/10 border border-accent/20">
+                      <h4 className="font-bold text-sm flex items-center gap-2 mb-2">
+                        🛢️ Recommandation huile moteur
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Selon les spécifications constructeur, nous recommandons une huile adaptée à votre motorisation ({fuelType}) et kilométrage ({mileage || 'N/A'} km).
+                        Consultez notre gamme complète pour trouver l'huile idéale.
+                      </p>
+                      <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
+                        <Link to="/categories/huiles-moteur">
+                          🛢️ Découvrez notre gamme d'huile moteur
+                        </Link>
+                      </Button>
+                    </div>
+
                     <p className="text-xs text-muted-foreground italic mt-6 pt-4 border-t border-border">
                       ⚠️ Le diagnostic proposé est indicatif et ne remplace pas l'avis d'un mécanicien professionnel.
                     </p>

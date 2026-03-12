@@ -97,6 +97,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          parent_id: string | null
           slug: string
           title: string
           updated_at: string | null
@@ -108,6 +109,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          parent_id?: string | null
           slug: string
           title: string
           updated_at?: string | null
@@ -119,11 +121,20 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          parent_id?: string | null
           slug?: string
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chat_conversations: {
         Row: {
