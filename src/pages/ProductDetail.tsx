@@ -5,6 +5,8 @@ import { StructuredData } from '@/components/StructuredData';
 import { ChevronRight, Minus, Plus, Share2, ShoppingBag, Star, ChevronDown, MessageCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/format';
 import { ProductCard } from '@/components/product/ProductCard';
+import { PacksCarousel } from '@/components/product/PacksCarousel';
+import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
