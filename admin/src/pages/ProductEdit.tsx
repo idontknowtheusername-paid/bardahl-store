@@ -535,6 +535,29 @@ export default function ProductEdit() {
                 )}
               </div>
 
+              {/* Subcategory dropdown for Filtres and Additifs */}
+              {(() => {
+                const selectedType = PRODUCT_TYPES.find(t => t.value === form.watch('product_type'));
+                if (!selectedType || !('subcategories' in selectedType) || !(selectedType as any).subcategories) return null;
+                const subs = (selectedType as any).subcategories as { value: string; label: string }[];
+                return (
+                  <div className="space-y-2">
+                    <Label>Sous-catégorie</Label>
+                    <Select value={form.watch('style') || ''} onValueChange={(v) => form.setValue('style' as any, v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une sous-catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucune</SelectItem>
+                        {subs.map((sub: any) => (
+                          <SelectItem key={sub.value} value={sub.value}>{sub.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              })()}
+
               <div className="space-y-2">
                 <Label htmlFor="short_description">Description courte</Label>
                 <Textarea id="short_description" rows={2} {...form.register('short_description')} />
