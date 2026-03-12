@@ -390,19 +390,19 @@ export default function VehicleDetail() {
                     <p className="text-sm text-muted-foreground">Aucun entretien enregistré.</p>
                   </div>
                 ) : (
-                  <div className="space-y-2.5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {records.map(r => (
-                      <div key={r.id} className="bg-card border border-border rounded-xl p-3.5 flex items-start justify-between gap-2">
+                      <div key={r.id} className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between gap-2 shadow-card">
                         <div className="min-w-0">
-                          <h4 className="font-semibold text-sm">{r.maintenance_type}</h4>
-                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-1">
-                            {r.last_date && <span>Dernière : {new Date(r.last_date).toLocaleDateString('fr-FR')}</span>}
-                            {r.next_date && <span className="text-primary font-medium">Prochaine : {new Date(r.next_date).toLocaleDateString('fr-FR')}</span>}
-                            {r.mileage_at_service && <span>{r.mileage_at_service.toLocaleString()} km</span>}
+                          <h4 className="font-semibold text-sm mb-2">{r.maintenance_type}</h4>
+                          <div className="space-y-1 text-xs text-muted-foreground">
+                            {r.last_date && <div className="flex justify-between"><span>Dernière</span><span className="font-medium text-foreground">{new Date(r.last_date).toLocaleDateString('fr-FR')}</span></div>}
+                            {r.next_date && <div className="flex justify-between"><span>Prochaine</span><span className="font-medium text-primary">{new Date(r.next_date).toLocaleDateString('fr-FR')}</span></div>}
+                            {r.mileage_at_service && <div className="flex justify-between"><span>Kilométrage</span><span className="font-medium text-foreground">{r.mileage_at_service.toLocaleString()} km</span></div>}
                           </div>
-                          {r.notes && <p className="text-xs text-muted-foreground mt-1 italic truncate">{r.notes}</p>}
+                          {r.notes && <p className="text-xs text-muted-foreground mt-2 italic truncate">{r.notes}</p>}
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-1 justify-end pt-2 border-t border-border mt-2">
                           <button onClick={() => startEditRecord(r)} className="text-muted-foreground hover:text-primary p-1"><Pencil className="h-3.5 w-3.5" /></button>
                           <button onClick={() => handleDeleteMaintenance(r.id)} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="h-4 w-4" /></button>
                         </div>
