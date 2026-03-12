@@ -381,7 +381,7 @@ export default function ProductEdit() {
           available_cup_sizes: null,
           composition: null,
           care_instructions: null,
-          style: null,
+          style: (data as any).style || null,
         };
 
         let productId = id;
