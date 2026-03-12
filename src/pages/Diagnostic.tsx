@@ -243,7 +243,7 @@ Utilise des emojis et formate bien la réponse.`;
           <div className="container text-center">
             <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-sm font-bold px-4 py-2 rounded-full mb-4">
               <Stethoscope className="h-4 w-4" />
-              Diagnostic rapide
+              Diagnostic moteur
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
               Diagnostiquez votre voiture en 1 minute
