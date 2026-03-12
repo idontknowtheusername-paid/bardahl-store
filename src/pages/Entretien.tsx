@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
-import { Wrench, Droplets, Shield, Fuel, Cog, Thermometer, Pipette, Sparkles, ChevronRight } from 'lucide-react';
+import { Wrench, Droplets, Shield, Fuel, Cog, Thermometer, Pipette, Sparkles, Wind } from 'lucide-react';
+import { PacksCarousel } from '@/components/product/PacksCarousel';
 
 const maintenanceSections = [
   {
@@ -44,12 +45,20 @@ const maintenanceSections = [
     color: 'bg-primary/10 text-primary',
   },
   {
+    id: 'reduire-fumee',
+    title: 'Réduire la fumée',
+    description: 'Additifs anti-fumée et nettoyants FAP/EGR',
+    icon: Wind,
+    href: '/categories/additifs',
+    color: 'bg-accent/10 text-accent',
+  },
+  {
     id: 'radiateur',
     title: 'Vidange radiateur',
     description: 'Liquides de refroidissement et antigel',
     icon: Thermometer,
     href: '/categories/liquides',
-    color: 'bg-accent/10 text-accent',
+    color: 'bg-primary/10 text-primary',
   },
   {
     id: 'fuites',
@@ -57,7 +66,7 @@ const maintenanceSections = [
     description: 'Stop-fuites moteur, boîte et radiateur',
     icon: Pipette,
     href: '/categories/additifs',
-    color: 'bg-primary/10 text-primary',
+    color: 'bg-accent/10 text-accent',
   },
   {
     id: 'confort',
@@ -65,7 +74,7 @@ const maintenanceSections = [
     description: 'Purifiants, désodorisants et nettoyants habitacle',
     icon: Sparkles,
     href: '/categories/entretien',
-    color: 'bg-accent/10 text-accent',
+    color: 'bg-primary/10 text-primary',
   },
 ];
 
@@ -84,7 +93,7 @@ export default function Entretien() {
         <div className="container text-center">
           <div className="inline-flex items-center gap-2 bg-accent/15 text-accent text-xs font-bold px-3 py-1.5 rounded-full mb-4">
             <Wrench className="h-3.5 w-3.5" />
-            Entretien préventif
+            Entretien véhicule
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
             Entretenir son moteur coûte moins cher que le réparer.
@@ -95,7 +104,7 @@ export default function Entretien() {
         </div>
       </section>
 
-      {/* Grid 2x2 partout */}
+      {/* Grid */}
       <section className="py-12 md:py-16">
         <div className="container">
           <div className="grid grid-cols-2 gap-4 md:gap-6">
@@ -116,6 +125,9 @@ export default function Entretien() {
           </div>
         </div>
       </section>
+
+      {/* Packs recommandés */}
+      <PacksCarousel />
     </>
   );
 }

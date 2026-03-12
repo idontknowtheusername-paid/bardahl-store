@@ -3,7 +3,6 @@ import { StructuredData } from '@/components/StructuredData';
 import { HeroSection } from '@/components/home/HeroSection';
 import { TrustSection } from '@/components/home/TrustSection';
 import { FeaturesSection } from '@/components/home/FeaturesSection';
-import { PopularProductsSection } from '@/components/home/PopularProductsSection';
 import { FeaturedProductsSection } from '@/components/home/FeaturedProductsSection';
 import { CategoriesSection } from '@/components/home/CategoriesSection';
 import { CategorySections } from '@/components/home/CategorySections';
@@ -22,7 +21,7 @@ const Index = () => {
       <StructuredData type="organization" />
       <StructuredData type="website" />
       <HeroSection />
-      <PopularProductsSection />
+      {/* PopularProductsSection removed - now inside HeroSection */}
       <FeaturedProductsSection />
       <CategoriesSection />
       <CategorySections />
