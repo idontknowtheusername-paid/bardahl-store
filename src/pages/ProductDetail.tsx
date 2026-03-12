@@ -511,6 +511,9 @@ export default function ProductDetail() {
         {/* Recommended Products - "Souvent achetés ensemble" */}
         <RecommendedProducts currentProduct={product} />
 
+        {/* Packs recommandés */}
+        <PacksCarousel className="mt-16" />
+
           {/* Popular Products */}
           <PopularProductsInDetail />
 
