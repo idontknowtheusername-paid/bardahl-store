@@ -231,9 +231,9 @@ Utilise des emojis et formate bien la réponse.`;
   return (
     <>
       <SEOHead
-        title="Diagnostic Auto Rapide | Autopassion BJ"
+        title="Diagnostic Moteur Rapide | Autopassion BJ"
         description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées."
-        keywords="diagnostic auto, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
+        keywords="diagnostic moteur, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
         url="/diagnostic"
       />
 
