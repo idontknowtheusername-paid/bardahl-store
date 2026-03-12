@@ -419,6 +419,22 @@ Utilise des emojis et formate bien la réponse.`;
 
                 {(!isLoading || diagnosticResult) && (
                   <>
+                    {/* Oil recommendation block */}
+                    <div className="mt-6 p-4 rounded-xl bg-accent/10 border border-accent/20">
+                      <h4 className="font-bold text-sm flex items-center gap-2 mb-2">
+                        🛢️ Recommandation huile moteur
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Selon les spécifications constructeur, nous recommandons une huile adaptée à votre motorisation ({fuelType}) et kilométrage ({mileage || 'N/A'} km).
+                        Consultez notre gamme complète pour trouver l'huile idéale.
+                      </p>
+                      <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
+                        <Link to="/categories/huiles-moteur">
+                          🛢️ Découvrez notre gamme d'huile moteur
+                        </Link>
+                      </Button>
+                    </div>
+
                     <p className="text-xs text-muted-foreground italic mt-6 pt-4 border-t border-border">
                       ⚠️ Le diagnostic proposé est indicatif et ne remplace pas l'avis d'un mécanicien professionnel.
                     </p>

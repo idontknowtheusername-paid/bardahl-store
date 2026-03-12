@@ -106,6 +106,9 @@ export default function CategoryDetail() {
             </div>
         )}
 
+          {/* Packs recommandés carousel */}
+          <PacksCarousel className="mt-16" />
+
           {/* Popular Products Carousel */}
           <PopularProductsCarousel
             title="Produits populaires"
