@@ -66,14 +66,24 @@ const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '2
 const PRODUCT_TYPES = [
   { value: 'huiles-moteur', label: 'Huiles Moteur' },
   { value: 'transmission', label: 'Huiles boîtes & Transmission' },
-  { value: 'additifs', label: 'Additifs & Traitements' },
+  { value: 'additifs', label: 'Additifs & Traitements', subcategories: [
+    { value: 'additif-essence', label: 'Additif carburant Essence' },
+    { value: 'additif-diesel', label: 'Additif moteur Diesel' },
+    { value: 'additif-moteur', label: 'Additif moteur' },
+  ]},
   { value: 'liquides', label: 'Liquide de refroidissement & lave-glace' },
   { value: 'purifiant-desodorisant', label: 'Purifiant & désodorisant' },
   { value: 'entretien', label: 'Entretien & Nettoyage' },
   { value: 'special-atelier', label: 'Spécial atelier' },
   { value: 'packs-entretien', label: 'Packs entretien' },
   { value: 'accessoires-electronique', label: 'Accessoires & Électronique auto' },
-  { value: 'filtres', label: 'Filtres' },
+  { value: 'filtres', label: 'Filtres', subcategories: [
+    { value: 'filtres-a-huile', label: 'Filtres à huile' },
+    { value: 'filtres-a-air', label: 'Filtres à air' },
+    { value: 'filtres-gasoil', label: 'Filtres gasoil' },
+    { value: 'filtres-hydrauliques', label: 'Filtres hydrauliques' },
+  ]},
+  { value: 'epi', label: 'EPI (Équipement de Protection)' },
 ];
 
 // Sortable Image Component
