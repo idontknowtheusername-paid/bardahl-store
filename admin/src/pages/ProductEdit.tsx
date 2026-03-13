@@ -371,6 +371,7 @@ export default function ProductEdit() {
           sku: data.sku?.trim() || generateSKU(data.title),
           stock: data.stock || 0,
           product_type: data.product_type,
+          subcategory_id: data.subcategory_id && data.subcategory_id !== 'none' ? data.subcategory_id : null,
           viscosity: data.viscosity || null,
           api_norm: data.api_norm || null,
           acea_norm: data.acea_norm || null,
@@ -383,7 +384,7 @@ export default function ProductEdit() {
           available_cup_sizes: null,
           composition: null,
           care_instructions: null,
-          style: (data as any).style || null,
+          style: null,
         };
 
         let productId = id;
