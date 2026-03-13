@@ -546,18 +546,22 @@ export default function ProductEdit() {
                 return (
                   <div className="space-y-2">
                     <Label>Sous-catégorie</Label>
-                    <Select value={form.watch('style') || ''} onValueChange={(v) => form.setValue('style' as any, v)}>
+                    <Select value={form.watch('subcategory_id') || ''} onValueChange={(v) => form.setValue('subcategory_id', v === 'none' ? null : v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une sous-catégorie" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Aucune</SelectItem>
-                        {subs.map((sub: any) => (
-                          <SelectItem key={sub.value} value={sub.value}>{sub.label}</SelectItem>
-                        ))}
+                        {subcategories
+                          ?.filter((sc: any) => subs.some((s: any) => s.value === sc.slug))
+                          .map((sc: any) => (
+                            <SelectItem key={sc.id} value={sc.id}>{sc.title}</SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
+                );
+              })()}
                 );
               })()}
 
