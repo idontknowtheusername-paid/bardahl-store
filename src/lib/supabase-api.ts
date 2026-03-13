@@ -207,7 +207,8 @@ export async function getPopularProducts(limit: number = 6) {
     .from('products')
     .select(`
       *,
-      product_images (image_url, alt_text, display_order)
+      product_images (image_url, alt_text, display_order),
+      subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('is_active', true)
     .order('sales_count', { ascending: false, nullsLast: true })
