@@ -43,17 +43,13 @@ export default function CategoryDetail() {
     if (!allProducts || !slug) return [];
     const info = PRODUCT_TYPE_INFO[slug];
     if (info?.parentType) {
-      // This is a subcategory — filter by product_type matching parent AND subcategory_id slug
-      // For now, filter by style field matching subcategory slug as fallback
-      return allProducts.filter(p => {
-        // Check if product's style matches the subcategory slug
-        if (p.style === slug) return true;
-        // Also check product_type for parent match
-        return false;
-      });
+      // Subcategory: match by subcategorySlug or style
+      return allProducts.filter(p => 
+        p.subcategorySlug === slug || p.style === slug
+      );
     }
-    // Main category — filter by product_type or style
-    return allProducts.filter(p => p.style === slug || p.category === slug);
+    // Main category: match by product_type (style field holds product_type)
+    return allProducts.filter(p => p.style === slug);
   }, [allProducts, slug]);
 
   if (isLoading) {

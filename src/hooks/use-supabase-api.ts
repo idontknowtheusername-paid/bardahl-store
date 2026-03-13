@@ -72,6 +72,7 @@ export function transformProduct(dbProduct: DbProduct & {
     composition,
     care: dbProduct.care_instructions || '',
     style: dbProduct.product_type || dbProduct.style || 'Classique',
+    subcategorySlug: (dbProduct as any).subcategory?.slug || (dbProduct as any).subcategory_slug || undefined,
     isNew: dbProduct.is_new || false,
     isBestseller: dbProduct.is_featured || false,
     stock: { global: globalStock },
