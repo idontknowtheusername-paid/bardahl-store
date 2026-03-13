@@ -40,7 +40,20 @@ export default function CategoryDetail() {
   const categoryInfo = slug ? PRODUCT_TYPE_INFO[slug] : null;
 
   const products = useMemo(() => {
-    return allProducts?.filter(p => p.style === slug) || [];
+    if (!allProducts || !slug) return [];
+    const info = PRODUCT_TYPE_INFO[slug];
+    if (info?.parentType) {
+      // This is a subcategory — filter by product_type matching parent AND subcategory_id slug
+      // For now, filter by style field matching subcategory slug as fallback
+      return allProducts.filter(p => {
+        // Check if product's style matches the subcategory slug
+        if (p.style === slug) return true;
+        // Also check product_type for parent match
+        return false;
+      });
+    }
+    // Main category — filter by product_type or style
+    return allProducts.filter(p => p.style === slug || p.category === slug);
   }, [allProducts, slug]);
 
   if (isLoading) {

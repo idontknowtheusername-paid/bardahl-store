@@ -24,36 +24,30 @@ export function Header() {
   const navigate = useNavigate();
 
   const productCategories = [
-    {
-      label: 'Huiles moteur',
-      href: '/categories/huiles-moteur',
-    },
-    {
-      label: 'Huiles boîtes & transmission',
-      href: '/categories/transmission',
-    },
+    { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
+    { label: 'Huiles boîtes & transmission', href: '/categories/transmission' },
     {
       label: 'Filtres',
       href: '/categories/filtres',
       subcategories: [
-        { label: 'Filtres à huile', href: '/categories/filtres?sub=filtres-a-huile' },
-        { label: 'Filtres à air', href: '/categories/filtres?sub=filtres-a-air' },
-        { label: 'Filtres gasoil', href: '/categories/filtres?sub=filtres-gasoil' },
-        { label: 'Filtres hydrauliques', href: '/categories/filtres?sub=filtres-hydrauliques' },
+        { label: 'Filtres à huile', href: '/categories/filtres-a-huile' },
+        { label: 'Filtres à air', href: '/categories/filtres-a-air' },
+        { label: 'Filtres gasoil', href: '/categories/filtres-gasoil' },
+        { label: 'Filtres hydrauliques', href: '/categories/filtres-hydrauliques' },
       ],
     },
     {
       label: 'Additifs & Traitements',
       href: '/categories/additifs',
       subcategories: [
-        { label: 'Additif carburant Essence', href: '/categories/additifs?sub=additif-essence' },
-        { label: 'Additif moteur Diesel', href: '/categories/additifs?sub=additif-diesel' },
-        { label: 'Additif moteur', href: '/categories/additifs?sub=additif-moteur' },
+        { label: 'Additif carburant Essence', href: '/categories/additif-essence' },
+        { label: 'Additif moteur Diesel', href: '/categories/additif-diesel' },
+        { label: 'Additif moteur', href: '/categories/additif-moteur' },
       ],
     },
-    { label: 'Liquide de frein', href: '/categories/transmission' },
+    { label: 'Liquide de frein', href: '/categories/liquide-de-frein' },
     { label: 'Liquide de refroidissement', href: '/categories/liquides' },
-    { label: 'EPI', href: '/categories/accessoires-electronique' },
+    { label: 'EPI', href: '/categories/epi' },
     { label: 'Purifiant & désodorisant', href: '/categories/purifiant-desodorisant' },
     { label: 'Entretien & nettoyage', href: '/categories/entretien' },
     { label: 'Spécial atelier', href: '/categories/special-atelier' },
