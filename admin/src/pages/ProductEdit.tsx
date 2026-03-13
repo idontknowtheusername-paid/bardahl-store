@@ -266,6 +266,7 @@ export default function ProductEdit() {
       sku: product.sku || '',
       stock: product.stock || 0,
       product_type: product.product_type || 'huiles-moteur',
+      subcategory_id: product.subcategory_id || null,
       viscosity: product.viscosity || '',
       api_norm: product.api_norm || '',
       acea_norm: product.acea_norm || '',
