@@ -48,6 +48,7 @@ const productSchema = z.object({
   sku: z.string().optional(),
   stock: z.number().min(0).optional(),
   product_type: z.string().min(1, 'Gamme requise'),
+  subcategory_id: z.string().nullable().optional(),
   viscosity: z.string().optional(),
   api_norm: z.string().optional(),
   acea_norm: z.string().optional(),
