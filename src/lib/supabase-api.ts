@@ -80,7 +80,8 @@ export async function getProductBySlug(slug: string) {
     .from('products')
     .select(`
       *,
-      product_images (image_url, alt_text, display_order)
+      product_images (image_url, alt_text, display_order),
+      subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('slug', slug)
     .eq('is_active', true)
