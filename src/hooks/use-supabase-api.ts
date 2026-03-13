@@ -10,6 +10,7 @@ type DbProduct = Database['public']['Tables']['products']['Row'];
 export function transformProduct(dbProduct: DbProduct & { 
   product_images?: { image_url: string; alt_text?: string | null }[];
   product_categories?: { categories: { id: string; title: string; slug: string } | null }[];
+  subcategory?: { id: string; slug: string; title: string } | null;
 }): Product {
   const images = dbProduct.product_images?.map(img => img.image_url) || [];
   
@@ -71,6 +72,7 @@ export function transformProduct(dbProduct: DbProduct & {
     composition,
     care: dbProduct.care_instructions || '',
     style: dbProduct.product_type || dbProduct.style || 'Classique',
+    subcategorySlug: (dbProduct as any).subcategory?.slug || (dbProduct as any).subcategory_slug || undefined,
     isNew: dbProduct.is_new || false,
     isBestseller: dbProduct.is_featured || false,
     stock: { global: globalStock },

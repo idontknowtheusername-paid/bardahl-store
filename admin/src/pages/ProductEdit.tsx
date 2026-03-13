@@ -48,6 +48,7 @@ const productSchema = z.object({
   sku: z.string().optional(),
   stock: z.number().min(0).optional(),
   product_type: z.string().min(1, 'Gamme requise'),
+  subcategory_id: z.string().nullable().optional(),
   viscosity: z.string().optional(),
   api_norm: z.string().optional(),
   acea_norm: z.string().optional(),
@@ -236,6 +237,20 @@ export default function ProductEdit() {
     enabled: !isNew,
   });
 
+  // Fetch subcategories (categories with parent_id)
+  const { data: subcategories } = useQuery({
+    queryKey: ['subcategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, slug, title, parent_id')
+        .not('parent_id', 'is', null)
+        .eq('is_active', true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   useEffect(() => {
     if (!product) return;
     if (product.product_images && product.product_images.length > 0) {
@@ -265,6 +280,7 @@ export default function ProductEdit() {
       sku: product.sku || '',
       stock: product.stock || 0,
       product_type: product.product_type || 'huiles-moteur',
+      subcategory_id: product.subcategory_id || null,
       viscosity: product.viscosity || '',
       api_norm: product.api_norm || '',
       acea_norm: product.acea_norm || '',
@@ -369,6 +385,7 @@ export default function ProductEdit() {
           sku: data.sku?.trim() || generateSKU(data.title),
           stock: data.stock || 0,
           product_type: data.product_type,
+          subcategory_id: data.subcategory_id && data.subcategory_id !== 'none' ? data.subcategory_id : null,
           viscosity: data.viscosity || null,
           api_norm: data.api_norm || null,
           acea_norm: data.acea_norm || null,
@@ -381,7 +398,7 @@ export default function ProductEdit() {
           available_cup_sizes: null,
           composition: null,
           care_instructions: null,
-          style: (data as any).style || null,
+          style: null,
         };
 
         let productId = id;
@@ -543,18 +560,22 @@ export default function ProductEdit() {
                 return (
                   <div className="space-y-2">
                     <Label>Sous-catégorie</Label>
-                    <Select value={form.watch('style') || ''} onValueChange={(v) => form.setValue('style' as any, v)}>
+                    <Select value={form.watch('subcategory_id') || ''} onValueChange={(v) => form.setValue('subcategory_id', v === 'none' ? null : v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une sous-catégorie" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Aucune</SelectItem>
-                        {subs.map((sub: any) => (
-                          <SelectItem key={sub.value} value={sub.value}>{sub.label}</SelectItem>
-                        ))}
+                        {subcategories
+                          ?.filter((sc: any) => subs.some((s: any) => s.value === sc.slug))
+                          .map((sc: any) => (
+                            <SelectItem key={sc.id} value={sc.id}>{sc.title}</SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
+                );
+              })()}
                 );
               })()}
 

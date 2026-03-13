@@ -44,7 +44,8 @@ export async function getProducts(params?: {
     .from('products')
     .select(`
       *,
-      product_images (image_url, alt_text, display_order)
+      product_images (image_url, alt_text, display_order),
+      subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('is_active', true)
     .order('created_at', { ascending: false });
@@ -79,7 +80,8 @@ export async function getProductBySlug(slug: string) {
     .from('products')
     .select(`
       *,
-      product_images (image_url, alt_text, display_order)
+      product_images (image_url, alt_text, display_order),
+      subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('slug', slug)
     .eq('is_active', true)
@@ -205,7 +207,8 @@ export async function getPopularProducts(limit: number = 6) {
     .from('products')
     .select(`
       *,
-      product_images (image_url, alt_text, display_order)
+      product_images (image_url, alt_text, display_order),
+      subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('is_active', true)
     .order('sales_count', { ascending: false, nullsLast: true })

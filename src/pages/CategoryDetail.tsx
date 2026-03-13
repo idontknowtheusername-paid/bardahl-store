@@ -9,7 +9,7 @@ import { FilterEquivalenceModal } from '@/components/product/FilterEquivalenceMo
 import { useProducts } from '@/hooks/use-supabase-api';
 import { useMemo } from 'react';
 
-const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string }> = {
+const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string; parentType?: string }> = {
   'huiles-moteur': { name: 'Huiles Moteur', description: 'Huiles moteur haute performance pour tous types de véhicules' },
   'transmission': { name: 'Huiles boîtes & Transmission', description: 'Huiles de transmission, liquides de frein et direction assistée' },
   'additifs': { name: 'Additifs & Traitements', description: 'Additifs moteur et carburant pour optimiser les performances' },
@@ -20,6 +20,17 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string }> =
   'packs-entretien': { name: 'Packs entretien', description: 'Packs complets pour l\'entretien de votre véhicule' },
   'accessoires-electronique': { name: 'Accessoires & Électronique auto', description: 'Accessoires et équipements électroniques pour votre véhicule' },
   'filtres': { name: 'Filtres', description: 'Filtres à huile, à gasoil, à air et autres filtres' },
+  'liquide-de-frein': { name: 'Liquide de frein', description: 'Liquides de frein haute performance pour votre sécurité' },
+  'epi': { name: 'EPI (Équipement de Protection)', description: 'Équipements de protection individuelle pour l\'atelier' },
+  // Subcategories for Filtres
+  'filtres-a-huile': { name: 'Filtres à huile', description: 'Filtres à huile pour tous types de moteurs', parentType: 'filtres' },
+  'filtres-a-air': { name: 'Filtres à air', description: 'Filtres à air pour une meilleure performance moteur', parentType: 'filtres' },
+  'filtres-gasoil': { name: 'Filtres gasoil', description: 'Filtres gasoil pour moteurs diesel', parentType: 'filtres' },
+  'filtres-hydrauliques': { name: 'Filtres hydrauliques', description: 'Filtres hydrauliques pour systèmes de transmission', parentType: 'filtres' },
+  // Subcategories for Additifs
+  'additif-essence': { name: 'Additif carburant Essence', description: 'Additifs pour moteurs essence', parentType: 'additifs' },
+  'additif-diesel': { name: 'Additif moteur Diesel', description: 'Additifs pour moteurs diesel', parentType: 'additifs' },
+  'additif-moteur': { name: 'Additif moteur', description: 'Additifs de traitement moteur', parentType: 'additifs' },
 };
 
 export default function CategoryDetail() {
@@ -29,7 +40,16 @@ export default function CategoryDetail() {
   const categoryInfo = slug ? PRODUCT_TYPE_INFO[slug] : null;
 
   const products = useMemo(() => {
-    return allProducts?.filter(p => p.style === slug) || [];
+    if (!allProducts || !slug) return [];
+    const info = PRODUCT_TYPE_INFO[slug];
+    if (info?.parentType) {
+      // Subcategory: match by subcategorySlug or style
+      return allProducts.filter(p => 
+        p.subcategorySlug === slug || p.style === slug
+      );
+    }
+    // Main category: match by product_type (style field holds product_type)
+    return allProducts.filter(p => p.style === slug);
   }, [allProducts, slug]);
 
   if (isLoading) {

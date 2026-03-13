@@ -546,18 +546,62 @@ export default function VehicleDetail() {
                     <p className="text-sm text-muted-foreground">Aucun plan de lubrification configuré.</p>
                   </div>
                 ) : plan && !showEditPlan ? (
-                  <div className="bg-card border border-border rounded-xl p-4 grid grid-cols-2 gap-4 text-sm">
-                    {plan.oil_type_engine && <div><span className="text-muted-foreground text-xs block">🛢️ Huile moteur</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
-                    {(plan as any).engine_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant moteur</span><span className="font-semibold">{(plan as any).engine_cleaner}</span></div>}
-                    {plan.oil_type_gearbox && <div><span className="text-muted-foreground text-xs block">⚙️ Huile boîte</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
-                    {(plan as any).gearbox_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant boîte</span><span className="font-semibold">{(plan as any).gearbox_cleaner}</span></div>}
-                    {plan.oil_quantity_engine && <div><span className="text-muted-foreground text-xs block">📏 Qté moteur</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
-                    {plan.oil_quantity_gearbox && <div><span className="text-muted-foreground text-xs block">📏 Qté boîte</span><span className="font-semibold">{plan.oil_quantity_gearbox}</span></div>}
-                    {(plan as any).coolant_type && <div><span className="text-muted-foreground text-xs block">❄️ Liquide refroidissement</span><span className="font-semibold">{(plan as any).coolant_type}</span></div>}
-                    {(plan as any).brake_fluid_type && <div><span className="text-muted-foreground text-xs block">🔴 Liquide de frein</span><span className="font-semibold">{(plan as any).brake_fluid_type}</span></div>}
-                    {(plan as any).radiator_cleaner && <div><span className="text-muted-foreground text-xs block">🧹 Nettoyant radiateur</span><span className="font-semibold">{(plan as any).radiator_cleaner}</span></div>}
-                    {plan.change_frequency_km && <div><span className="text-muted-foreground text-xs block">📅 Fréquence</span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
-                    {plan.change_frequency_months && <div><span className="text-muted-foreground text-xs block">📅 Fréquence</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Vidange moteur card */}
+                    {(plan.oil_type_engine || (plan as any).engine_cleaner || plan.oil_quantity_engine) && (
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">🛢️ Vidange moteur</h4>
+                        <div className="space-y-2 text-sm">
+                          {plan.oil_type_engine && <div className="flex justify-between"><span className="text-muted-foreground">Huile / Produit</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
+                          {plan.oil_quantity_engine && <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
+                          {(plan as any).engine_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Additif / Traitement</span><span className="font-semibold">{(plan as any).engine_cleaner}</span></div>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Vidange boîte card */}
+                    {(plan.oil_type_gearbox || (plan as any).gearbox_cleaner || plan.oil_quantity_gearbox) && (
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">⚙️ Vidange boîte</h4>
+                        <div className="space-y-2 text-sm">
+                          {plan.oil_type_gearbox && <div className="flex justify-between"><span className="text-muted-foreground">Huile / Produit</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
+                          {plan.oil_quantity_gearbox && <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_gearbox}</span></div>}
+                          {(plan as any).gearbox_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Additif / Traitement</span><span className="font-semibold">{(plan as any).gearbox_cleaner}</span></div>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Liquide refroidissement card */}
+                    {((plan as any).coolant_type || (plan as any).radiator_cleaner) && (
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">❄️ Liquide de refroidissement</h4>
+                        <div className="space-y-2 text-sm">
+                          {(plan as any).coolant_type && <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{(plan as any).coolant_type}</span></div>}
+                          {(plan as any).radiator_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Nettoyant</span><span className="font-semibold">{(plan as any).radiator_cleaner}</span></div>}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Liquide de frein card */}
+                    {(plan as any).brake_fluid_type && (
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">🔴 Liquide de frein</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{(plan as any).brake_fluid_type}</span></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fréquence card */}
+                    {(plan.change_frequency_km || plan.change_frequency_months) && (
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">📅 Fréquence de vidange</h4>
+                        <div className="space-y-2 text-sm">
+                          {plan.change_frequency_km && <div className="flex justify-between"><span className="text-muted-foreground">Kilométrage</span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
+                          {plan.change_frequency_months && <div className="flex justify-between"><span className="text-muted-foreground">Intervalle</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : null}
               </TabsContent>

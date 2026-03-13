@@ -22,6 +22,7 @@ export interface Product {
   capacity?: string;
   apiNorm?: string;
   aceaNorm?: string;
+  subcategorySlug?: string;
 }
 
 export interface ProductColor {
