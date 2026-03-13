@@ -958,6 +958,7 @@ export type Database = {
           slug: string
           stock: number | null
           style: string | null
+          subcategory_id: string | null
           title: string
           updated_at: string | null
           view_count: number | null
@@ -989,6 +990,7 @@ export type Database = {
           slug: string
           stock?: number | null
           style?: string | null
+          subcategory_id?: string | null
           title: string
           updated_at?: string | null
           view_count?: number | null
@@ -1020,13 +1022,22 @@ export type Database = {
           slug?: string
           stock?: number | null
           style?: string | null
+          subcategory_id?: string | null
           title?: string
           updated_at?: string | null
           view_count?: number | null
           viscosity?: string | null
           weight?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promo_codes: {
         Row: {
