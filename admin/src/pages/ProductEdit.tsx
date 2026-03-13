@@ -237,6 +237,20 @@ export default function ProductEdit() {
     enabled: !isNew,
   });
 
+  // Fetch subcategories (categories with parent_id)
+  const { data: subcategories } = useQuery({
+    queryKey: ['subcategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, slug, title, parent_id')
+        .not('parent_id', 'is', null)
+        .eq('is_active', true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
   useEffect(() => {
     if (!product) return;
     if (product.product_images && product.product_images.length > 0) {
