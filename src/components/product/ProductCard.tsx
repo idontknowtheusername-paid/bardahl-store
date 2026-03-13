@@ -13,9 +13,10 @@ interface ProductCardProps {
   product: Product;
   className?: string;
   style?: React.CSSProperties;
+  compact?: boolean;
 }
 
-export function ProductCard({ product, className, style }: ProductCardProps) {
+export function ProductCard({ product, className, style, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
   const { formatPrice } = useCurrency();
   const t = useTranslation();
@@ -38,33 +39,33 @@ export function ProductCard({ product, className, style }: ProductCardProps) {
   return (
     <div className={cn("group block bg-card rounded-lg overflow-hidden hover-lift", className)} style={style}>
       <Link to={`/produits/${product.slug}`}>
-        <div className="relative aspect-square overflow-hidden bg-muted">
+        <div className={cn("relative overflow-hidden bg-muted", compact ? "aspect-[4/3]" : "aspect-square")}>
           <img src={product.images[0]} alt={product.name}
-            className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
-            {product.isNew && <Badge variant="new">{t.new}</Badge>}
-            {discount > 0 && <Badge variant="sale">-{discount}%</Badge>}
-            {product.isBestseller && <Badge variant="bestseller">{t.bestseller}</Badge>}
+            className={cn("w-full h-full object-contain transition-transform duration-500 group-hover:scale-105", compact ? "p-1" : "p-2")} loading="lazy" />
+          <div className={cn("absolute flex flex-col gap-2", compact ? "top-1.5 left-1.5" : "top-3 left-3")}>
+            {product.isNew && <Badge variant="new" className={compact ? "text-[10px] px-1.5 py-0.5" : ""}>{t.new}</Badge>}
+            {discount > 0 && <Badge variant="sale" className={compact ? "text-[10px] px-1.5 py-0.5" : ""}>-{discount}%</Badge>}
+            {product.isBestseller && <Badge variant="bestseller" className={compact ? "text-[10px] px-1.5 py-0.5" : ""}>{t.bestseller}</Badge>}
           </div>
-          <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Button variant="default" size="sm" className={cn("w-full gap-2 transition-transform", isAdding && "animate-cart-bounce")} onClick={handleAddToCart}>
-              <ShoppingBag className="h-4 w-4" />
+          <div className={cn("absolute left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300", compact ? "bottom-1.5" : "bottom-3")}>
+            <Button variant="default" size={compact ? "sm" : "sm"} className={cn("w-full gap-2 transition-transform", compact && "text-xs h-7", isAdding && "animate-cart-bounce")} onClick={handleAddToCart}>
+              <ShoppingBag className={compact ? "h-3 w-3" : "h-4 w-4"} />
               {t.addToCart}
             </Button>
           </div>
         </div>
       </Link>
-      <div className="p-4">
+      <div className={compact ? "p-2" : "p-4"}>
         <Link to={`/produits/${product.slug}`}>
-          <h3 className="font-medium text-sm md:text-base truncate group-hover:text-primary transition-colors">{product.name}</h3>
+          <h3 className={cn("font-medium truncate group-hover:text-primary transition-colors", compact ? "text-xs" : "text-sm md:text-base")}>{product.name}</h3>
         </Link>
         {product.composition && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{product.composition}</p>
+          <p className={cn("text-muted-foreground mt-1 truncate", compact ? "text-[10px]" : "text-xs")}>{product.composition}</p>
         )}
-        <div className="flex items-center gap-2 mt-2">
-          <span className="font-bold text-primary">{formatPrice(product.price)}</span>
+        <div className={cn("flex items-center gap-2", compact ? "mt-1" : "mt-2")}>
+          <span className={cn("font-bold text-primary", compact ? "text-xs" : "")}>{formatPrice(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
+            <span className={cn("text-muted-foreground line-through", compact ? "text-[10px]" : "text-sm")}>{formatPrice(product.originalPrice)}</span>
           )}
         </div>
       </div>

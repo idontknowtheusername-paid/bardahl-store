@@ -24,10 +24,9 @@ export function Header() {
   const navigate = useNavigate();
 
   const productCategories = [
-    { label: 'Huiles moteur', href: '/categories/huiles-moteur' },
-    { label: 'Huiles boîtes & transmission', href: '/categories/transmission' },
+    { label: 'Huile moteur', href: '/categories/huiles-moteur' },
     {
-      label: 'Filtres',
+      label: 'Filtres voiture',
       href: '/categories/filtres',
       subcategories: [
         { label: 'Filtres à huile', href: '/categories/filtres-a-huile' },
@@ -45,14 +44,15 @@ export function Header() {
         { label: 'Additif moteur', href: '/categories/additif-moteur' },
       ],
     },
+    { label: 'Liquide de refroidissement radiateur', href: '/categories/liquides' },
     { label: 'Liquide de frein', href: '/categories/liquide-de-frein' },
-    { label: 'Liquide de refroidissement', href: '/categories/liquides' },
-    { label: 'EPI', href: '/categories/epi' },
+    { label: 'Huile boîte de vitesse & transmission', href: '/categories/transmission' },
+    { label: 'Entretien & Nettoyage auto', href: '/categories/entretien' },
     { label: 'Purifiant & désodorisant', href: '/categories/purifiant-desodorisant' },
-    { label: 'Entretien & nettoyage', href: '/categories/entretien' },
-    { label: 'Spécial atelier', href: '/categories/special-atelier' },
-    { label: 'Packs entretien', href: '/categories/packs-entretien' },
-    { label: 'Accessoires & Électronique', href: '/categories/accessoires-electronique' },
+    { label: 'Packs entretien voiture', href: '/categories/packs-entretien' },
+    { label: 'Produits professionnels garage & atelier', href: '/categories/special-atelier' },
+    { label: 'Équipements de protection (EPI)', href: '/categories/epi' },
+    { label: 'Accessoires & électronique', href: '/categories/accessoires-electronique' },
   ];
 
   const navLinks = [
@@ -133,8 +133,8 @@ export function Header() {
                           </div>
                           {mobileSubOpen === 'products' && (
                             <div className="pl-4 flex flex-col gap-0.5 animate-in slide-in-from-top-2">
-                              {productCategories.map(cat => (
-                                <div key={cat.href + cat.label}>
+                              {productCategories.map((cat, idx) => (
+                                <div key={`cat-${idx}-${cat.label}`}>
                                   {cat.subcategories ? (
                                     <>
                                       <button
@@ -150,8 +150,8 @@ export function Header() {
                                             className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors font-medium">
                                             Tous les {cat.label.toLowerCase()}
                                           </Link>
-                                          {cat.subcategories.map(sub => (
-                                            <Link key={sub.href} to={sub.href} onClick={() => setIsMenuOpen(false)}
+                                          {cat.subcategories.map((sub, subIdx) => (
+                                            <Link key={`sub-${idx}-${subIdx}`} to={sub.href} onClick={() => setIsMenuOpen(false)}
                                               className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors">
                                               {sub.label}
                                             </Link>
@@ -280,7 +280,7 @@ export function Header() {
               </Sheet>
 
               {/* Cart with label on desktop */}
-              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent lg:h-auto lg:w-auto lg:px-2 lg:py-1"
+              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent h-auto w-auto px-2 py-1"
                 onClick={() => setIsCartOpen(true)}>
                 <div className="flex flex-col items-center gap-0.5">
                   <div className="relative">
@@ -291,16 +291,16 @@ export function Header() {
                       </span>
                     )}
                   </div>
-                  <span className="hidden lg:block text-[10px] font-medium text-secondary-foreground/70">Panier</span>
+                  <span className="text-[10px] font-medium text-secondary-foreground/70">Panier</span>
                 </div>
               </Button>
 
               {/* Profile with label on desktop */}
-              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent lg:h-auto lg:w-auto lg:px-2 lg:py-1" asChild>
+              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent h-auto w-auto px-2 py-1" asChild>
                 <Link to="/mon-espace">
                   <div className="flex flex-col items-center gap-0.5">
                     <User className="h-6 w-6" />
-                    <span className="hidden lg:block text-[10px] font-medium text-secondary-foreground/70">Mon espace</span>
+                    <span className="text-[10px] font-medium text-secondary-foreground/70">Mon espace</span>
                   </div>
                 </Link>
               </Button>

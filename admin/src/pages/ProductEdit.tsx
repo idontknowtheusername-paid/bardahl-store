@@ -56,6 +56,7 @@ const productSchema = z.object({
   is_active: z.boolean(),
   is_new: z.boolean(),
   is_featured: z.boolean(),
+  featured_order: z.number().nullable().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -269,6 +270,7 @@ export default function ProductEdit() {
       product_type: 'huiles-moteur',
       viscosity: '', api_norm: '', acea_norm: '', capacity: '',
       is_active: true, is_new: false, is_featured: false,
+      featured_order: null,
     },
     values: product ? {
       title: product.title,
@@ -288,6 +290,7 @@ export default function ProductEdit() {
       is_active: product.is_active,
       is_new: product.is_new,
       is_featured: product.is_featured,
+      featured_order: product.featured_order || null,
     } : undefined,
   });
 
@@ -393,6 +396,7 @@ export default function ProductEdit() {
           is_active: data.is_active,
           is_new: data.is_new,
           is_featured: data.is_featured,
+          featured_order: data.featured_order,
           available_colors: [],
           available_sizes: null,
           available_cup_sizes: null,
@@ -717,6 +721,22 @@ export default function ProductEdit() {
                   <p className="text-sm text-muted-foreground">Affiché sur la page d'accueil</p>
                 </div>
                 <Switch checked={form.watch('is_featured')} onCheckedChange={(checked) => form.setValue('is_featured', checked)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="featured_order">Ordre d'affichage (Produits populaires)</Label>
+                <Input
+                  id="featured_order"
+                  type="number"
+                  min="1"
+                  placeholder="Ex: 1, 2, 3... (vide = automatique)"
+                  {...form.register('featured_order', {
+                    setValueAs: (v) => v === '' || v === null ? null : parseInt(v)
+                  })}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Définissez l'ordre d'affichage dans le carousel des produits populaires.
+                  Les numéros plus petits apparaissent en premier. Laissez vide pour un tri automatique.
+                </p>
               </div>
             </CardContent>
           </Card>

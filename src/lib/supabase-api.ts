@@ -211,6 +211,7 @@ export async function getPopularProducts(limit: number = 6) {
       subcategory:categories!subcategory_id (id, slug, title)
     `)
     .eq('is_active', true)
+    .order('featured_order', { ascending: true, nullsLast: true }) // Manual featured order first
     .order('sales_count', { ascending: false, nullsLast: true })
     .order('view_count', { ascending: false, nullsLast: true })
     .order('click_count', { ascending: false, nullsLast: true })
