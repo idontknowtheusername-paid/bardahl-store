@@ -10,6 +10,7 @@ type DbProduct = Database['public']['Tables']['products']['Row'];
 export function transformProduct(dbProduct: DbProduct & { 
   product_images?: { image_url: string; alt_text?: string | null }[];
   product_categories?: { categories: { id: string; title: string; slug: string } | null }[];
+  subcategory?: { id: string; slug: string; title: string } | null;
 }): Product {
   const images = dbProduct.product_images?.map(img => img.image_url) || [];
   
