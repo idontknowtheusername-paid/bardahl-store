@@ -197,6 +197,11 @@
   100% { background-position: -200% 0; }
 }
 
+@keyframes indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
