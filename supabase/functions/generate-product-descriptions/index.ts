@@ -13,7 +13,6 @@ interface Product {
   api_norm?: string;
   acea_norm?: string;
   capacity?: string;
-  category?: string;
 }
 
 async function generateDescription(product: Product): Promise<{ short: string; long: string }> {
@@ -88,7 +87,7 @@ Deno.serve(async (req) => {
     // Récupérer les produits sans description
     const { data: products, error: fetchError } = await supabase
       .from('products')
-      .select('id, title, product_type, viscosity, api_norm, acea_norm, capacity, category')
+      .select('id, title, product_type, viscosity, api_norm, acea_norm, capacity')
       .or('short_description.is.null,description.is.null')
       .eq('is_active', true)
       .limit(10); // Traiter 10 produits à la fois pour éviter les timeouts
