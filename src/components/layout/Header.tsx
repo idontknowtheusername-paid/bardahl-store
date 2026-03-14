@@ -106,7 +106,7 @@ export function Header() {
     <header className="sticky top-0 z-50">
       <SeasonalBanner />
 
-      <div className="bg-secondary text-secondary-foreground border-b border-secondary/20">
+      <div className="bg-white text-gray-900 border-b border-gray-200">
         <div className="container">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Left side: Menu + Search (mobile only) */}
@@ -114,7 +114,7 @@ export function Header() {
               {/* Mobile Menu */}
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
+                  <Button variant="ghost" size="icon" className="lg:hidden text-gray-900 hover:text-orange-500">
                     <Menu className="h-7 w-7" />
                   </Button>
                 </SheetTrigger>
@@ -202,7 +202,7 @@ export function Header() {
               {/* Search - mobile only, next to menu */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
+                  <Button variant="ghost" size="icon" className="lg:hidden text-gray-900 hover:text-orange-500">
                     <Search className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
@@ -284,7 +284,7 @@ export function Header() {
                   onMouseLeave={() => hasSubmenu && setShowProductsMenu(false)}
                 >
                   <Link to={href}
-                    className="text-sm xl:text-base font-semibold uppercase tracking-wide text-secondary-foreground/80 hover:text-accent transition-colors whitespace-nowrap flex items-center gap-1">
+                    className="text-sm xl:text-base font-semibold uppercase tracking-wide text-gray-700 hover:text-orange-500 transition-colors whitespace-nowrap flex items-center gap-1">
                     {label}
                     {hasSubmenu && <ChevronDown className="h-3.5 w-3.5" />}
                   </Link>
@@ -321,7 +321,7 @@ export function Header() {
               {/* Search - desktop only */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden lg:flex text-secondary-foreground hover:text-accent">
+                  <Button variant="ghost" size="icon" className="hidden lg:flex text-gray-900 hover:text-orange-500">
                     <Search className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
@@ -390,27 +390,27 @@ export function Header() {
               </Sheet>
 
               {/* Cart with label on desktop */}
-              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent h-auto w-auto px-1 py-1"
+              <Button variant="ghost" size="icon" className="relative text-gray-900 hover:text-orange-500 h-auto w-auto px-1 py-1"
                 onClick={() => setIsCartOpen(true)}>
                 <div className="flex flex-col items-center gap-0.5">
                   <div className="relative">
                     <ShoppingBag className="h-6 w-6" />
                     {totalItems > 0 && (
-                      <span className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 rounded-full bg-accent text-accent-foreground text-[10px] md:text-xs flex items-center justify-center font-bold animate-scale-in">
+                      <span className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 rounded-full bg-orange-500 text-white text-[10px] md:text-xs flex items-center justify-center font-bold animate-scale-in">
                         {totalItems}
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] font-medium text-secondary-foreground/70">Panier</span>
+                  <span className="text-[10px] font-medium text-gray-600">Panier</span>
                 </div>
               </Button>
 
               {/* Profile with label on desktop */}
-              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent h-auto w-auto px-1 py-1" asChild>
+              <Button variant="ghost" size="icon" className="text-gray-900 hover:text-orange-500 h-auto w-auto px-1 py-1" asChild>
                 <Link to="/mon-espace">
                   <div className="flex flex-col items-center gap-0.5">
                     <User className="h-6 w-6" />
-                    <span className="text-[10px] font-medium text-secondary-foreground/70">Mon espace</span>
+                    <span className="text-[10px] font-medium text-gray-600">Mon espace</span>
                   </div>
                 </Link>
               </Button>
