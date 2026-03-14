@@ -28,9 +28,9 @@ const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string; par
   'filtres-gasoil': { name: 'Filtres gasoil', description: 'Filtres gasoil pour moteurs diesel', parentType: 'filtres' },
   'filtres-hydrauliques': { name: 'Filtres hydrauliques', description: 'Filtres hydrauliques pour systèmes de transmission', parentType: 'filtres' },
   // Subcategories for Additifs
-  'additif-essence': { name: 'Additif carburant Essence', description: 'Additifs pour moteurs essence', parentType: 'additifs' },
-  'additif-diesel': { name: 'Additif moteur Diesel', description: 'Additifs pour moteurs diesel', parentType: 'additifs' },
-  'additif-moteur': { name: 'Additif moteur', description: 'Additifs de traitement moteur', parentType: 'additifs' },
+  'additifs-carburant': { name: 'Additifs carburant', description: 'Additifs pour carburant essence et diesel', parentType: 'additifs' },
+  'additifs-moteur': { name: 'Additifs moteur', description: 'Additifs de traitement moteur', parentType: 'additifs' },
+  'autres-additifs': { name: 'Autres additifs & traitements', description: 'Autres additifs et traitements spécialisés', parentType: 'additifs' },
 };
 
 export default function CategoryDetail() {

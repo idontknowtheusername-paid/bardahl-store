@@ -52,9 +52,9 @@ export function Header() {
       label: 'Additifs & Traitements',
       href: '/categories/additifs',
       subcategories: [
-        { label: 'Additif carburant Essence', href: '/categories/additif-essence' },
-        { label: 'Additif moteur Diesel', href: '/categories/additif-diesel' },
-        { label: 'Additif moteur', href: '/categories/additif-moteur' },
+        { label: 'Additifs carburant', href: '/categories/additifs-carburant' },
+        { label: 'Additifs moteur', href: '/categories/additifs-moteur' },
+        { label: 'Autres additifs & traitements', href: '/categories/autres-additifs' },
       ],
     },
     { label: 'Liquide de refroidissement radiateur', href: '/categories/liquides' },
@@ -138,25 +138,26 @@ export function Header() {
                               <ChevronDown className={`h-4 w-4 transition-transform ${mobileSubOpen === 'products' ? 'rotate-180' : ''}`} />
                             </button>
                           </div>
-                          {mobileSubOpen === 'products' && (
-                            <div className="pl-4 flex flex-col gap-0.5 animate-in slide-in-from-top-2">
+                          {(mobileSubOpen === 'products' || productCategories.some(cat => mobileSubOpen === cat.label)) && (
+                            <div className="flex flex-col gap-0.5 animate-in slide-in-from-top-2">
                               {productCategories.map((cat, idx) => (
                                 <div key={`cat-${idx}-${cat.label}`}>
                                   {cat.subcategories ? (
                                     <>
-                                      <button
-                                        onClick={() => setMobileSubOpen(mobileSubOpen === cat.label ? 'products' : cat.label)}
-                                        className="w-full flex items-center justify-between px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors"
-                                      >
-                                        {cat.label}
-                                        <ChevronDown className={`h-3 w-3 transition-transform ${mobileSubOpen === cat.label ? 'rotate-180' : ''}`} />
-                                      </button>
+                                      <div className="flex items-center">
+                                        <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
+                                          className="flex-1 block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
+                                          {cat.label}
+                                        </Link>
+                                        <button
+                                          onClick={() => setMobileSubOpen(mobileSubOpen === cat.label ? 'products' : cat.label)}
+                                          className="p-2 hover:bg-primary/10 rounded transition-colors flex-shrink-0"
+                                        >
+                                          <ChevronDown className={`h-3 w-3 transition-transform ${mobileSubOpen === cat.label ? 'rotate-180' : ''}`} />
+                                        </button>
+                                      </div>
                                       {mobileSubOpen === cat.label && (
-                                        <div className="pl-4 flex flex-col gap-0.5">
-                                          <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
-                                            className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors font-medium">
-                                            Tous les {cat.label.toLowerCase()}
-                                          </Link>
+                                        <div className="pl-3 flex flex-col gap-0.5">
                                           {cat.subcategories.map((sub, subIdx) => (
                                             <Link key={`sub-${idx}-${subIdx}`} to={sub.href} onClick={() => setIsMenuOpen(false)}
                                               className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors">
@@ -168,7 +169,7 @@ export function Header() {
                                     </>
                                   ) : (
                                     <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
-                                      className="px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
+                                        className="block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
                                       {cat.label}
                                     </Link>
                                   )}
@@ -198,7 +199,7 @@ export function Header() {
             </Sheet>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1">
+            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
               <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
               <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
               <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>

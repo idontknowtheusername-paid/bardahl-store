@@ -83,7 +83,7 @@ export function PopularProductsCarousel({
         <Carousel opts={{ align: 'start', loop: true }} plugins={[autoplayPlugin]} className="w-full">
           <CarouselContent className={compact ? '-ml-2 md:-ml-3' : '-ml-4 md:-ml-6'}>
             {displayedProducts.map((product, index) => (
-              <CarouselItem key={product.id} className={`${compact ? 'pl-2 md:pl-3 basis-[40%] sm:basis-[35%] md:basis-[28%] lg:basis-1/5' : 'pl-4 md:pl-6 basis-[45%] sm:basis-[40%] md:basis-1/3 lg:basis-1/4'}`}>
+              <CarouselItem key={product.id} className={`${compact ? 'pl-2 md:pl-3 basis-[45%] sm:basis-[38%] md:basis-[30%] lg:basis-1/4' : 'pl-4 md:pl-6 basis-[45%] sm:basis-[40%] md:basis-1/3 lg:basis-1/4'}`}>
                 <ProductCard product={product} compact={compact} className="animate-slide-up"
                   style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties} />
               </CarouselItem>

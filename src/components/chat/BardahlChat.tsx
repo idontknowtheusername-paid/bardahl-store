@@ -19,8 +19,10 @@ interface SavedConversation {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
 const HIDDEN_PATHS = ['/panier', '/checkout'];
 const CONSENT_KEY = 'bardahl-chat-consent';
+const CONSENT_EXPIRY_HOURS = 24;
 const HISTORY_KEY = 'temi-chat-history';
 const MAX_CONVERSATIONS = 20;
+const WIDGETS_VISIBILITY_KEY = 'floating-widgets-visible';
 
 function getSessionId() {
   let sid = sessionStorage.getItem('bardahl-chat-session');
@@ -31,12 +33,42 @@ function getSessionId() {
   return sid;
 }
 
+function getWidgetsVisibility(): boolean {
+  const stored = localStorage.getItem(WIDGETS_VISIBILITY_KEY);
+  return stored === null ? true : stored === 'true';
+}
+
 function hasConsent(): boolean {
-  return localStorage.getItem(CONSENT_KEY) === 'true';
+  const stored = localStorage.getItem(CONSENT_KEY);
+  if (!stored) return false;
+
+  try {
+    const { timestamp } = JSON.parse(stored);
+    const now = Date.now();
+    const expiryTime = CONSENT_EXPIRY_HOURS * 60 * 60 * 1000; // 24h en millisecondes
+
+    // Vérifie si le consentement a expiré
+    if (now - timestamp > expiryTime) {
+      localStorage.removeItem(CONSENT_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    // Si le format est invalide, on supprime et redemande
+    localStorage.removeItem(CONSENT_KEY);
+    return false;
+  }
 }
 
 function setConsent(value: boolean) {
-  localStorage.setItem(CONSENT_KEY, value.toString());
+  if (value) {
+    localStorage.setItem(CONSENT_KEY, JSON.stringify({
+      timestamp: Date.now(),
+      accepted: true
+    }));
+  } else {
+    localStorage.removeItem(CONSENT_KEY);
+  }
 }
 
 function loadHistory(): SavedConversation[] {
@@ -109,6 +141,7 @@ export function BardahlChat() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showConsent, setShowConsent] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [widgetsVisible, setWidgetsVisible] = useState(getWidgetsVisibility);
   const [messages, setMessages] = useState<Msg[]>([WELCOME_MSG]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -117,6 +150,18 @@ export function BardahlChat() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
+
+  // Listen to widgets visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = (e: CustomEvent) => {
+      setWidgetsVisible(e.detail);
+      if (!e.detail && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('widgetsVisibilityChange', handleVisibilityChange as EventListener);
+    return () => window.removeEventListener('widgetsVisibilityChange', handleVisibilityChange as EventListener);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && !hasConsent()) setShowConsent(true);
@@ -214,8 +259,8 @@ export function BardahlChat() {
 
   const isHidden = HIDDEN_PATHS.some(p => pathname.startsWith(p));
 
-  if (!isOpen || isHidden) {
-    if (isHidden) return null;
+  if (!isOpen || isHidden || !widgetsVisible) {
+    if (isHidden || !widgetsVisible) return null;
     return (
       <button onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-4 md:right-6 z-50 h-10 px-2.5 pr-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:scale-105 active:scale-95 transition-transform flex items-center gap-1.5 ring-1 ring-primary/20 animate-slide-in-right"

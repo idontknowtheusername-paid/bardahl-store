@@ -34,43 +34,28 @@ export function HeroSection() {
               Entretien automobile & solutions moteur
             </motion.div>
 
-            {/* Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight mb-2"
-            >
-              Protéger et améliorer la performance
-              <br />
-              <motion.span
-                className="text-accent inline-block mt-0.5"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                de votre moteur
-              </motion.span>
-            </motion.h1>
-
-            {/* Two mentions */}
+            {/* Three mentions - 2 lines on desktop */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 justify-center items-center mb-2"
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col gap-1.5 justify-center items-center mb-0"
             >
+              {/* First line: 2 items on desktop, stacked on mobile */}
+              <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 justify-center items-center">
+                <div className="flex items-center gap-1.5 text-white/90 text-xs sm:text-sm">
+                  <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent flex-shrink-0" />
+                  <span>Produits certifiés</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-white/90 text-xs sm:text-sm">
+                  <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent flex-shrink-0" />
+                  <span>Suivi d'entretien sur mobile</span>
+                </div>
+              </div>
+              {/* Second line: 1 item centered */}
               <div className="flex items-center gap-1.5 text-white/90 text-xs sm:text-sm">
                 <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent flex-shrink-0" />
                 <span>Conseillers auto & assistance WhatsApp</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-white/90 text-xs sm:text-sm">
-                <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent flex-shrink-0" />
-                <span>Suivi d'entretien sur mobile</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-white/90 text-xs sm:text-sm">
-                <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent flex-shrink-0" />
-                <span>Produits certifiés XTS</span>
               </div>
             </motion.div>
           </div>
@@ -81,7 +66,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="relative z-10 overflow-hidden"
+          className="relative z-10 overflow-hidden mt-1 md:mt-1.5"
         >
           <PopularProductsCarousel
             title="Produits les plus populaires"

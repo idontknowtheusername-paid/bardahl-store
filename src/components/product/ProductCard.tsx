@@ -37,8 +37,8 @@ export function ProductCard({ product, className, style, compact = false }: Prod
   };
 
   return (
-    <div className={cn("group block bg-card rounded-lg overflow-hidden hover-lift", className)} style={style}>
-      <Link to={`/produits/${product.slug}`}>
+    <div className={cn("group block bg-card rounded-lg overflow-hidden hover-lift h-full flex flex-col", className)} style={style}>
+      <Link to={`/produits/${product.slug}`} className="flex-shrink-0">
         <div className={cn("relative overflow-hidden bg-muted", compact ? "aspect-[4/3]" : "aspect-square")}>
           <img src={product.images[0]} alt={product.name}
             className={cn("w-full h-full object-contain transition-transform duration-500 group-hover:scale-105", compact ? "p-1" : "p-2")} loading="lazy" />
@@ -55,13 +55,15 @@ export function ProductCard({ product, className, style, compact = false }: Prod
           </div>
         </div>
       </Link>
-      <div className={compact ? "p-2" : "p-4"}>
-        <Link to={`/produits/${product.slug}`}>
-          <h3 className={cn("font-medium truncate group-hover:text-primary transition-colors", compact ? "text-xs" : "text-sm md:text-base")}>{product.name}</h3>
-        </Link>
-        {product.composition && (
-          <p className={cn("text-muted-foreground mt-1 truncate", compact ? "text-[10px]" : "text-xs")}>{product.composition}</p>
-        )}
+      <div className={cn("flex-1 flex flex-col justify-between", compact ? "p-2" : "p-4")}>
+        <div>
+          <Link to={`/produits/${product.slug}`}>
+            <h3 className={cn("font-medium line-clamp-2 group-hover:text-primary transition-colors", compact ? "text-xs" : "text-sm md:text-base")}>{product.name}</h3>
+          </Link>
+          {product.composition && (
+            <p className={cn("text-muted-foreground mt-1 line-clamp-1", compact ? "text-[10px]" : "text-xs")}>{product.composition}</p>
+          )}
+        </div>
         <div className={cn("flex items-center gap-2", compact ? "mt-1" : "mt-2")}>
           <span className={cn("font-bold text-primary", compact ? "text-xs" : "")}>{formatPrice(product.price)}</span>
           {product.originalPrice && (
