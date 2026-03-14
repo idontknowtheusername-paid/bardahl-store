@@ -199,7 +199,7 @@ export function Header() {
             </Sheet>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pointer-events-auto lg:static lg:translate-x-0">
+            <Link to="/" className="flex items-center gap-1 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
               <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
               <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
               <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>
@@ -246,7 +246,7 @@ export function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-0 sm:gap-1">
+            <div className="flex items-center gap-1">
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">
