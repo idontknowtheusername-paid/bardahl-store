@@ -1,27 +1,29 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
-import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw, Thermometer, Wind, Car, Disc3, Plug, Wrench, Droplets, Shield, ChevronDown } from 'lucide-react';
+import { Stethoscope, ArrowRight, Fuel, Gauge, Flame, Activity, Zap, Volume2, Loader2, ShoppingCart, RotateCcw, Thermometer, Wind, Car, Disc3, Plug, Wrench, Droplets, Shield, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import DiagnosticTTS from '@/components/diagnostic/DiagnosticTTS';
 import { useProducts } from '@/hooks/use-supabase-api';
 import { ProductCard } from '@/components/product/ProductCard';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
 } from '@/components/ui/carousel';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bardahl-assistant`;
+
+const PROGRESS_MESSAGES = [
+  '🔍 Analyse des symptômes...',
+  '🧠 Consultation de la base de données...',
+  '🔧 Identification des causes probables...',
+  '💡 Recherche des solutions adaptées...',
+  '📦 Sélection des produits recommandés...',
+];
 
 const symptomCategories = [
   {
@@ -87,10 +89,8 @@ const symptomCategories = [
   },
 ];
 
-// Flatten all symptoms for lookup
 const allSymptoms = symptomCategories.flatMap(c => c.symptoms);
 
-// Extract product slugs from AI response markdown links like (/produits/slug)
 function extractProductSlugs(text: string): string[] {
   const regex = /\/produits\/([\w-]+)/g;
   const slugs: string[] = [];
@@ -99,6 +99,47 @@ function extractProductSlugs(text: string): string[] {
     if (!slugs.includes(match[1])) slugs.push(match[1]);
   }
   return slugs;
+}
+
+// Notification sound using Web Audio API
+function playDingSound() {
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.5);
+  } catch {}
+}
+
+function DiagnosticSkeleton() {
+  return (
+    <div className="space-y-4 animate-in fade-in duration-500">
+      <Skeleton className="h-6 w-3/4" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+      <Skeleton className="h-4 w-4/5" />
+      <div className="h-3" />
+      <Skeleton className="h-5 w-1/2" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-11/12" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+      <div className="h-3" />
+      <Skeleton className="h-5 w-2/5" />
+      <div className="flex gap-3">
+        <Skeleton className="h-24 w-32 rounded-lg" />
+        <Skeleton className="h-24 w-32 rounded-lg" />
+      </div>
+    </div>
+  );
 }
 
 export default function Diagnostic() {
@@ -110,11 +151,38 @@ export default function Diagnostic() {
   const [isLoading, setIsLoading] = useState(false);
   const [diagnosticResult, setDiagnosticResult] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [progressIdx, setProgressIdx] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const resultRef = useRef<HTMLDivElement>(null);
+  const prevLoadingRef = useRef(false);
 
   const { data: allProducts } = useProducts({ limit: 200 });
 
   const selectedSymptom = selectedSymptoms[0] || null;
+
+  // Progress messages rotation
+  useEffect(() => {
+    if (!isLoading) return;
+    const interval = setInterval(() => {
+      setProgressIdx(prev => (prev + 1) % PROGRESS_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  // Elapsed time counter
+  useEffect(() => {
+    if (!isLoading) { setElapsedSeconds(0); return; }
+    const interval = setInterval(() => setElapsedSeconds(prev => prev + 1), 1000);
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  // Play ding when loading finishes
+  useEffect(() => {
+    if (prevLoadingRef.current && !isLoading && diagnosticResult) {
+      playDingSound();
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading, diagnosticResult]);
 
   const recommendedProducts = useMemo(() => {
     if (!diagnosticResult || !allProducts?.length) return [];
@@ -125,9 +193,7 @@ export default function Diagnostic() {
   }, [diagnosticResult, allProducts]);
 
   const toggleSymptom = (id: string) => {
-    setSelectedSymptoms(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    setSelectedSymptoms(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
   };
 
   const handleStartDiagnostic = () => {
@@ -141,6 +207,7 @@ export default function Diagnostic() {
     setIsLoading(true);
     setError('');
     setDiagnosticResult('');
+    setProgressIdx(0);
 
     const symptomDetails = selectedSymptoms.map(id => {
       const s = allSymptoms.find(x => x.id === id);
@@ -189,7 +256,6 @@ Utilise des emojis et formate bien la réponse.`;
         const { done, value } = await reader.read();
         if (done) break;
         buf += decoder.decode(value, { stream: true });
-
         let idx: number;
         while ((idx = buf.indexOf('\n')) !== -1) {
           let line = buf.slice(0, idx);
@@ -201,14 +267,8 @@ Utilise des emojis et formate bien la réponse.`;
           try {
             const p = JSON.parse(json);
             const c = p.choices?.[0]?.delta?.content;
-            if (c) {
-              fullContent += c;
-              setDiagnosticResult(fullContent);
-            }
-          } catch {
-            buf = line + '\n' + buf;
-            break;
-          }
+            if (c) { fullContent += c; setDiagnosticResult(fullContent); }
+          } catch { buf = line + '\n' + buf; break; }
         }
       }
     } catch (e: any) {
@@ -219,43 +279,26 @@ Utilise des emojis et formate bien la réponse.`;
   };
 
   const resetDiagnostic = () => {
-    setStep(1);
-    setSelectedSymptoms([]);
-    setFuelType('');
-    setMileage('');
-    setYear('');
-    setDiagnosticResult('');
-    setError('');
+    setStep(1); setSelectedSymptoms([]); setFuelType(''); setMileage(''); setYear(''); setDiagnosticResult(''); setError('');
   };
 
   return (
     <>
-      <SEOHead
-        title="Diagnostic Moteur Rapide | Autopassion BJ"
-        description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées."
-        keywords="diagnostic moteur, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin"
-        url="/diagnostic"
-      />
+      <SEOHead title="Diagnostic Moteur Rapide | Autopassion BJ" description="Diagnostiquez votre voiture en 1 minute. Sélectionnez les symptômes et découvrez les solutions recommandées." keywords="diagnostic moteur, problème voiture, symptômes moteur, autopassion, bénin, huile moteur Bénin" url="/diagnostic" />
 
       <div className="min-h-[70vh] bg-muted/30">
-        {/* Hero */}
         <section className="bg-secondary text-secondary-foreground py-12 md:py-16">
           <div className="container text-center">
             <div className="inline-flex items-center gap-2 bg-primary/15 text-primary text-sm font-bold px-4 py-2 rounded-full mb-4">
-              <Stethoscope className="h-4 w-4" />
-              Diagnostic moteur
+              <Stethoscope className="h-4 w-4" /> Diagnostic moteur
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
-              Diagnostiquez votre voiture en 1 minute
-            </h1>
-            <p className="text-secondary-foreground/70 text-lg max-w-lg mx-auto">
-              Sélectionnez le(s) symptôme(s) de votre voiture et découvrez les solutions recommandées.
-            </p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">Diagnostiquez votre voiture en 1 minute</h1>
+            <p className="text-secondary-foreground/70 text-lg max-w-lg mx-auto">Sélectionnez le(s) symptôme(s) de votre voiture et découvrez les solutions recommandées.</p>
           </div>
         </section>
 
         <div className="container py-12">
-          {/* Step 1: Symptom selection by category */}
+          {/* Step 1 */}
           {step === 1 && (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl font-bold text-center mb-2">Quel(s) problème(s) a votre voiture ?</h2>
@@ -263,21 +306,12 @@ Utilise des emojis et formate bien la réponse.`;
               <Accordion type="single" collapsible className="space-y-3">
                 {symptomCategories.map((cat) => (
                   <AccordionItem key={cat.label} value={cat.label} className="border border-border rounded-xl overflow-hidden bg-card">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                      {cat.label}
-                    </AccordionTrigger>
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 text-sm font-bold uppercase tracking-wider text-muted-foreground">{cat.label}</AccordionTrigger>
                     <AccordionContent className="px-4 pb-4">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
                         {cat.symptoms.map((symptom) => (
-                          <button
-                            key={symptom.id}
-                            onClick={() => toggleSymptom(symptom.id)}
-                            className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${
-                              selectedSymptoms.includes(symptom.id)
-                                ? 'border-primary bg-primary/5 shadow-md'
-                                : 'border-border bg-background hover:border-primary/30'
-                            }`}
-                          >
+                          <button key={symptom.id} onClick={() => toggleSymptom(symptom.id)}
+                            className={`p-4 rounded-xl border-2 transition-all text-center hover-lift ${selectedSymptoms.includes(symptom.id) ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-background hover:border-primary/30'}`}>
                             <symptom.icon className={`h-7 w-7 mx-auto mb-2 ${selectedSymptoms.includes(symptom.id) ? 'text-primary' : 'text-muted-foreground'}`} />
                             <h4 className="font-bold text-sm mb-1">{symptom.label}</h4>
                             <p className="text-xs text-muted-foreground leading-tight">{symptom.description}</p>
@@ -298,7 +332,7 @@ Utilise des emojis et formate bien la réponse.`;
             </div>
           )}
 
-          {/* Step 2: Vehicle info */}
+          {/* Step 2 */}
           {step === 2 && (
             <div className="max-w-md mx-auto">
               <h2 className="text-xl font-bold text-center mb-2">Quelques informations sur votre véhicule</h2>
@@ -310,13 +344,8 @@ Utilise des emojis et formate bien la réponse.`;
                   <label className="block text-sm font-semibold mb-2">Type de carburant</label>
                   <div className="grid grid-cols-2 gap-3">
                     {['Diesel', 'Essence'].map(type => (
-                      <button
-                        key={type}
-                        onClick={() => setFuelType(type)}
-                        className={`p-3 rounded-lg border-2 font-semibold text-sm transition-all ${
-                          fuelType === type ? 'border-primary bg-primary/5 text-primary' : 'border-border hover:border-primary/30'
-                        }`}
-                      >
+                      <button key={type} onClick={() => setFuelType(type)}
+                        className={`p-3 rounded-lg border-2 font-semibold text-sm transition-all ${fuelType === type ? 'border-primary bg-primary/5 text-primary' : 'border-border hover:border-primary/30'}`}>
                         {type}
                       </button>
                     ))}
@@ -324,23 +353,11 @@ Utilise des emojis et formate bien la réponse.`;
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">Kilométrage approximatif</label>
-                  <input
-                    type="text"
-                    placeholder="Ex: 120000"
-                    value={mileage}
-                    onChange={(e) => setMileage(e.target.value)}
-                    className="w-full p-3 rounded-lg border border-input bg-background text-sm"
-                  />
+                  <input type="text" placeholder="Ex: 120000" value={mileage} onChange={(e) => setMileage(e.target.value)} className="w-full p-3 rounded-lg border border-input bg-background text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2">Année du véhicule</label>
-                  <input
-                    type="text"
-                    placeholder="Ex: 2018"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    className="w-full p-3 rounded-lg border border-input bg-background text-sm"
-                  />
+                  <input type="text" placeholder="Ex: 2018" value={year} onChange={(e) => setYear(e.target.value)} className="w-full p-3 rounded-lg border border-input bg-background text-sm" />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <Button variant="outline" onClick={() => setStep(1)} className="flex-1">Retour</Button>
@@ -352,7 +369,7 @@ Utilise des emojis et formate bien la réponse.`;
             </div>
           )}
 
-          {/* Step 3: AI Results */}
+          {/* Step 3 */}
           {step === 3 && (
             <div className="max-w-2xl mx-auto" ref={resultRef}>
               <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-card">
@@ -368,25 +385,46 @@ Utilise des emojis et formate bien la réponse.`;
                   </div>
                 </div>
 
+                {/* Loading state with progress messages + skeleton */}
                 {isLoading && !diagnosticResult && (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">Analyse en cours...</p>
+                  <div className="space-y-6">
+                    {/* Progress bar */}
+                    <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full bg-primary rounded-full animate-[indeterminate_1.5s_ease-in-out_infinite]" style={{ width: '40%' }} />
                     </div>
+
+                    {/* Dynamic progress message + timer */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-primary animate-in fade-in duration-300" key={progressIdx}>
+                        {PROGRESS_MESSAGES[progressIdx]}
+                      </p>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Timer className="h-3 w-3" /> {elapsedSeconds}s
+                      </span>
+                    </div>
+
+                    {/* Skeleton */}
+                    <DiagnosticSkeleton />
                   </div>
                 )}
 
                 {error && (
-                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-sm text-destructive mb-4">
-                    {error}
-                  </div>
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-sm text-destructive mb-4">{error}</div>
                 )}
 
                 {diagnosticResult && (
                   <>
+                    {/* Still loading indicator */}
+                    {isLoading && (
+                      <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>{PROGRESS_MESSAGES[progressIdx]}</span>
+                        <span className="ml-auto flex items-center gap-1"><Timer className="h-3 w-3" /> {elapsedSeconds}s</span>
+                      </div>
+                    )}
+
                     <DiagnosticTTS text={diagnosticResult} />
-                    <div className="prose prose-sm max-w-none dark:prose-invert [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h2]:text-base [&>h3]:text-sm">
+                    <div className="prose prose-sm max-w-none dark:prose-invert [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h2]:text-base [&>h3]:text-sm animate-in fade-in duration-500">
                       <ReactMarkdown>{diagnosticResult}</ReactMarkdown>
                     </div>
                   </>
@@ -396,8 +434,7 @@ Utilise des emojis et formate bien la réponse.`;
                 {!isLoading && recommendedProducts.length > 0 && (
                   <div className="mt-8 pt-6 border-t border-border">
                     <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4 text-primary" />
-                      Produits recommandés
+                      <ShoppingCart className="h-4 w-4 text-primary" /> Produits recommandés
                     </h3>
                     <Carousel opts={{ align: 'start', loop: recommendedProducts.length > 2 }} className="w-full">
                       <CarouselContent className="-ml-3">
@@ -419,19 +456,14 @@ Utilise des emojis et formate bien la réponse.`;
 
                 {(!isLoading || diagnosticResult) && (
                   <>
-                    {/* Oil recommendation block */}
                     <div className="mt-6 p-4 rounded-xl bg-accent/10 border border-accent/20">
-                      <h4 className="font-bold text-sm flex items-center gap-2 mb-2">
-                        🛢️ Recommandation huile moteur
-                      </h4>
+                      <h4 className="font-bold text-sm flex items-center gap-2 mb-2">🛢️ Recommandation huile moteur</h4>
                       <p className="text-xs text-muted-foreground mb-3">
                         Selon les spécifications constructeur, nous recommandons une huile adaptée à votre motorisation ({fuelType}) et kilométrage ({mileage || 'N/A'} km).
                         Consultez notre gamme complète pour trouver l'huile idéale.
                       </p>
                       <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
-                        <Link to="/categories/huiles-moteur">
-                          🛢️ Découvrez notre gamme d'huile moteur
-                        </Link>
+                        <Link to="/categories/huiles-moteur">🛢️ Découvrez notre gamme d'huile moteur</Link>
                       </Button>
                     </div>
 
