@@ -109,97 +109,171 @@ export function Header() {
       <div className="bg-secondary text-secondary-foreground border-b border-secondary/20">
         <div className="container">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Mobile Menu */}
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
-                  <Menu className="h-7 w-7" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20 overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle className="text-left">
-                    <span className="text-accent font-extrabold text-2xl tracking-tight">AUTO</span>
-                    <span className="text-primary font-extrabold text-2xl tracking-tight">PASSION</span>
-                  </SheetTitle>
-                </SheetHeader>
-                <nav className="mt-8 flex flex-col gap-1">
-                  {navLinks.map(({ label, href, hasSubmenu, icon: Icon }) => (
-                    <div key={href}>
-                      {hasSubmenu ? (
-                        <>
-                          <div className="flex items-center">
-                            <Link to={href} onClick={() => setIsMenuOpen(false)}
-                              className="flex-1 px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
-                              {label}
-                            </Link>
-                            <button onClick={() => setMobileSubOpen(mobileSubOpen === 'products' ? '' : 'products')}
-                              className="p-3 hover:bg-primary/10 rounded-lg transition-colors">
-                              <ChevronDown className={`h-4 w-4 transition-transform ${mobileSubOpen === 'products' ? 'rotate-180' : ''}`} />
-                            </button>
-                          </div>
-                          {(mobileSubOpen === 'products' || productCategories.some(cat => mobileSubOpen === cat.label)) && (
-                            <div className="flex flex-col gap-0.5 animate-in slide-in-from-top-2">
-                              {productCategories.map((cat, idx) => (
-                                <div key={`cat-${idx}-${cat.label}`}>
-                                  {cat.subcategories ? (
-                                    <>
-                                      <div className="flex items-center">
-                                        <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
-                                          className="flex-1 block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
-                                          {cat.label}
-                                        </Link>
-                                        <button
-                                          onClick={() => setMobileSubOpen(mobileSubOpen === cat.label ? 'products' : cat.label)}
-                                          className="p-2 hover:bg-primary/10 rounded transition-colors flex-shrink-0"
-                                        >
-                                          <ChevronDown className={`h-3 w-3 transition-transform ${mobileSubOpen === cat.label ? 'rotate-180' : ''}`} />
-                                        </button>
-                                      </div>
-                                      {mobileSubOpen === cat.label && (
-                                        <div className="pl-3 flex flex-col gap-0.5">
-                                          {cat.subcategories.map((sub, subIdx) => (
-                                            <Link key={`sub-${idx}-${subIdx}`} to={sub.href} onClick={() => setIsMenuOpen(false)}
-                                              className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors">
-                                              {sub.label}
-                                            </Link>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
-                                        className="block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
-                                      {cat.label}
-                                    </Link>
-                                  )}
-                                </div>
-                              ))}
+            {/* Left side: Menu + Search (mobile only) */}
+            <div className="flex items-center gap-1">
+              {/* Mobile Menu */}
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
+                    <Menu className="h-7 w-7" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20 overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="text-left">
+                      <span className="text-accent font-extrabold text-2xl tracking-tight">AUTO</span>
+                      <span className="text-primary font-extrabold text-2xl tracking-tight">PASSION</span>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <nav className="mt-8 flex flex-col gap-1">
+                    {navLinks.map(({ label, href, hasSubmenu, icon: Icon }) => (
+                      <div key={href}>
+                        {hasSubmenu ? (
+                          <>
+                            <div className="flex items-center">
+                              <Link to={href} onClick={() => setIsMenuOpen(false)}
+                                className="flex-1 px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                                {label}
+                              </Link>
+                              <button onClick={() => setMobileSubOpen(mobileSubOpen === 'products' ? '' : 'products')}
+                                className="p-3 hover:bg-primary/10 rounded-lg transition-colors">
+                                <ChevronDown className={`h-4 w-4 transition-transform ${mobileSubOpen === 'products' ? 'rotate-180' : ''}`} />
+                              </button>
                             </div>
-                          )}
-                        </>
-                      ) : (
-                        <Link to={href} onClick={() => setIsMenuOpen(false)}
-                          className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
-                          {Icon && <Icon className="h-5 w-5" />}
-                          {label}
-                        </Link>
-                      )}
+                            {(mobileSubOpen === 'products' || productCategories.some(cat => mobileSubOpen === cat.label)) && (
+                              <div className="flex flex-col gap-0.5 animate-in slide-in-from-top-2">
+                                {productCategories.map((cat, idx) => (
+                                  <div key={`cat-${idx}-${cat.label}`}>
+                                    {cat.subcategories ? (
+                                      <>
+                                        <div className="flex items-center">
+                                          <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
+                                            className="flex-1 block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
+                                            {cat.label}
+                                          </Link>
+                                          <button
+                                            onClick={() => setMobileSubOpen(mobileSubOpen === cat.label ? 'products' : cat.label)}
+                                            className="p-2 hover:bg-primary/10 rounded transition-colors flex-shrink-0"
+                                          >
+                                            <ChevronDown className={`h-3 w-3 transition-transform ${mobileSubOpen === cat.label ? 'rotate-180' : ''}`} />
+                                          </button>
+                                        </div>
+                                        {mobileSubOpen === cat.label && (
+                                          <div className="pl-3 flex flex-col gap-0.5">
+                                            {cat.subcategories.map((sub, subIdx) => (
+                                              <Link key={`sub-${idx}-${subIdx}`} to={sub.href} onClick={() => setIsMenuOpen(false)}
+                                                className="px-3 py-1.5 rounded text-xs text-secondary-foreground/60 hover:text-primary transition-colors">
+                                                {sub.label}
+                                              </Link>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <Link to={cat.href} onClick={() => setIsMenuOpen(false)}
+                                        className="block px-3 py-2 rounded text-sm text-secondary-foreground/70 hover:text-primary transition-colors">
+                                        {cat.label}
+                                      </Link>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <Link to={href} onClick={() => setIsMenuOpen(false)}
+                            className="px-3 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide flex items-center gap-2">
+                            {Icon && <Icon className="h-5 w-5" />}
+                            {label}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                    <div className="border-t border-secondary-foreground/10 my-3" />
+                    {secondaryLinks.map(({ label, href }) => (
+                      <Link key={href} to={href} onClick={() => setIsMenuOpen(false)}
+                        className="px-3 py-2.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors text-sm text-secondary-foreground/60">
+                        {label}
+                      </Link>
+                    ))}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+
+              {/* Search - mobile only, next to menu */}
+              <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="lg:hidden text-secondary-foreground hover:text-accent">
+                    <Search className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="top" className="h-auto max-h-[80vh]">
+                  <SheetHeader>
+                    <SheetTitle>{t.search}</SheetTitle>
+                  </SheetHeader>
+                  <form onSubmit={handleSearchSubmit} className="mt-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Input type="search" placeholder={t.searchPlaceholder} value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)} className="pl-10 text-base" autoFocus />
                     </div>
-                  ))}
-                  <div className="border-t border-secondary-foreground/10 my-3" />
-                  {secondaryLinks.map(({ label, href }) => (
-                    <Link key={href} to={href} onClick={() => setIsMenuOpen(false)}
-                      className="px-3 py-2.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors text-sm text-secondary-foreground/60">
-                      {label}
-                    </Link>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
+                  </form>
+
+                  {/* Loading state */}
+                  {isSearching && debouncedQuery.length >= 2 && (
+                    <div className="mt-4 flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2 text-sm text-muted-foreground">Recherche en cours...</span>
+                    </div>
+                  )}
+
+                  {/* Results */}
+                  {!isSearching && searchResults.length > 0 && (
+                    <div className="mt-4 max-h-[50vh] overflow-y-auto">
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {searchResults.length} {t.searchResults}
+                        {searchResults.length >= 20 && ' (affichage limité à 20)'}
+                      </p>
+                      <div className="space-y-2">
+                        {searchResults.map((product) => (
+                          <button key={product.id} onClick={() => handleProductClick(product.slug)}
+                            className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors text-left">
+                            <img src={product.images[0]} alt={product.name} className="w-14 h-14 object-cover rounded" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-base truncate">{product.name}</p>
+                              <p className="text-sm text-muted-foreground">{formatPrice(product.price)}</p>
+                              {product.stock?.global === 0 && (
+                                <span className="text-xs text-red-500">Rupture de stock</span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* No results */}
+                  {!isSearching && debouncedQuery.length >= 2 && searchResults.length === 0 && (
+                    <div className="mt-4 text-center py-8">
+                      <p className="text-muted-foreground">{t.noResults} "{debouncedQuery}"</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Essayez avec un autre terme (nom, référence, viscosité...)
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Search hint */}
+                  {searchQuery.length > 0 && searchQuery.length < 2 && (
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
+                      Tapez au moins 2 caractères pour rechercher
+                    </p>
+                  )}
+                </SheetContent>
+              </Sheet>
+            </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pointer-events-auto lg:static lg:translate-x-0">
               <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
               <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
               <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>
@@ -247,9 +321,10 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-0.5 md:gap-1">
+              {/* Search - desktop only */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent">
+                  <Button variant="ghost" size="icon" className="hidden lg:flex text-secondary-foreground hover:text-accent">
                     <Search className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
