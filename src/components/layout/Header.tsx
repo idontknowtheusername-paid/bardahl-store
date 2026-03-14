@@ -399,7 +399,7 @@ export function Header() {
                   <div className="relative">
                     <ShoppingBag className="h-6 w-6" />
                     {totalItems > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-bold animate-scale-in">
+                      <span className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 rounded-full bg-accent text-accent-foreground text-[10px] md:text-xs flex items-center justify-center font-bold animate-scale-in">
                         {totalItems}
                       </span>
                     )}
