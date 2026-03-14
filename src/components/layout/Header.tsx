@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, ChevronDown, Stethoscope, User, Wrench, Car } from 'lucide-react';
+import { ShoppingBag, Search, Menu, ChevronDown, Stethoscope, User, Wrench, Car, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { searchProducts } from '@/data/products';
+import { useProductSearch } from '@/hooks/use-product-search';
 import { SeasonalBanner } from './SeasonalBanner';
-import type { Product } from '@/types/product';
 
 export function Header() {
   const { totalItems, setIsCartOpen } = useCart();
@@ -18,10 +17,24 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [showProductsMenu, setShowProductsMenu] = useState(false);
   const [mobileSubOpen, setMobileSubOpen] = useState('');
   const navigate = useNavigate();
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Use intelligent search hook
+  const { data: searchResults = [], isLoading: isSearching } = useProductSearch(
+    debouncedQuery,
+    isSearchOpen && debouncedQuery.length >= 2
+  );
 
   const productCategories = [
     { label: 'Huile moteur', href: '/categories/huiles-moteur' },
@@ -71,27 +84,21 @@ export function Header() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query.trim().length >= 2) {
-      setSearchResults(searchProducts(query));
-    } else {
-      setSearchResults([]);
-    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setIsSearchOpen(false);
+      const queryToUse = searchQuery;
       setSearchQuery('');
-      setSearchResults([]);
-      navigate(`/categories?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/categories?search=${encodeURIComponent(queryToUse)}`);
     }
   };
 
   const handleProductClick = (slug: string) => {
     setIsSearchOpen(false);
     setSearchQuery('');
-    setSearchResults([]);
     navigate(`/produits/${slug}`);
   };
 
@@ -256,25 +263,55 @@ export function Header() {
                         onChange={(e) => handleSearch(e.target.value)} className="pl-10 text-base" autoFocus />
                     </div>
                   </form>
-                  {searchResults.length > 0 && (
+
+                  {/* Loading state */}
+                  {isSearching && debouncedQuery.length >= 2 && (
+                    <div className="mt-4 flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2 text-sm text-muted-foreground">Recherche en cours...</span>
+                    </div>
+                  )}
+
+                  {/* Results */}
+                  {!isSearching && searchResults.length > 0 && (
                     <div className="mt-4 max-h-[50vh] overflow-y-auto">
-                      <p className="text-sm text-muted-foreground mb-3">{searchResults.length} {t.searchResults}</p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {searchResults.length} {t.searchResults}
+                        {searchResults.length >= 20 && ' (affichage limité à 20)'}
+                      </p>
                       <div className="space-y-2">
-                        {searchResults.slice(0, 8).map((product) => (
+                        {searchResults.map((product) => (
                           <button key={product.id} onClick={() => handleProductClick(product.slug)}
                             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors text-left">
                             <img src={product.images[0]} alt={product.name} className="w-14 h-14 object-cover rounded" />
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-base truncate">{product.name}</p>
                               <p className="text-sm text-muted-foreground">{formatPrice(product.price)}</p>
+                              {product.stock?.global === 0 && (
+                                <span className="text-xs text-red-500">Rupture de stock</span>
+                              )}
                             </div>
                           </button>
                         ))}
                       </div>
                     </div>
                   )}
-                  {searchQuery.length >= 2 && searchResults.length === 0 && (
-                    <p className="mt-4 text-center text-muted-foreground">{t.noResults} "{searchQuery}"</p>
+
+                  {/* No results */}
+                  {!isSearching && debouncedQuery.length >= 2 && searchResults.length === 0 && (
+                    <div className="mt-4 text-center py-8">
+                      <p className="text-muted-foreground">{t.noResults} "{debouncedQuery}"</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Essayez avec un autre terme (nom, référence, viscosité...)
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Search hint */}
+                  {searchQuery.length > 0 && searchQuery.length < 2 && (
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
+                      Tapez au moins 2 caractères pour rechercher
+                    </p>
                   )}
                 </SheetContent>
               </Sheet>

@@ -580,8 +580,6 @@ export default function ProductEdit() {
                   </div>
                 );
               })()}
-                );
-              })()}
 
               <div className="space-y-2">
                 <Label htmlFor="short_description">Description courte</Label>

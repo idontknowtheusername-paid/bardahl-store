@@ -44,7 +44,7 @@ export function FloatingActions() {
       isWhatsApp: true,
     },
     {
-      label: 'Diagnostic',
+      label: 'Diagnostic moteur',
       icon: Stethoscope,
       href: '/diagnostic',
       color: 'bg-primary hover:bg-primary/90 text-primary-foreground',

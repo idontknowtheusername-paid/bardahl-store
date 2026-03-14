@@ -36,6 +36,16 @@ interface Expense {
   created_at: string;
 }
 
+interface Revenue {
+  id: string;
+  category: string;
+  label: string;
+  amount: number;
+  date: string;
+  notes: string | null;
+  created_at: string;
+}
+
 const EXPENSE_CATEGORIES = [
   { value: 'stock', label: 'Achat de stock / Fournisseurs' },
   { value: 'shipping', label: 'Frais de livraison' },
@@ -47,15 +57,25 @@ const EXPENSE_CATEGORIES = [
   { value: 'other', label: 'Autres dépenses' },
 ];
 
+const REVENUE_CATEGORIES = [
+  { value: 'offline_sale', label: 'Vente hors ligne / Magasin' },
+  { value: 'service', label: 'Prestation de service' },
+  { value: 'wholesale', label: 'Vente en gros' },
+  { value: 'consultation', label: 'Consultation / Diagnostic' },
+  { value: 'other', label: 'Autres recettes' },
+];
+
 const MONTHS_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 export default function Finances() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [revenueDialogOpen, setRevenueDialogOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
   const [newExpense, setNewExpense] = useState({ category: 'stock', label: '', amount: '', date: new Date().toISOString().split('T')[0], notes: '' });
+  const [newRevenue, setNewRevenue] = useState({ category: 'offline_sale', label: '', amount: '', date: new Date().toISOString().split('T')[0], notes: '' });
   const queryClient = useQueryClient();
 
   const [year, month] = selectedMonth.split('-').map(Number);
@@ -92,6 +112,21 @@ export default function Finances() {
     },
   });
 
+  // Fetch manual revenues for the month
+  const { data: revenues, isLoading: revenuesLoading } = useQuery({
+    queryKey: ['finance-revenues', selectedMonth],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('revenues')
+        .select('*')
+        .gte('date', startDate.split('T')[0])
+        .lte('date', endDate.split('T')[0])
+        .order('date', { ascending: false });
+      if (error) throw error;
+      return (data || []) as Revenue[];
+    },
+  });
+
   // Add expense mutation
   const addExpenseMutation = useMutation({
     mutationFn: async (expense: { category: string; label: string; amount: number; date: string; notes: string | null }) => {
@@ -118,9 +153,37 @@ export default function Finances() {
     },
   });
 
+  // Add revenue mutation
+  const addRevenueMutation = useMutation({
+    mutationFn: async (revenue: { category: string; label: string; amount: number; date: string; notes: string | null }) => {
+      const { error } = await supabase.from('revenues').insert(revenue);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['finance-revenues'] });
+      toast.success('Recette ajoutée');
+      setRevenueDialogOpen(false);
+      setNewRevenue({ category: 'offline_sale', label: '', amount: '', date: new Date().toISOString().split('T')[0], notes: '' });
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const deleteRevenueMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('revenues').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['finance-revenues'] });
+      toast.success('Recette supprimée');
+    },
+  });
+
   // Compute financials
   const stats = useMemo(() => {
-    const totalRevenue = (orders || []).reduce((sum, o) => sum + (o.total || 0), 0);
+    const onlineRevenue = (orders || []).reduce((sum, o) => sum + (o.total || 0), 0);
+    const manualRevenue = (revenues || []).reduce((sum, r) => sum + r.amount, 0);
+    const totalRevenue = onlineRevenue + manualRevenue;
     const totalShippingRevenue = (orders || []).reduce((sum, o) => sum + (o.shipping_cost || 0), 0);
     const totalDiscounts = (orders || []).reduce((sum, o) => sum + (o.discount_amount || 0), 0);
     const totalExpenses = (expenses || []).reduce((sum, e) => sum + e.amount, 0);
@@ -134,8 +197,8 @@ export default function Finances() {
       byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
     });
 
-    return { totalRevenue, totalShippingRevenue, totalDiscounts, totalExpenses, netProfit, margin, orderCount, byCategory };
-  }, [orders, expenses]);
+    return { totalRevenue, onlineRevenue, manualRevenue, totalShippingRevenue, totalDiscounts, totalExpenses, netProfit, margin, orderCount, byCategory };
+  }, [orders, expenses, revenues]);
 
   const handleAddExpense = () => {
     const amount = parseFloat(newExpense.amount);
@@ -147,6 +210,19 @@ export default function Finances() {
       amount,
       date: newExpense.date,
       notes: newExpense.notes.trim() || null,
+    });
+  };
+
+  const handleAddRevenue = () => {
+    const amount = parseFloat(newRevenue.amount);
+    if (!newRevenue.label.trim()) { toast.error('Libellé requis'); return; }
+    if (isNaN(amount) || amount <= 0) { toast.error('Montant invalide'); return; }
+    addRevenueMutation.mutate({
+      category: newRevenue.category,
+      label: newRevenue.label.trim(),
+      amount,
+      date: newRevenue.date,
+      notes: newRevenue.notes.trim() || null,
     });
   };
 
@@ -185,7 +261,11 @@ export default function Finances() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => setDialogOpen(true)}>
+          <Button onClick={() => setRevenueDialogOpen(true)} variant="default">
+            <Plus className="h-4 w-4 mr-2" />
+            Recette
+          </Button>
+          <Button onClick={() => setDialogOpen(true)} variant="outline">
             <Plus className="h-4 w-4 mr-2" />
             Dépense
           </Button>
@@ -201,7 +281,9 @@ export default function Finances() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatPrice(stats.totalRevenue)}</div>
-            <p className="text-xs text-muted-foreground mt-1">{stats.orderCount} commandes payées</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              En ligne: {formatPrice(stats.onlineRevenue)} • Manuel: {formatPrice(stats.manualRevenue)}
+            </p>
           </CardContent>
         </Card>
 
@@ -341,6 +423,140 @@ export default function Finances() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Revenues Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Recettes du mois</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Catégorie</TableHead>
+                  <TableHead>Libellé</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="text-right">Montant</TableHead>
+                  <TableHead className="w-10"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {revenuesLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">Chargement...</TableCell>
+                  </TableRow>
+                ) : (revenues || []).length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Aucune recette manuelle ce mois. Cliquez sur "+ Recette" pour en ajouter.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  revenues?.map(rev => (
+                    <TableRow key={rev.id}>
+                      <TableCell className="text-sm">
+                        {new Date(rev.date).toLocaleDateString('fr-FR')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs bg-green-50">
+                          {REVENUE_CATEGORIES.find(c => c.value === rev.category)?.label || rev.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium text-sm">{rev.label}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
+                        {rev.notes || '-'}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-green-600">
+                        +{formatPrice(rev.amount)}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => {
+                            if (confirm('Supprimer cette recette ?')) {
+                              deleteRevenueMutation.mutate(rev.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add Revenue Dialog */}
+      <Dialog open={revenueDialogOpen} onOpenChange={setRevenueDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter une recette</DialogTitle>
+            <DialogDescription>Enregistrez une recette manuelle (vente hors ligne, service, etc.).</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Catégorie</Label>
+              <Select value={newRevenue.category} onValueChange={v => setNewRevenue(p => ({ ...p, category: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {REVENUE_CATEGORIES.map(c => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Libellé *</Label>
+              <Input
+                placeholder="Ex: Vente magasin - Client X"
+                value={newRevenue.label}
+                onChange={e => setNewRevenue(p => ({ ...p, label: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Montant (FCFA) *</Label>
+                <Input
+                  type="number"
+                  placeholder="50000"
+                  value={newRevenue.amount}
+                  onChange={e => setNewRevenue(p => ({ ...p, amount: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  value={newRevenue.date}
+                  onChange={e => setNewRevenue(p => ({ ...p, date: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Notes (optionnel)</Label>
+              <Textarea
+                placeholder="Détails supplémentaires..."
+                value={newRevenue.notes}
+                onChange={e => setNewRevenue(p => ({ ...p, notes: e.target.value }))}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setRevenueDialogOpen(false)}>Annuler</Button>
+              <Button onClick={handleAddRevenue} disabled={addRevenueMutation.isPending}>
+                {addRevenueMutation.isPending ? 'Ajout...' : 'Ajouter'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Expense Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

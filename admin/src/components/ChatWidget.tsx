@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Bot, X, Send, Loader2, Minimize2, Trash2 } from 'lucide-react';
+import { Bot, X, Send, Loader2, Minimize2, Trash2, Maximize2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { chatWithAssistant } from '@/lib/mistral';
@@ -33,6 +33,7 @@ type Message = {
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -156,7 +157,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-background border rounded-lg shadow-2xl flex flex-col z-50 max-w-[calc(100vw-1.5rem)]">
+    <div className={`fixed ${isFullscreen ? 'inset-4' : 'bottom-6 right-6 w-96 h-[600px]'} bg-background border rounded-lg shadow-2xl flex flex-col z-50 ${!isFullscreen && 'max-w-[calc(100vw-1.5rem)]'}`}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
         <div className="flex items-center gap-2">
@@ -180,9 +181,19 @@ export function ChatWidget() {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
-            onClick={() => setIsMinimized(true)}
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title={isFullscreen ? "Réduire" : "Plein écran"}
           >
-            <Minimize2 className="h-4 w-4" />
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            onClick={() => setIsMinimized(true)}
+            title="Minimiser"
+          >
+            <ChevronDown className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"

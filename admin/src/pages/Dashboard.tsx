@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Package, ShoppingCart, TrendingUp, Users, AlertTriangle, Download, Bell,
-  DollarSign, BarChart3, Eye, UserCheck,
+  DollarSign, BarChart3, Eye, UserCheck, QrCode,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -78,6 +78,25 @@ export default function Dashboard() {
         .from('page_views')
         .select('*', { count: 'exact', head: true });
 
+      // QR codes stats
+      const { count: totalQRGenerated } = await supabase
+        .from('vehicle_qr_codes')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: paidQRCount } = await supabase
+        .from('vehicle_qr_codes')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_paid', true);
+
+      // Fetch QR price from settings
+      const { data: settings } = await supabase
+        .from('site_settings')
+        .select('qr_activation_price')
+        .single();
+
+      const qrPrice = settings?.qr_activation_price || 1000;
+      const totalQRRevenue = (paidQRCount || 0) * qrPrice;
+
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -120,6 +139,9 @@ export default function Dashboard() {
         monthOrderCount,
         monthVisits: monthVisits || 0,
         totalVisits: totalVisits || 0,
+        totalQRGenerated: totalQRGenerated || 0,
+        paidQRCount: paidQRCount || 0,
+        totalQRRevenue,
       };
     },
     refetchInterval: 30000,
@@ -232,7 +254,7 @@ export default function Dashboard() {
       </div>
 
       {/* Second row of KPIs */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Panier moyen</CardTitle>
@@ -262,6 +284,16 @@ export default function Dashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.monthVisits || 0} <span className="text-sm font-normal text-muted-foreground">visiteurs</span></div>
             <p className="text-xs text-muted-foreground">{stats?.totalVisits || 0} visites au total</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">QR Codes Carnet</CardTitle>
+            <QrCode className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalQRGenerated || 0} <span className="text-sm font-normal text-muted-foreground">générés</span></div>
+            <p className="text-xs text-green-600 font-semibold">{formatPrice(stats?.totalQRRevenue || 0)} <span className="text-muted-foreground font-normal">({stats?.paidQRCount || 0} payés)</span></p>
           </CardContent>
         </Card>
       </div>
