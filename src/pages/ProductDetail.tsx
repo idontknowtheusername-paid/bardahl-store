@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/carousel';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
-import { getProductBySlug } from '@/data/products';
+import { getProductBySlug, getRelatedProducts } from '@/data/products';
 import { useProduct, usePopularProducts } from '@/hooks/use-supabase-api';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -243,54 +243,97 @@ export default function ProductDetail() {
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
 
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
-  // Fetch related products from database
+  // Fetch related products from Supabase
   useEffect(() => {
-    if (!product?.id) return;
+    const fetchRelatedProducts = async () => {
+      if (!product?.id) return;
 
-    const fetchRelated = async () => {
       const currentCategory = product.category || '';
-      const currentType = product.product_type || '';
+      const currentType = (product as any).product_type || product.style || '';
 
-      let query = supabase
-        .from('products')
-        .select('id, title, slug, price, compare_at_price, is_new, product_type, category')
-        .eq('is_active', true)
-        .neq('id', product.id);
+      // Strategy 1: Try to get products from same category via product_categories relation
+      let data: any[] = [];
 
-      // Same category first
-      if (currentCategory) {
-        query = query.eq('category', currentCategory);
-      } else if (currentType) {
-        query = query.eq('product_type', currentType);
+      if (currentCategory && currentCategory !== 'autres') {
+        const { data: categoryProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images!inner (image_url, display_order),
+            product_categories!inner (
+              categories!inner (slug)
+            )
+          `)
+          .eq('is_active', true)
+          .eq('product_categories.categories.slug', currentCategory)
+          .neq('id', product.id)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(8);
+
+        if (categoryProducts && categoryProducts.length > 0) {
+          data = categoryProducts;
+        }
       }
 
-      const { data } = await query.limit(8);
+      // Strategy 2: If no results, try by product_type
+      if (data.length === 0 && currentType) {
+        const { data: typeProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images (image_url, display_order)
+          `)
+          .eq('is_active', true)
+          .eq('product_type', currentType)
+          .neq('id', product.id)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(8);
 
-      if (data && data.length > 0) {
-        const ids = data.map(p => p.id);
-        const { data: images } = await supabase
-          .from('product_images')
-          .select('product_id, image_url')
-          .in('product_id', ids)
-          .order('display_order', { ascending: true });
+        if (typeProducts && typeProducts.length > 0) {
+          data = typeProducts;
+        }
+      }
 
-        const imageMap = new Map<string, string>();
-        images?.forEach(img => {
-          if (!imageMap.has(img.product_id)) imageMap.set(img.product_id, img.image_url);
-        });
+      // Strategy 3: If still no results, get any active products
+      if (data.length === 0) {
+        const { data: anyProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images (image_url, display_order)
+          `)
+          .eq('is_active', true)
+          .neq('id', product.id)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(8);
 
-        const transformed = data.map(p => ({
+        if (anyProducts && anyProducts.length > 0) {
+          data = anyProducts;
+        }
+      }
+
+      // Transform to Product format
+      const transformed = data.map((p: any) => {
+        const firstImage = Array.isArray(p.product_images) && p.product_images.length > 0
+          ? p.product_images.sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))[0].image_url
+          : '/placeholder.svg';
+
+        return {
           id: p.id,
           slug: p.slug,
           name: p.title,
           price: p.price,
           originalPrice: p.compare_at_price || undefined,
-          images: [imageMap.get(p.id) || '/placeholder.svg'],
+          images: [firstImage],
           category: p.product_type || 'autres',
           collection: '',
           colors: [{ name: 'Standard', hex: '#1a1a1a' }],
@@ -301,15 +344,15 @@ export default function ProductDetail() {
           care: '',
           style: p.product_type || 'Classique',
           isNew: p.is_new || false,
-          isBestseller: false,
+          isBestseller: p.is_featured || false,
           stock: { global: 1 },
-        }));
+        };
+      });
 
-        setRelatedProducts(transformed);
-      }
+      setRelatedProducts(transformed);
     };
 
-    fetchRelated();
+    fetchRelatedProducts();
   }, [product?.id]);
 
   const hasStock = () => (product?.stock?.['global'] || 0) > 0;
@@ -618,7 +661,7 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
 
   useEffect(() => {
     const fetchRecommended = async () => {
-      // Get products of same product_type or complementary types
+      // Mapping of complementary product types
       const complementaryTypes: Record<string, string[]> = {
         'huile-moteur': ['nettoyant-moteur', 'additif', 'filtre'],
         'huile-boite': ['nettoyant-boite', 'additif'],
@@ -628,55 +671,96 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
         'nettoyant-injecteur': ['additif', 'huile-moteur'],
         'liquide-refroidissement': ['nettoyant-radiateur', 'nettoyant-moteur'],
         'liquide-frein': ['liquide-refroidissement'],
+        'filtre': ['huile-moteur', 'nettoyant-moteur'],
       };
 
-      const currentType = currentProduct.product_type || '';
+      const currentType = currentProduct.product_type || currentProduct.style || '';
       const currentCategory = currentProduct.category || '';
       const relatedTypes = complementaryTypes[currentType] || [];
 
-      // If we have complementary types, filter by them. Otherwise, show different product types
-      let query = supabase
-        .from('products')
-        .select('id, title, slug, price, compare_at_price, is_new, product_type, category')
-        .eq('is_active', true)
-        .neq('id', currentProduct.id);
+      let data: any[] = [];
 
-      // IMPORTANT: Exclude products of the same type AND same category as current product
-      if (currentType) {
-        query = query.neq('product_type', currentType);
-      }
-
-      // Also exclude same category to avoid showing similar products (e.g., different oil viscosities)
-      if (currentCategory) {
-        query = query.neq('category', currentCategory);
-      }
-
-      // If we have complementary types, prioritize them
+      // Strategy 1: Try complementary types first
       if (relatedTypes.length > 0) {
-        query = query.in('product_type', relatedTypes);
+        const { data: complementaryProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images (image_url, display_order)
+          `)
+          .eq('is_active', true)
+          .neq('id', currentProduct.id)
+          .in('product_type', relatedTypes)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (complementaryProducts && complementaryProducts.length > 0) {
+          data = complementaryProducts;
+        }
       }
 
-      const { data } = await query.limit(6);
+      // Strategy 2: If no complementary products, get products from different categories
+      if (data.length === 0) {
+        // Get products from different category but exclude same product_type
+        const { data: differentProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images (image_url, display_order),
+            product_categories!inner (
+              categories!inner (slug)
+            )
+          `)
+          .eq('is_active', true)
+          .neq('id', currentProduct.id)
+          .neq('product_categories.categories.slug', currentCategory)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(6);
 
-      if (data && data.length > 0) {
-        // Get images for these products
-        const ids = data.map(p => p.id);
-        const { data: images } = await supabase
-          .from('product_images')
-          .select('product_id, image_url')
-          .in('product_id', ids)
-          .order('display_order', { ascending: true });
-
-        const imageMap = new Map<string, string>();
-        images?.forEach(img => {
-          if (!imageMap.has(img.product_id)) imageMap.set(img.product_id, img.image_url);
-        });
-
-        setRecommended(data.map(p => ({
-          ...p,
-          image: imageMap.get(p.id) || '/placeholder.svg',
-        })));
+        if (differentProducts && differentProducts.length > 0) {
+          data = differentProducts;
+        }
       }
+
+      // Strategy 3: Last resort - any different product
+      if (data.length === 0) {
+        const { data: anyProducts } = await supabase
+          .from('products')
+          .select(`
+            id, title, slug, price, compare_at_price, is_new, is_featured, product_type,
+            product_images (image_url, display_order)
+          `)
+          .eq('is_active', true)
+          .neq('id', currentProduct.id)
+          .order('is_featured', { ascending: false })
+          .limit(6);
+
+        if (anyProducts && anyProducts.length > 0) {
+          data = anyProducts;
+        }
+      }
+
+      // Transform data with images
+      const transformed = data.map((p: any) => {
+        const firstImage = Array.isArray(p.product_images) && p.product_images.length > 0
+          ? p.product_images.sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))[0].image_url
+          : '/placeholder.svg';
+
+        return {
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          price: p.price,
+          compare_at_price: p.compare_at_price,
+          is_new: p.is_new,
+          product_type: p.product_type,
+          image: firstImage,
+        };
+      });
+
+      setRecommended(transformed);
     };
 
     fetchRecommended();
