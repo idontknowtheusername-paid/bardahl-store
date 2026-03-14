@@ -97,7 +97,7 @@ export default function LivraisonRetours() {
 
             <p className="leading-relaxed">
               <strong className="text-foreground">Procédure d'échange :</strong><br />
-              1. Contactez-nous via WhatsApp au +229 96 78 62 84<br />
+              1. Contactez-nous via WhatsApp au +229 01 96 52 64 72<br />
               2. Envoyez une photo du produit et votre numéro de commande<br />
               3. Nous organisons la récupération du produit<br />
               4. L'échange est effectué sous 48h après réception

@@ -77,8 +77,8 @@ export default function CGV() {
             <h2 className="font-serif text-2xl font-medium mb-4">Article 8 - Service client</h2>
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question ou réclamation, notre service client est disponible :<br />
-              - Par WhatsApp : +229 96 78 62 84 (du lundi au samedi de 8h à 20h)<br />
-              - Par téléphone : +229 96 78 62 84 / +229 62 21 67 66<br />
+              - Par WhatsApp : +229 01 96 52 64 72 (du lundi au samedi de 8h à 20h)<br />
+              - Par téléphone : +229 01 96 52 64 72<br />
               - Adresse : 01 BP 369 Parakou, Bénin
             </p>
           </section>

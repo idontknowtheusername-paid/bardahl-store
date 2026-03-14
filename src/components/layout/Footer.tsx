@@ -66,8 +66,8 @@ export function Footer() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center text-xs text-secondary-foreground/50">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> 01 BP 369 Parakou</span>
-            <a href={`tel:${settings?.contact_phone?.replace(/\s/g, '') || '+2290196786284'}`} className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer">
-              <Phone className="h-3 w-3" /> {settings?.contact_phone || '+2290196786284'}
+            <a href={`tel:${settings?.contact_phone?.replace(/\s/g, '') || '+2290196526472'}`} className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer">
+              <Phone className="h-3 w-3" /> {settings?.contact_phone || '+229 01 96 52 64 72'}
             </a>
             <a href={`mailto:${settings?.contact_email || 'contact@autopassionbj.com'}`} className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer">
               <Mail className="h-3 w-3" /> {settings?.contact_email || 'contact@autopassionbj.com'}

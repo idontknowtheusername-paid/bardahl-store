@@ -177,7 +177,7 @@ export default function CustomerAuth() {
                     <label className="block text-sm font-semibold mb-1.5">Téléphone *</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input type="text" placeholder="+229 96 78 62 84" value={phone} onChange={(e) => setPhone(e.target.value)}
+                        <input type="text" placeholder="+229 01 96 52 64 72" value={phone} onChange={(e) => setPhone(e.target.value)}
                         className="w-full pl-10 pr-3 py-3 rounded-xl border border-input bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" required />
                     </div>
                   </div>

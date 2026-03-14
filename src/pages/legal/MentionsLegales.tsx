@@ -35,8 +35,8 @@ export default function MentionsLegales() {
           <section className="mb-8">
             <h2 className="font-serif text-2xl font-medium mb-4">Contact</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Téléphone : +229 96 78 62 84 / +229 62 21 67 66<br />
-              WhatsApp : +229 96 78 62 84<br />
+              Téléphone : +229 01 96 52 64 72<br />
+              WhatsApp : +229 01 96 52 64 72<br />
               Adresse : 01 BP 369 Parakou, Bénin
             </p>
           </section>

@@ -33,7 +33,7 @@ const faqs = [
   },
   {
     question: "Comment retourner un produit ?",
-    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 96 78 62 84 avec votre numéro de commande et une photo du produit (non ouvert)."
+    answer: "Vous disposez de 7 jours pour demander un échange. Contactez-nous via WhatsApp au +229 01 96 52 64 72 avec votre numéro de commande et une photo du produit (non ouvert)."
   },
   {
     question: "Quels moyens de paiement acceptez-vous ?",
@@ -105,12 +105,12 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">WhatsApp (Recommandé)</h3>
                 <a
-                  href="https://wa.me/2290196786284"
+                    href="https://wa.me/2290196526472"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700 transition-colors font-medium"
                 >
-                  +229 01 96 78 62 84
+                    +229 01 96 52 64 72
                 </a>
                 <p className="text-xs text-muted-foreground mt-1">
                   Réponse rapide garantie
@@ -125,10 +125,10 @@ export default function Contact() {
               <div>
                 <h3 className="font-medium mb-1">Téléphone</h3>
                 <a
-                  href="tel:+2290196786284"
+                    href="tel:+2290196526472"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +229 01 96 78 62 84
+                    +229 01 96 52 64 72
                 </a>
               </div>
             </div>

@@ -49,8 +49,8 @@ export default function Maintenance() {
               <Mail className="h-8 w-8 text-accent mx-auto mb-3" />
               <h3 className="font-bold text-sm mb-1">Besoin d'aide ?</h3>
               <p className="text-xs text-muted-foreground">
-                <a href="tel:+22996786284" className="text-primary hover:underline">
-                  +229 96 78 62 84
+                <a href="tel:+2290196526472" className="text-primary hover:underline">
+                  +229 01 96 52 64 72
                 </a>
               </p>
             </div>

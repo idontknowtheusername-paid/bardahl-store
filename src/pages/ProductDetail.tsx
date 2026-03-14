@@ -469,7 +469,7 @@ export default function ProductDetail() {
                 className="w-full mb-8 gap-2 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
                 onClick={() => {
                   const msg = encodeURIComponent(`Bonjour, je souhaite commander : ${product.name} (${formatPrice(product.price)})\n${window.location.href}`);
-                  window.open(`https://wa.me/22996786284?text=${msg}`, '_blank');
+                  window.open(`https://wa.me/2290196526472?text=${msg}`, '_blank');
                 }}
               >
                 <MessageCircle className="h-5 w-5" /> Commander sur WhatsApp

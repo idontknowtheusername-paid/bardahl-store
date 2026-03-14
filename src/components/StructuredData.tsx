@@ -53,7 +53,7 @@ export const StructuredData = ({ type, data }: StructuredDataProps) => {
         },
         contactPoint: {
           '@type': 'ContactPoint',
-          telephone: '+229-96-78-62-84',
+          telephone: '+229-01-96-52-64-72',
           contactType: 'Customer Service',
           availableLanguage: ['French'],
         },

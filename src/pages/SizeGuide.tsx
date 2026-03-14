@@ -188,7 +188,7 @@ export default function SizeGuide() {
               Besoin d'un conseil personnalisé pour votre véhicule ?
             </p>
             <a 
-              href="https://wa.me/22901970000000"
+              href="https://wa.me/2290196526472"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"

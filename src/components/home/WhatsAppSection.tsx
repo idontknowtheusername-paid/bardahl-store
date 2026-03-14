@@ -1,7 +1,7 @@
 import { MessageCircle, ArrowRight } from 'lucide-react';
 
 export function WhatsAppSection() {
-  const whatsappUrl = `https://wa.me/22996786284?text=${encodeURIComponent("Bonjour, j'aimerais un conseil pour mon véhicule. Marque : , Modèle : , Problème : ")}`;
+  const whatsappUrl = `https://wa.me/2290196526472?text=${encodeURIComponent("Bonjour, j'aimerais un conseil pour mon véhicule. Marque : , Modèle : , Problème : ")}`;
 
   return (
     <section className="py-16 md:py-20 bg-green-600 text-white">

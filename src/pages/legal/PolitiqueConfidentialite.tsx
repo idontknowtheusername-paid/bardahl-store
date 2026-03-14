@@ -55,7 +55,7 @@ export default function PolitiqueConfidentialite() {
               - Droit de rectification<br />
               - Droit à l'effacement<br />
               - Droit d'opposition<br /><br />
-              Pour exercer ces droits, contactez-nous par WhatsApp au +229 96 78 62 84 
+              Pour exercer ces droits, contactez-nous par WhatsApp au +229 01 96 52 64 72 
               ou à l'adresse : 01 BP 369 Parakou, Bénin.
             </p>
           </section>
@@ -73,8 +73,8 @@ export default function PolitiqueConfidentialite() {
             <p className="text-muted-foreground leading-relaxed">
               Pour toute question relative à cette politique de confidentialité, vous pouvez nous 
               contacter :<br />
-              - WhatsApp : +229 96 78 62 84<br />
-              - Téléphone : +229 96 78 62 84 / +229 62 21 67 66<br />
+              - WhatsApp : +229 01 96 52 64 72<br />
+              - Téléphone : +229 01 96 52 64 72<br />
               - Adresse : 01 BP 369 Parakou, Bénin
             </p>
           </section>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { X, Send, Loader2, Minimize2, Trash2, User, CheckCircle2, XCircle, Maximize2, History, RotateCcw } from 'lucide-react';
+import { X, Send, Loader2, Minimize2, Trash2, User, CheckCircle2, XCircle, Maximize2, History, RotateCcw, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import temiAvatar from '@/assets/temi-avatar.png';
 import ReactMarkdown from 'react-markdown';
@@ -116,6 +116,7 @@ export function BardahlChat() {
   const [history, setHistory] = useState<SavedConversation[]>(loadHistory);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && !hasConsent()) setShowConsent(true);
@@ -124,6 +125,20 @@ export function BardahlChat() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Close chat when clicking outside
+  useEffect(() => {
+    if (!isOpen || isMinimized || showConsent) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatRef.current && !chatRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, isMinimized, showConsent]);
 
   // Save current conversation to history on each new message
   useEffect(() => {
@@ -223,7 +238,7 @@ export function BardahlChat() {
   }
 
   return (
-    <div className={`fixed z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen
+    <div ref={chatRef} className={`fixed z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen
       ? 'inset-4 w-auto h-auto'
       : 'bottom-4 right-2 sm:right-4 w-[calc(100vw-1rem)] sm:w-[380px] max-w-[calc(100vw-1rem)] h-[min(560px,calc(100vh-6rem))]'
     }`}>
@@ -275,7 +290,10 @@ export function BardahlChat() {
               <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsFullscreen(!isFullscreen)} title={isFullscreen ? "Réduire" : "Plein écran"}>
                 {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
               </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsOpen(false)}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsMinimized(true)} title="Minimiser">
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-secondary-foreground hover:bg-white/10" onClick={() => setIsOpen(false)} title="Fermer">
                 <X className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -340,7 +358,7 @@ export function BardahlChat() {
               {QUICK_ACTIONS.map((a) => (
                 <button key={a.label} onClick={() => {
                   if (a.isWhatsApp) {
-                    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '22996786284';
+                    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '2290196526472';
                     const message = encodeURIComponent("Bonjour, j'aimerais avoir plus d'informations sur vos produits");
                     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
                   } else { send(a.msg!); }

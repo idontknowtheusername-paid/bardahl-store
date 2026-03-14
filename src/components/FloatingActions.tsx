@@ -29,7 +29,7 @@ export function FloatingActions() {
 
   if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
 
-  const whatsappNumber = '2290196786284';
+  const whatsappNumber = '2290196526472';
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour, je souhaite passer une commande")}`;
 
   const actions = [
