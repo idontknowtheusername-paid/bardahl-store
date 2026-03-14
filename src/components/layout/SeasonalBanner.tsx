@@ -120,7 +120,7 @@ export function SeasonalBanner() {
   if (activeBanners.length === 0) return null;
 
   return (
-    <div className="bg-[#A04000] text-white">
+    <div className="bg-primary text-primary-foreground">
       <div className="container">
         <div className="flex items-center justify-between sm:justify-center py-2 text-sm relative">
           <div className="flex items-center gap-2 font-semibold animate-fade-in">
@@ -132,7 +132,7 @@ export function SeasonalBanner() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/20 hover:text-white gap-1 text-xs h-6 px-2 font-medium"
+                className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-white gap-1 text-xs h-6 px-2 font-medium"
                 onClick={() => setShowLangMenu(!showLangMenu)}
               >
                 <span className="text-base">{currentLang?.flag}</span>
