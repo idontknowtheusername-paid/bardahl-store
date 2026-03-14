@@ -320,7 +320,7 @@ export function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-0.5 md:gap-1">
+            <div className="flex items-center gap-0 ml-auto">
               {/* Search - desktop only */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
