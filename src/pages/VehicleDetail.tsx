@@ -6,6 +6,7 @@ import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
