@@ -121,8 +121,7 @@ export function Header() {
                 <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20 overflow-y-auto">
                   <SheetHeader>
                     <SheetTitle className="text-left">
-                      <span className="text-accent font-extrabold text-2xl tracking-tight">AUTO</span>
-                      <span className="text-primary font-extrabold text-2xl tracking-tight">PASSION</span>
+                      <img src="/logo-autopassion.jpg" alt="AutoPassion BJ" className="h-26 w-auto object-contain" />
                     </SheetTitle>
                   </SheetHeader>
                   <nav className="mt-8 flex flex-col gap-1">
@@ -273,10 +272,8 @@ export function Header() {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pointer-events-auto lg:static lg:translate-x-0">
-              <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
-              <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
-              <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>
+            <Link to="/" className="flex items-center absolute left-1/2 -translate-x-1/2 pointer-events-auto lg:static lg:translate-x-0">
+              <img src="/logo-autopassion.jpg" alt="AutoPassion BJ" className="h-14 md:h-16 w-auto object-contain" />
             </Link>
 
             {/* Desktop Nav */}

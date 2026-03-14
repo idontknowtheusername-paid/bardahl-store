@@ -30,7 +30,7 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
               className="flex justify-center mb-2"
             >
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-accent text-center">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">
                 Entretien automobile & solutions moteur
               </h1>
             </motion.div>
@@ -64,7 +64,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="relative z-10 overflow-hidden -mt-2 md:-mt-3"
+          className="relative z-10 overflow-hidden -mt-4 md:-mt-6"
         >
           <PopularProductsCarousel
             title="Produits les plus populaires"

@@ -65,6 +65,9 @@ const VISCOSITIES = ['0W-20', '0W-30', '5W-30', '5W-40', '10W-40', '10W-60', '15
 const API_NORMS = ['API SN', 'API SN Plus', 'API SP', 'API CJ-4', 'API CK-4', 'API GL-4', 'API GL-5'];
 const ACEA_NORMS = ['ACEA A3/B4', 'ACEA A5/B5', 'ACEA C2', 'ACEA C3', 'ACEA C4', 'ACEA C5', 'ACEA E6', 'ACEA E9'];
 const CAPACITIES = ['250ml', '400ml', '500ml', '1L', '2L', '4L', '5L', '10L', '20L', '60L', '200L'];
+
+// TODO: Charger dynamiquement depuis la DB (categories avec parent_id = null) au lieu d'utiliser ce tableau hardcodé
+// Cela permettra d'ajouter/modifier des catégories sans toucher au code
 const PRODUCT_TYPES = [
   { value: 'huiles-moteur', label: 'Huiles Moteur' },
   { value: 'transmission', label: 'Huiles boîtes & Transmission' },
