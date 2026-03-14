@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Stethoscope, MessageCircle, EyeOff, Eye } from 'lucide-react';
 
@@ -18,27 +18,7 @@ function setWidgetsVisibility(visible: boolean) {
 
 export function FloatingActions() {
   const { pathname } = useLocation();
-  const [showFullText, setShowFullText] = useState(true);
   const [widgetsVisible, setWidgetsVisible] = useState(getWidgetsVisibility);
-
-  useEffect(() => {
-    // Animation en boucle toutes les 20 secondes
-    const interval = setInterval(() => {
-      setShowFullText(true);
-
-      // Après 6 secondes, on réduit le texte
-      setTimeout(() => {
-        setShowFullText(false);
-      }, 6000);
-    }, 20000);
-
-    // Premier cycle au chargement
-    setTimeout(() => {
-      setShowFullText(false);
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const toggleWidgets = () => {
     const newVisibility = !widgetsVisible;
@@ -53,9 +33,7 @@ export function FloatingActions() {
 
   const actions = [
     {
-      label: showFullText ? 'Commandez sur WhatsApp' : 'WhatsApp',
-      fullLabel: 'Commandez sur WhatsApp',
-      shortLabel: 'WhatsApp',
+      label: 'Commandez sur WhatsApp',
       icon: MessageCircle,
       href: whatsappUrl,
       color: 'bg-green-500 hover:bg-green-600 text-white',
@@ -63,7 +41,7 @@ export function FloatingActions() {
       isWhatsApp: true,
     },
     {
-      label: 'Diagnostic moteur',
+      label: 'Diagnostiquer mon moteur',
       icon: Stethoscope,
       href: '/diagnostic',
       color: 'bg-primary hover:bg-primary/90 text-primary-foreground',
@@ -72,6 +50,31 @@ export function FloatingActions() {
 
   return (
     <>
+      <style>{`
+        @keyframes shake-glow {
+          0%, 100% { 
+            transform: translateX(0);
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+          }
+          10%, 30%, 50%, 70%, 90% { 
+            transform: translateX(-2px);
+            box-shadow: 0 0 20px 5px rgba(34, 197, 94, 0.4);
+          }
+          20%, 40%, 60%, 80% { 
+            transform: translateX(2px);
+            box-shadow: 0 0 25px 8px rgba(34, 197, 94, 0.6);
+          }
+        }
+        
+        .whatsapp-cta {
+          animation: shake-glow 3s ease-in-out infinite;
+          animation-delay: 2s;
+        }
+        
+        .whatsapp-cta:hover {
+          animation: none;
+        }
+      `}</style>
       {/* Toggle button - always visible at Témi's position when widgets hidden */}
       {!widgetsVisible && (
         <button
@@ -96,7 +99,7 @@ export function FloatingActions() {
               </>
             );
 
-            const className = `flex items-center gap-1.5 h-10 px-3 rounded-full shadow-lg transition-all duration-300 ${action.color} animate-in slide-in-from-right`;
+            const className = `flex items-center gap-1.5 h-10 px-3 rounded-full shadow-lg transition-all duration-300 ${action.color} animate-in slide-in-from-right ${action.isWhatsApp ? 'whatsapp-cta' : ''}`;
 
             if (action.external) {
               return (
@@ -106,7 +109,7 @@ export function FloatingActions() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={className}
-                  title={action.fullLabel || action.label}
+                  title={action.label}
                 >
                   {content}
                 </a>

@@ -102,7 +102,7 @@ export function HeroSection() {
                 >
                   <Link to="/diagnostic">
                     <Stethoscope className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
-                    Diagnostic moteur
+                    Diagnostiquer mon moteur
                   </Link>
                 </Button>
                 <Button
