@@ -22,16 +22,18 @@ export function HeroSection() {
         </div>
 
         <div className="container relative z-10 pt-2 pb-2 md:pt-3 md:pb-2 flex-shrink-0">
-          <div className="max-w-3xl mx-auto text-center px-4 sm:px-6">
-            {/* Badge */}
+          <div className="max-w-3xl mx-auto px-4 sm:px-6">
+            {/* Badge - centered but slightly left */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-accent/15 border border-accent/30 text-accent text-xs font-bold px-3 py-1 rounded-full mb-2 backdrop-blur-sm"
+              className="flex justify-center"
             >
-              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
-              Entretien automobile & solutions moteur
+              <div className="inline-flex items-center gap-2 bg-accent/15 border border-accent/30 text-accent text-xs font-bold px-3 py-1 rounded-full mb-2 backdrop-blur-sm mr-auto ml-[15%]">
+                <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
+                Entretien automobile & solutions moteur
+              </div>
             </motion.div>
 
             {/* Three mentions - 2 lines on desktop */}

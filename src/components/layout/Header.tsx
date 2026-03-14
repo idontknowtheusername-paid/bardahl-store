@@ -393,7 +393,7 @@ export function Header() {
               </Sheet>
 
               {/* Cart with label on desktop */}
-              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent h-auto w-auto px-2 py-1"
+              <Button variant="ghost" size="icon" className="relative text-secondary-foreground hover:text-accent h-auto w-auto px-1 py-1"
                 onClick={() => setIsCartOpen(true)}>
                 <div className="flex flex-col items-center gap-0.5">
                   <div className="relative">
@@ -409,7 +409,7 @@ export function Header() {
               </Button>
 
               {/* Profile with label on desktop */}
-              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent h-auto w-auto px-2 py-1" asChild>
+              <Button variant="ghost" size="icon" className="text-secondary-foreground hover:text-accent h-auto w-auto px-1 py-1" asChild>
                 <Link to="/mon-espace">
                   <div className="flex flex-col items-center gap-0.5">
                     <User className="h-6 w-6" />
