@@ -97,12 +97,12 @@ export function HeroSection() {
                 </Button>
                 <Button
                   size="lg"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs sm:text-sm px-3 sm:px-4 group h-9 sm:h-10 flex-1 min-w-[140px] sm:flex-initial"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-[10px] sm:text-sm px-2 sm:px-4 group h-9 sm:h-10 flex-1 min-w-[140px] sm:flex-initial"
                   asChild
                 >
                   <Link to="/diagnostic">
-                    <Stethoscope className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
-                    Diagnostiquer mon moteur
+                    <Stethoscope className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
+                    <span className="whitespace-nowrap">Diagnostiquer mon moteur</span>
                   </Link>
                 </Button>
                 <Button
