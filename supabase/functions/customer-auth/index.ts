@@ -123,8 +123,11 @@ serve(async (req) => {
       // Determine if identifier is phone or license plate
       let fakeEmail: string | null = null;
 
-      // Check if it looks like a phone number (starts with + or contains mostly digits)
-      const isPhone = /^[\+]?[\d\s-]{8,}$/.test(identifier.trim());
+      // Check if it looks like a phone number
+      // Accepts: +22996786284, 96786284, 01234567, 96 78 62 84, 96-78-62-84
+      // Must start with +, 0, or any digit, and contain at least 8 digits total
+      const isPhone = /^[\+0]?[\d\s-]{7,}$/.test(identifier.trim()) &&
+        (identifier.replace(/[^\d]/g, '').length >= 8);
 
       if (isPhone) {
         const cleanPhone = identifier.trim();
