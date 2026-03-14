@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/carousel';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
-import { getProductBySlug, getRelatedProducts } from '@/data/products';
+import { getProductBySlug } from '@/data/products';
 import { useProduct, usePopularProducts } from '@/hooks/use-supabase-api';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -243,11 +243,74 @@ export default function ProductDetail() {
   const staticProduct = getProductBySlug(slug || '');
   const product = apiProduct || staticProduct;
 
-  const relatedProducts = product ? getRelatedProducts(product) : [];
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+  // Fetch related products from database
+  useEffect(() => {
+    if (!product?.id) return;
+
+    const fetchRelated = async () => {
+      const currentCategory = product.category || '';
+      const currentType = product.product_type || '';
+
+      let query = supabase
+        .from('products')
+        .select('id, title, slug, price, compare_at_price, is_new, product_type, category')
+        .eq('is_active', true)
+        .neq('id', product.id);
+
+      // Same category first
+      if (currentCategory) {
+        query = query.eq('category', currentCategory);
+      } else if (currentType) {
+        query = query.eq('product_type', currentType);
+      }
+
+      const { data } = await query.limit(8);
+
+      if (data && data.length > 0) {
+        const ids = data.map(p => p.id);
+        const { data: images } = await supabase
+          .from('product_images')
+          .select('product_id, image_url')
+          .in('product_id', ids)
+          .order('display_order', { ascending: true });
+
+        const imageMap = new Map<string, string>();
+        images?.forEach(img => {
+          if (!imageMap.has(img.product_id)) imageMap.set(img.product_id, img.image_url);
+        });
+
+        const transformed = data.map(p => ({
+          id: p.id,
+          slug: p.slug,
+          name: p.title,
+          price: p.price,
+          originalPrice: p.compare_at_price || undefined,
+          images: [imageMap.get(p.id) || '/placeholder.svg'],
+          category: p.product_type || 'autres',
+          collection: '',
+          colors: [{ name: 'Standard', hex: '#1a1a1a' }],
+          sizes: [{ size: 'Standard', available: true }],
+          cupSizes: [],
+          description: '',
+          composition: '',
+          care: '',
+          style: p.product_type || 'Classique',
+          isNew: p.is_new || false,
+          isBestseller: false,
+          stock: { global: 1 },
+        }));
+
+        setRelatedProducts(transformed);
+      }
+    };
+
+    fetchRelated();
+  }, [product?.id]);
 
   const hasStock = () => (product?.stock?.['global'] || 0) > 0;
 
