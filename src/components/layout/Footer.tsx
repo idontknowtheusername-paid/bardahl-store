@@ -57,7 +57,7 @@ export function Footer() {
         {/* Logo + contact info */}
         <div className="text-center mb-10">
           <Link to="/" className="inline-block mb-4">
-            <img src="/logo-autopassion.jpg" alt="AutoPassion BJ" className="h-20 w-auto object-contain mx-auto" />
+            <img src="/logo-autopassion.png" alt="AutoPassion BJ" className="h-24 w-auto object-contain mx-auto" />
           </Link>
           <p className="text-secondary-foreground/60 text-sm leading-relaxed max-w-md mx-auto mb-4">
             Entretien automobile & solutions moteur. Votre partenaire de confiance pour la performance de votre véhicule au Bénin.

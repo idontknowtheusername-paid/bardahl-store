@@ -81,7 +81,7 @@ function generateInvoiceHTML(order: Order): string {
     <div class="invoice">
       <div class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
-          <img src="${window.location.origin}/logo-autopassion.jpg" alt="AutoPassion" style="height: 60px; width: auto; object-fit: contain;" />
+          <img src="${window.location.origin}/logo-autopassion.png" alt="AutoPassion" style="height: 70px; width: auto; object-fit: contain;" />
           <div>
             <div class="brand">AUTOPASSION</div>
             <div class="brand-sub">Lubrifiants & Solutions Automobile - Bénin</div>
