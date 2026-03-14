@@ -568,18 +568,24 @@ function RecommendedProducts({ currentProduct }: { currentProduct: any }) {
       };
 
       const currentType = currentProduct.product_type || '';
+      const currentCategory = currentProduct.category || '';
       const relatedTypes = complementaryTypes[currentType] || [];
 
       // If we have complementary types, filter by them. Otherwise, show different product types
       let query = supabase
         .from('products')
-        .select('id, title, slug, price, compare_at_price, is_new, product_type')
+        .select('id, title, slug, price, compare_at_price, is_new, product_type, category')
         .eq('is_active', true)
         .neq('id', currentProduct.id);
 
-      // IMPORTANT: Exclude products of the same type as current product
+      // IMPORTANT: Exclude products of the same type AND same category as current product
       if (currentType) {
         query = query.neq('product_type', currentType);
+      }
+
+      // Also exclude same category to avoid showing similar products (e.g., different oil viscosities)
+      if (currentCategory) {
+        query = query.neq('category', currentCategory);
       }
 
       // If we have complementary types, prioritize them

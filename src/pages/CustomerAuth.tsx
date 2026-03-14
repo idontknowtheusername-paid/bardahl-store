@@ -142,7 +142,7 @@ export default function CustomerAuth() {
                     <label className="block text-sm font-semibold mb-1.5">Téléphone ou immatriculation</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input type="text" placeholder="+229 XX XX XX XX ou AB-1234-CD" value={identifier}
+                      <input type="text" placeholder="+229 97 12 34 56 ou AB-1234-CD" value={identifier}
                         onChange={(e) => setIdentifier(e.target.value)}
                         className="w-full pl-10 pr-3 py-3 rounded-xl border border-input bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" required />
                     </div>
@@ -169,7 +169,7 @@ export default function CustomerAuth() {
                     <label className="block text-sm font-semibold mb-1.5">Nom complet *</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input type="text" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)}
+                        <input type="text" placeholder="Koffi Mensah" value={fullName} onChange={(e) => setFullName(e.target.value)}
                         className="w-full pl-10 pr-3 py-3 rounded-xl border border-input bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" required />
                     </div>
                   </div>
@@ -177,7 +177,7 @@ export default function CustomerAuth() {
                     <label className="block text-sm font-semibold mb-1.5">Téléphone *</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <input type="text" placeholder="+229 01 96 52 64 72" value={phone} onChange={(e) => setPhone(e.target.value)}
+                        <input type="text" placeholder="+229 97 12 34 56" value={phone} onChange={(e) => setPhone(e.target.value)}
                         className="w-full pl-10 pr-3 py-3 rounded-xl border border-input bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" required />
                     </div>
                   </div>
@@ -185,7 +185,7 @@ export default function CustomerAuth() {
                     <label className="block text-sm font-semibold mb-1.5">Email <span className="text-muted-foreground font-normal">(optionnel)</span></label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input type="email" placeholder="jean@email.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                        <input type="email" placeholder="koffi@email.com" value={email} onChange={(e) => setEmail(e.target.value)}
                         className="w-full pl-10 pr-3 py-3 rounded-xl border border-input bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
                     </div>
                   </div>
