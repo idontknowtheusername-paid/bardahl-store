@@ -121,7 +121,7 @@ export function Header() {
                 <SheetContent side="left" className="w-[300px] bg-secondary text-secondary-foreground border-secondary/20 overflow-y-auto">
                   <SheetHeader>
                     <SheetTitle className="text-left">
-                      <img src="/logo-autopassion.png" alt="AutoPassion BJ" className="h-16 w-auto object-contain" />
+                      <img src="/logo-autopassion.png" alt="AutoPassion BJ" className="h-22 w-auto object-contain" />
                     </SheetTitle>
                   </SheetHeader>
                   <nav className="mt-8 flex flex-col gap-1">

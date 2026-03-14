@@ -76,15 +76,13 @@ export default function BrandedQRCard({ qrToken, vehicleBrand, vehicleModel, lic
 
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                  <circle cx="12" cy="12" r="11" fill="#2F6FB5" />
-                  <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">A</text>
-                </svg>
-                <span style={{ fontSize: 18, fontWeight: 800, color: '#1F2937', letterSpacing: '-0.5px' }}>
-                  AUTOPASSION
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 600, color: '#F59E0B', marginTop: 2 }}>BJ</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                <img
+                  src="/logo-autopassion.png"
+                  alt="AutoPassion BJ"
+                  style={{ height: 60, width: 'auto', objectFit: 'contain' }}
+                  crossOrigin="anonymous"
+                />
               </div>
               <p style={{ fontSize: 9, color: '#6b7280', letterSpacing: '2px', textTransform: 'uppercase' as const, margin: 0 }}>
                 Carnet d'entretien digital
