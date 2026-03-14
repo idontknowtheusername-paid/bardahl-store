@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { generateBlogPost } from '@/lib/mistral'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
-import { Loader2, Pencil, Trash2, Eye, Sparkles, Wand2, Image, RefreshCw } from 'lucide-react'
+import { Loader2, Pencil, Trash2, Eye, Sparkles, Wand2, Image, RefreshCw, Upload, X } from 'lucide-react'
 
 interface BlogPost {
   id: string
@@ -49,10 +49,13 @@ export default function BlogPosts() {
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [editPost, setEditPost] = useState<BlogPost | null>(null)
+  const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showGenerateDialog, setShowGenerateDialog] = useState(false)
   const [customTopic, setCustomTopic] = useState('')
   const [autoPublish, setAutoPublish] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchPosts()
@@ -119,7 +122,59 @@ export default function BlogPosts() {
 
   const handleEdit = (post: BlogPost) => {
     setEditPost({ ...post })
+    setOriginalImage(post.featured_image)
     setShowEditDialog(true)
+  }
+
+  const handleCloseEditDialog = (open: boolean) => {
+    if (!open && editPost && originalImage !== editPost.featured_image) {
+      // Restore original image if dialog is closed without saving
+      setEditPost(prev => prev ? { ...prev, featured_image: originalImage } : null)
+    }
+    setShowEditDialog(open)
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editPost) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('L\'image ne doit pas dépasser 5 Mo')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${editPost.id}-${Date.now()}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('blog_images')
+        .upload(path, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('blog_images')
+        .getPublicUrl(path)
+
+      setEditPost({ ...editPost, featured_image: publicUrl })
+      toast.success('Image uploadée !')
+    } catch (error: any) {
+      toast.error(`Erreur upload : ${error.message}`)
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleRemoveImage = () => {
+    if (!editPost) return
+    setEditPost({ ...editPost, featured_image: null })
   }
 
   const handleSave = async () => {
@@ -149,6 +204,7 @@ export default function BlogPosts() {
 
       if (error) throw error
 
+      setOriginalImage(editPost.featured_image)
       toast.success('Article mis à jour')
       setShowEditDialog(false)
       fetchPosts()
@@ -354,7 +410,7 @@ export default function BlogPosts() {
       </Dialog>
 
       {/* Edit dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+      <Dialog open={showEditDialog} onOpenChange={handleCloseEditDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Modifier l'article</DialogTitle>
@@ -369,13 +425,67 @@ export default function BlogPosts() {
                 <Label>Extrait</Label>
                 <Textarea value={editPost.excerpt || ''} onChange={e => setEditPost({ ...editPost, excerpt: e.target.value })} rows={2} />
               </div>
+
+              {/* Image upload section */}
               <div>
-                <Label>Image de couverture (URL)</Label>
-                <Input value={editPost.featured_image || ''} onChange={e => setEditPost({ ...editPost, featured_image: e.target.value })} />
-                {editPost.featured_image && (
-                  <img src={editPost.featured_image} alt="" className="mt-2 w-full h-40 rounded object-cover" />
+                <Label>Image de couverture</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                {editPost.featured_image ? (
+                  <div className="mt-2 relative group">
+                    <img src={editPost.featured_image} alt="" className="w-full h-48 rounded-lg object-cover border border-border" />
+                    {uploading && (
+                      <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      </div>
+                    )}
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="gap-1.5"
+                      >
+                        <Upload className="w-3.5 h-3.5" /> Changer l'image
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                        disabled={uploading}
+                        className="gap-1.5 text-destructive hover:text-destructive"
+                      >
+                        <X className="w-3.5 h-3.5" /> Supprimer
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="mt-2 w-full h-32 rounded-lg border-2 border-dashed border-border hover:border-primary/50 bg-muted/30 flex flex-col items-center justify-center gap-2 transition-colors"
+                  >
+                    {uploading ? (
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    ) : (
+                      <>
+                        <Upload className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Cliquez pour uploader une image</span>
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
+
               <div>
                 <Label>Contenu (Markdown)</Label>
                 <Textarea value={editPost.content || ''} onChange={e => setEditPost({ ...editPost, content: e.target.value })} rows={15} className="font-mono text-sm" />
@@ -398,7 +508,7 @@ export default function BlogPosts() {
                 </Select>
               </div>
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setShowEditDialog(false)}>Annuler</Button>
+                <Button variant="outline" onClick={() => handleCloseEditDialog(false)}>Annuler</Button>
                 <Button onClick={handleSave}>Sauvegarder</Button>
               </div>
             </div>

@@ -6,6 +6,7 @@ import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -418,7 +419,6 @@ export default function VehicleDetail() {
                   <h2 className="text-lg font-bold flex items-center gap-2"><Droplets className="h-5 w-5 text-primary" /> Plan de lubrification</h2>
                   <Button size="sm" variant="outline" onClick={async () => {
                     if (!showEditPlan) {
-                      // Auto-fill from vehicle_specifications
                       if (vehicle.brand && vehicle.model) {
                         let query = supabase.from('vehicle_specifications' as any).select('*')
                           .ilike('brand', vehicle.brand)
@@ -487,52 +487,79 @@ export default function VehicleDetail() {
                         💡 Viscosité tropicale recommandée : <strong>{viscositySuggestion}</strong>
                       </div>
                     )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">🛢️ Huile moteur</label>
-                        <input type="text" value={planEngine} onChange={e => setPlanEngine(e.target.value)} placeholder="Ex: 5W-30" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+
+                    {/* 3-column edit form organized by section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Column 1: Vidange moteur */}
+                      <div className="bg-muted/30 rounded-lg p-3 border border-border">
+                        <h4 className="text-sm font-bold mb-3 flex items-center gap-2">🛢️ Faire la vidange</h4>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Huile moteur</label>
+                            <input type="text" value={planEngine} onChange={e => setPlanEngine(e.target.value)} placeholder="Ex: 5W-30" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Quantité</label>
+                            <input type="text" value={planQtyEngine} onChange={e => setPlanQtyEngine(e.target.value)} placeholder="Ex: 4.5L" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Additif / Traitement</label>
+                            <input type="text" value={planEngineCleaner} onChange={e => setPlanEngineCleaner(e.target.value)} placeholder="Ex: Additif pré-vidange" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant moteur</label>
-                        <input type="text" value={planEngineCleaner} onChange={e => setPlanEngineCleaner(e.target.value)} placeholder="Ex: Bardahl Engine Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+
+                      {/* Column 2: Transmission */}
+                      <div className="bg-muted/30 rounded-lg p-3 border border-border">
+                        <h4 className="text-sm font-bold mb-3 flex items-center gap-2">⚙️ Entretien transmission</h4>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Huile boîte</label>
+                            <input type="text" value={planGearbox} onChange={e => setPlanGearbox(e.target.value)} placeholder="Ex: 75W-90" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Quantité</label>
+                            <input type="text" value={planQtyGearbox} onChange={e => setPlanQtyGearbox(e.target.value)} placeholder="Ex: 2L" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Additif / Traitement</label>
+                            <input type="text" value={planGearboxCleaner} onChange={e => setPlanGearboxCleaner(e.target.value)} placeholder="Ex: ATF Flush" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">⚙️ Huile boîte</label>
-                        <input type="text" value={planGearbox} onChange={e => setPlanGearbox(e.target.value)} placeholder="Ex: 75W-90" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant boîte</label>
-                        <input type="text" value={planGearboxCleaner} onChange={e => setPlanGearboxCleaner(e.target.value)} placeholder="Ex: Bardahl Gearbox Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">📏 Quantité moteur</label>
-                        <input type="text" value={planQtyEngine} onChange={e => setPlanQtyEngine(e.target.value)} placeholder="Ex: 4.5L" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">📏 Quantité boîte</label>
-                        <input type="text" value={planQtyGearbox} onChange={e => setPlanQtyGearbox(e.target.value)} placeholder="Ex: 2L" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">❄️ Liquide de refroidissement</label>
-                        <input type="text" value={planCoolant} onChange={e => setPlanCoolant(e.target.value)} placeholder="Ex: G12+" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">🔴 Liquide de frein</label>
-                        <input type="text" value={planBrakeFluid} onChange={e => setPlanBrakeFluid(e.target.value)} placeholder="Ex: DOT 4" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">🧹 Nettoyant radiateur</label>
-                        <input type="text" value={planRadiatorCleaner} onChange={e => setPlanRadiatorCleaner(e.target.value)} placeholder="Ex: Bardahl Radiator Flush" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">📅 Fréquence (km)</label>
-                        <input type="number" value={planFreqKm} onChange={e => setPlanFreqKm(e.target.value)} placeholder="10000" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-1">📅 Fréquence (mois)</label>
-                        <input type="number" value={planFreqMonths} onChange={e => setPlanFreqMonths(e.target.value)} placeholder="6" className="w-full p-2.5 rounded-lg border border-input bg-background text-sm" />
+
+                      {/* Column 3: Refroidissement & Freinage */}
+                      <div className="bg-muted/30 rounded-lg p-3 border border-border md:col-span-2 lg:col-span-1">
+                        <h4 className="text-sm font-bold mb-3 flex items-center gap-2">❄️ Refroidissement & Freinage</h4>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Liquide refroidissement</label>
+                            <input type="text" value={planCoolant} onChange={e => setPlanCoolant(e.target.value)} placeholder="Ex: G12+" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Nettoyant radiateur</label>
+                            <input type="text" value={planRadiatorCleaner} onChange={e => setPlanRadiatorCleaner(e.target.value)} placeholder="Ex: Radiator Flush" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1">Liquide de frein</label>
+                            <input type="text" value={planBrakeFluid} onChange={e => setPlanBrakeFluid(e.target.value)} placeholder="Ex: DOT 4" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Frequency */}
+                    <div className="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-border">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">📅 Fréquence (km)</label>
+                        <input type="number" value={planFreqKm} onChange={e => setPlanFreqKm(e.target.value)} placeholder="10000" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1">📅 Fréquence (mois)</label>
+                        <input type="number" value={planFreqMonths} onChange={e => setPlanFreqMonths(e.target.value)} placeholder="6" className="w-full p-2 rounded-lg border border-input bg-background text-sm" />
+                      </div>
+                    </div>
+
                     <div className="flex gap-3 mt-4">
                       <Button type="button" variant="outline" size="sm" onClick={() => setShowEditPlan(false)}>Annuler</Button>
                       <Button type="submit" size="sm" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sauvegarder'}</Button>
@@ -546,63 +573,108 @@ export default function VehicleDetail() {
                     <p className="text-sm text-muted-foreground">Aucun plan de lubrification configuré.</p>
                   </div>
                 ) : plan && !showEditPlan ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Vidange moteur card */}
-                    {(plan.oil_type_engine || (plan as any).engine_cleaner || plan.oil_quantity_engine) && (
+                  <>
+                    {/* Desktop: 3 columns | Tablet: 2 cols | Mobile: accordion */}
+                    {/* Desktop/Tablet view */}
+                    <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {/* Card 1: Vidange */}
                       <div className="bg-card border border-border rounded-xl p-4 shadow-card">
-                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">🛢️ Vidange moteur</h4>
-                        <div className="space-y-2 text-sm">
-                          {plan.oil_type_engine && <div className="flex justify-between"><span className="text-muted-foreground">Huile / Produit</span><span className="font-semibold">{plan.oil_type_engine}</span></div>}
-                          {plan.oil_quantity_engine && <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_engine}</span></div>}
-                          {(plan as any).engine_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Additif / Traitement</span><span className="font-semibold">{(plan as any).engine_cleaner}</span></div>}
-                        </div>
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2 pb-2 border-b border-border">🛢️ Faire la vidange</h4>
+                        <table className="w-full text-xs">
+                          <thead><tr className="text-muted-foreground"><th className="text-left pb-2 font-medium">Produit</th><th className="text-left pb-2 font-medium">Qté</th><th className="text-left pb-2 font-medium">Additif</th></tr></thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-1.5 font-semibold">{plan.oil_type_engine || '—'}</td>
+                              <td className="py-1.5">{plan.oil_quantity_engine || '—'}</td>
+                              <td className="py-1.5">{(plan as any).engine_cleaner || '—'}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-                    )}
 
-                    {/* Vidange boîte card */}
-                    {(plan.oil_type_gearbox || (plan as any).gearbox_cleaner || plan.oil_quantity_gearbox) && (
+                      {/* Card 2: Transmission */}
                       <div className="bg-card border border-border rounded-xl p-4 shadow-card">
-                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">⚙️ Vidange boîte</h4>
-                        <div className="space-y-2 text-sm">
-                          {plan.oil_type_gearbox && <div className="flex justify-between"><span className="text-muted-foreground">Huile / Produit</span><span className="font-semibold">{plan.oil_type_gearbox}</span></div>}
-                          {plan.oil_quantity_gearbox && <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_gearbox}</span></div>}
-                          {(plan as any).gearbox_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Additif / Traitement</span><span className="font-semibold">{(plan as any).gearbox_cleaner}</span></div>}
-                        </div>
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2 pb-2 border-b border-border">⚙️ Entretien transmission</h4>
+                        <table className="w-full text-xs">
+                          <thead><tr className="text-muted-foreground"><th className="text-left pb-2 font-medium">Produit</th><th className="text-left pb-2 font-medium">Qté</th><th className="text-left pb-2 font-medium">Additif</th></tr></thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-1.5 font-semibold">{plan.oil_type_gearbox || '—'}</td>
+                              <td className="py-1.5">{plan.oil_quantity_gearbox || '—'}</td>
+                              <td className="py-1.5">{(plan as any).gearbox_cleaner || '—'}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-                    )}
 
-                    {/* Liquide refroidissement card */}
-                    {((plan as any).coolant_type || (plan as any).radiator_cleaner) && (
-                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
-                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">❄️ Liquide de refroidissement</h4>
-                        <div className="space-y-2 text-sm">
-                          {(plan as any).coolant_type && <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{(plan as any).coolant_type}</span></div>}
-                          {(plan as any).radiator_cleaner && <div className="flex justify-between"><span className="text-muted-foreground">Nettoyant</span><span className="font-semibold">{(plan as any).radiator_cleaner}</span></div>}
-                        </div>
+                      {/* Card 3: Refroidissement & Freinage */}
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card md:col-span-2 lg:col-span-1">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2 pb-2 border-b border-border">❄️ Refroidissement & Freinage</h4>
+                        <table className="w-full text-xs">
+                          <thead><tr className="text-muted-foreground"><th className="text-left pb-2 font-medium">Produit</th><th className="text-left pb-2 font-medium">Qté</th><th className="text-left pb-2 font-medium">Additif</th></tr></thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-1.5 font-semibold">{(plan as any).coolant_type || '—'}</td>
+                              <td className="py-1.5">—</td>
+                              <td className="py-1.5">{(plan as any).radiator_cleaner || '—'}</td>
+                            </tr>
+                            <tr className="border-t border-border">
+                              <td className="py-1.5 font-semibold">{(plan as any).brake_fluid_type || '—'}</td>
+                              <td className="py-1.5">—</td>
+                              <td className="py-1.5">—</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-                    )}
+                    </div>
 
-                    {/* Liquide de frein card */}
-                    {(plan as any).brake_fluid_type && (
-                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
-                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2">🔴 Liquide de frein</h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{(plan as any).brake_fluid_type}</span></div>
-                        </div>
-                      </div>
-                    )}
+                    {/* Mobile: Accordion */}
+                    <div className="md:hidden">
+                      <Accordion type="single" collapsible className="space-y-2">
+                        <AccordionItem value="vidange" className="border border-border rounded-xl overflow-hidden bg-card">
+                          <AccordionTrigger className="px-4 py-3 hover:no-underline text-sm font-bold">🛢️ Faire la vidange</AccordionTrigger>
+                          <AccordionContent className="px-4 pb-3">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{plan.oil_type_engine || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_engine || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Additif</span><span className="font-semibold">{(plan as any).engine_cleaner || '—'}</span></div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="transmission" className="border border-border rounded-xl overflow-hidden bg-card">
+                          <AccordionTrigger className="px-4 py-3 hover:no-underline text-sm font-bold">⚙️ Entretien transmission</AccordionTrigger>
+                          <AccordionContent className="px-4 pb-3">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between"><span className="text-muted-foreground">Produit</span><span className="font-semibold">{plan.oil_type_gearbox || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Quantité</span><span className="font-semibold">{plan.oil_quantity_gearbox || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Additif</span><span className="font-semibold">{(plan as any).gearbox_cleaner || '—'}</span></div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="cooling" className="border border-border rounded-xl overflow-hidden bg-card">
+                          <AccordionTrigger className="px-4 py-3 hover:no-underline text-sm font-bold">❄️ Refroidissement & Freinage</AccordionTrigger>
+                          <AccordionContent className="px-4 pb-3">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between"><span className="text-muted-foreground">Liquide refroid.</span><span className="font-semibold">{(plan as any).coolant_type || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Nettoyant rad.</span><span className="font-semibold">{(plan as any).radiator_cleaner || '—'}</span></div>
+                              <div className="flex justify-between"><span className="text-muted-foreground">Liquide frein</span><span className="font-semibold">{(plan as any).brake_fluid_type || '—'}</span></div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </div>
 
-                    {/* Fréquence card */}
+                    {/* Frequency info */}
                     {(plan.change_frequency_km || plan.change_frequency_months) && (
-                      <div className="bg-card border border-border rounded-xl p-4 shadow-card">
+                      <div className="bg-card border border-border rounded-xl p-4 shadow-card mt-4">
                         <h4 className="font-bold text-sm mb-3 flex items-center gap-2">📅 Fréquence de vidange</h4>
-                        <div className="space-y-2 text-sm">
-                          {plan.change_frequency_km && <div className="flex justify-between"><span className="text-muted-foreground">Kilométrage</span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
-                          {plan.change_frequency_months && <div className="flex justify-between"><span className="text-muted-foreground">Intervalle</span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
+                        <div className="flex gap-6 text-sm">
+                          {plan.change_frequency_km && <div><span className="text-muted-foreground">Kilométrage : </span><span className="font-semibold">{plan.change_frequency_km.toLocaleString()} km</span></div>}
+                          {plan.change_frequency_months && <div><span className="text-muted-foreground">Intervalle : </span><span className="font-semibold">{plan.change_frequency_months} mois</span></div>}
                         </div>
                       </div>
                     )}
-                  </div>
+                  </>
                 ) : null}
               </TabsContent>
 
