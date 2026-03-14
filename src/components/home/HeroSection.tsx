@@ -30,7 +30,7 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
               className="flex justify-center"
             >
-              <div className="inline-flex items-center gap-2 bg-accent/15 border border-accent/30 text-accent text-xs font-bold px-3 py-1 rounded-full mb-2 backdrop-blur-sm mr-auto ml-[15%]">
+              <div className="inline-flex items-center gap-2 bg-accent/15 border border-accent/30 text-accent text-xs font-bold px-3 py-1 rounded-full mb-2 backdrop-blur-sm">
                 <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
                 Entretien automobile & solutions moteur
               </div>
