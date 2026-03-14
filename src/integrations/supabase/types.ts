@@ -946,6 +946,7 @@ export type Database = {
           composition: string | null
           created_at: string | null
           description: string | null
+          featured_order: number | null
           id: string
           is_active: boolean | null
           is_featured: boolean | null
@@ -978,6 +979,7 @@ export type Database = {
           composition?: string | null
           created_at?: string | null
           description?: string | null
+          featured_order?: number | null
           id?: string
           is_active?: boolean | null
           is_featured?: boolean | null
@@ -1010,6 +1012,7 @@ export type Database = {
           composition?: string | null
           created_at?: string | null
           description?: string | null
+          featured_order?: number | null
           id?: string
           is_active?: boolean | null
           is_featured?: boolean | null
@@ -1087,6 +1090,39 @@ export type Database = {
           uses_count?: number | null
           valid_from?: string
           valid_until?: string | null
+        }
+        Relationships: []
+      }
+      revenues: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          id: string
+          label: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          date?: string
+          id?: string
+          label: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          label?: string
+          notes?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1582,6 +1618,20 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       lookup_customer_email: { Args: { identifier: string }; Returns: string }
       owns_vehicle: { Args: { _vehicle_id: string }; Returns: boolean }
+      search_products_fuzzy: {
+        Args: { search_query: string }
+        Returns: {
+          id: string
+          is_active: boolean
+          price: number
+          short_description: string
+          similarity_score: number
+          stock: number
+          title: string
+        }[]
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "customer"
