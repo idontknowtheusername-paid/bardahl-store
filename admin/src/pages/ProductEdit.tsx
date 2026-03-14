@@ -74,6 +74,7 @@ const PRODUCT_TYPES = [
     { value: 'additif-moteur', label: 'Additif moteur' },
   ]},
   { value: 'liquides', label: 'Liquide de refroidissement & lave-glace' },
+  { value: 'liquide-de-frein', label: 'Liquide de frein' },
   { value: 'purifiant-desodorisant', label: 'Purifiant & désodorisant' },
   { value: 'entretien', label: 'Entretien & Nettoyage' },
   { value: 'special-atelier', label: 'Spécial atelier' },
