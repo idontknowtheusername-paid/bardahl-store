@@ -273,14 +273,14 @@ export function Header() {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pointer-events-auto lg:static lg:translate-x-0">
+            <Link to="/" className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2 pointer-events-auto">
               <span className="text-accent font-extrabold text-2xl md:text-3xl tracking-tight">AUTO</span>
               <span className="text-primary font-extrabold text-2xl md:text-3xl tracking-tight">PASSION</span>
               <span className="text-secondary-foreground/50 text-xs font-bold ml-1 hidden sm:inline">BJ</span>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-3 xl:gap-5">
+            <nav className="hidden lg:flex items-center gap-3 xl:gap-5 absolute left-4 top-1/2 -translate-y-1/2">
               {navLinks.map(({ label, href, hasSubmenu }) => (
                 <div key={href} className="relative"
                   onMouseEnter={() => hasSubmenu && setShowProductsMenu(true)}
@@ -320,7 +320,7 @@ export function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-0 md:gap-1 ml-auto">
+            <div className="flex items-center gap-0 md:gap-1 absolute right-0 top-1/2 -translate-y-1/2 lg:relative lg:right-auto lg:top-auto lg:translate-y-0">
               {/* Search - desktop only */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
