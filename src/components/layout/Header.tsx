@@ -110,7 +110,7 @@ export function Header() {
         <div className="container">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Left side: Menu + Search (mobile only) */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0 md:gap-1">
               {/* Mobile Menu */}
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
@@ -320,7 +320,7 @@ export function Header() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center gap-0 ml-auto">
+            <div className="flex items-center gap-0 md:gap-1 ml-auto">
               {/* Search - desktop only */}
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                 <SheetTrigger asChild>
