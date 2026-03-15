@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check } from 'lucide-react';
+import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check, History } from 'lucide-react';
 import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import MaintenanceValidationBanner from '@/components/vehicle/MaintenanceValidationBanner';
@@ -90,6 +90,8 @@ export default function VehicleDetail() {
   const [alertPrefs, setAlertPrefs] = useState({ midpoint: true, one_week: true, one_day: true });
   const [alertInterval, setAlertInterval] = useState('6');
   const [savingAlerts, setSavingAlerts] = useState(false);
+  const [alertsHistoryPage, setAlertsHistoryPage] = useState(1);
+  const ALERTS_HISTORY_PER_PAGE = 5;
 
   // Maintenance validation banner
   const [showValidationBanner, setShowValidationBanner] = useState(false);
@@ -119,35 +121,47 @@ export default function VehicleDetail() {
     // Fetch alert reminder for this vehicle
     const veh = vehicles.find(v => v.id === id);
     if (veh) {
-      const { data: reminder } = await supabase
+      // Try to fetch by vehicle_id first (primary method)
+      let { data: reminder } = await supabase
         .from('oil_change_reminders')
         .select('*')
+        .eq('vehicle_id', id)
         .eq('is_active', true)
-        .limit(50);
-      const match = reminder?.find((r: any) =>
-        r.vehicle_brand === veh.brand && r.vehicle_model === veh.model
-      );
-      if (match) {
-        setAlertReminder(match);
-        setAlertPrefs((match as any).alert_preferences || { midpoint: true, one_week: true, one_day: true });
-        setAlertInterval(String(match.reminder_interval_months || 6));
+        .maybeSingle();
+
+      // Fallback: if not found, try by brand/model (for legacy data)
+      if (!reminder && veh.brand && veh.model) {
+        const { data: legacyReminder } = await supabase
+          .from('oil_change_reminders')
+          .select('*')
+          .ilike('vehicle_brand', veh.brand)
+          .ilike('vehicle_model', `%${veh.model}%`)
+          .eq('is_active', true)
+          .maybeSingle();
+        reminder = legacyReminder;
+      }
+
+      if (reminder) {
+        setAlertReminder(reminder);
+        setAlertPrefs((reminder as any).alert_preferences || { midpoint: true, one_week: true, one_day: true });
+        setAlertInterval(String(reminder.reminder_interval_months || 6));
 
         // Check if maintenance is overdue
-        const nextDate = new Date(match.next_reminder_date);
+        const nextDate = new Date(reminder.next_reminder_date);
         const today = new Date();
         const isPast = nextDate < today;
 
         if (isPast) {
           // Check if there's a "Vidange moteur" record for this date
           const vidangeRecord = (recs as unknown as MaintenanceRecord[])?.find(
-            r => r.maintenance_type === 'Vidange moteur' && r.next_date === match.next_reminder_date
+            r => r.maintenance_type === 'Vidange moteur' && r.next_date === reminder.next_reminder_date
           );
 
           if (vidangeRecord) {
             setPendingMaintenance({
               type: 'Vidange moteur',
-              date: match.next_reminder_date,
-              intervalMonths: match.reminder_interval_months || 6,
+              date: reminder.next_reminder_date,
+              intervalMonths: reminder.reminder_interval_months || 6,
             });
             setShowValidationBanner(true);
           }
@@ -727,47 +741,65 @@ export default function VehicleDetail() {
 
               {/* TAB: Alertes */}
               <TabsContent value="alertes" className="space-y-4">
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" /> Préférences d'alertes
-                </h2>
-
-                {!alertReminder ? (
-                  <div className="bg-card border border-border rounded-xl p-8 text-center">
-                    <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground mb-3">Aucun rappel configuré pour ce véhicule.</p>
-                    <p className="text-xs text-muted-foreground mb-4">Activez les rappels pour recevoir des alertes avant chaque vidange.</p>
-                    <Button
-                      disabled={savingAlerts}
-                      onClick={async () => {
-                        setSavingAlerts(true);
-                        const next = new Date();
-                        next.setMonth(next.getMonth() + 6);
-                        const { data: newReminder, error } = await supabase
-                          .from('oil_change_reminders')
-                          .insert({
-                            customer_email: profile?.email || `${profile?.phone}@autopassion.local`,
-                            customer_name: profile?.full_name || '',
-                            customer_phone: profile?.phone || '',
-                            vehicle_brand: vehicle.brand || null,
-                            vehicle_model: vehicle.model || null,
-                            reminder_interval_months: 6,
-                            next_reminder_date: next.toISOString(),
-                            alert_preferences: { midpoint: true, one_week: true, one_day: true },
-                          } as any)
-                          .select()
-                          .single();
-                        setSavingAlerts(false);
-                        if (error) { toast.error('Erreur: ' + error.message); return; }
-                        toast.success('🔔 Rappels vidange activés ! (par défaut : tous les 6 mois)');
-                        fetchData();
-                      }}
-                      className="gap-2"
-                    >
-                      {savingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Bell className="h-4 w-4" /> Activer les rappels vidange</>}
-                    </Button>
-                  </div>
+                    {!alertReminder ? (
+                      <>
+                        <h2 className="text-lg font-bold flex items-center gap-2">
+                          <Bell className="h-5 w-5 text-primary" /> Préférences d'alertes
+                        </h2>
+                        <div className="bg-card border border-border rounded-xl p-8 text-center">
+                          <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground mb-3">Aucun rappel configuré pour ce véhicule.</p>
+                          <p className="text-xs text-muted-foreground mb-4">Activez les rappels pour recevoir des alertes avant chaque vidange.</p>
+                          <Button
+                            disabled={savingAlerts}
+                            onClick={async () => {
+                              setSavingAlerts(true);
+                              const next = new Date();
+                              next.setMonth(next.getMonth() + 6);
+                              const { data: newReminder, error } = await supabase
+                                .from('oil_change_reminders')
+                                .insert({
+                                  vehicle_id: id,
+                                  customer_id: profile?.id,
+                                  customer_email: profile?.email || `${profile?.phone}@autopassion.local`,
+                                  customer_name: profile?.full_name || '',
+                                  customer_phone: profile?.phone || '',
+                                  vehicle_brand: vehicle.brand || null,
+                                  vehicle_model: vehicle.model || null,
+                                  vehicle_engine: vehicle.engine || null,
+                                  reminder_interval_months: 6,
+                                  next_reminder_date: next.toISOString(),
+                                  alert_preferences: { midpoint: true, one_week: true, one_day: true },
+                                } as any)
+                                .select()
+                                .single();
+                              setSavingAlerts(false);
+                              if (error) { toast.error('Erreur: ' + error.message); return; }
+                              toast.success('🔔 Rappels vidange activés ! (par défaut : tous les 6 mois)');
+                              fetchData();
+                            }}
+                            className="gap-2"
+                          >
+                            {savingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Bell className="h-4 w-4" /> Activer les rappels vidange</>}
+                          </Button>
+                        </div>
+                      </>
                 ) : (
-                  <div className="bg-card border border-border rounded-xl p-5 space-y-5">
+                        <Tabs defaultValue="preferences" className="w-full">
+                          <TabsList className="w-full grid grid-cols-2 mb-4">
+                            <TabsTrigger value="preferences" className="gap-1.5 text-xs sm:text-sm">
+                              <Bell className="h-4 w-4 hidden sm:block" /> Préférences
+                            </TabsTrigger>
+                            <TabsTrigger value="historique" className="gap-1.5 text-xs sm:text-sm">
+                              <History className="h-4 w-4 hidden sm:block" /> Historique
+                            </TabsTrigger>
+                          </TabsList>
+
+                          {/* Preferences Tab */}
+                          <TabsContent value="preferences" className="space-y-4">
+                            <h2 className="text-lg font-bold flex items-center gap-2">
+                              <Bell className="h-5 w-5 text-primary" /> Préférences d'alertes
+                            </h2>
                     {/* Interval */}
                     <div>
                       <label className="block text-sm font-semibold mb-2">Fréquence de vidange</label>
@@ -853,7 +885,113 @@ export default function VehicleDetail() {
                     >
                       {savingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sauvegarder mes préférences'}
                     </Button>
-                  </div>
+                          </TabsContent>
+
+                          {/* Historique Tab */}
+                          <TabsContent value="historique" className="space-y-4">
+                            <h2 className="text-lg font-bold flex items-center gap-2">
+                              <History className="h-5 w-5 text-primary" /> Historique des alertes
+                            </h2>
+
+                            {!alertReminder?.alerts_sent || Object.keys(alertReminder.alerts_sent).length === 0 ? (
+                              <div className="bg-card border border-border rounded-xl p-8 text-center">
+                                <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                                <p className="text-sm text-muted-foreground">Aucune alerte envoyée pour le moment.</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                {Object.entries(alertReminder.alerts_sent as Record<string, string>).map(([type, date]) => {
+                                  const alertDate = new Date(date);
+                                  const typeLabel = type === 'midpoint' ? '⏳ Mi-chemin' : type === 'one_week' ? '⚠️ J-7' : '🚨 J-1';
+                                  return (
+                                    <div key={type} className="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
+                                      <div>
+                                        <p className="text-sm font-medium">{typeLabel}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Envoyée le {alertDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                      </div>
+                                      <Check className="h-4 w-4 text-green-600" />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground">
+                              <p className="font-semibold text-foreground text-sm mb-1">ℹ️ À propos</p>
+                              <p>Cet historique affiche toutes les alertes email envoyées pour ce véhicule. Les alertes sont réinitialisées quand vous modifiez la date de vidange.</p>
+                            </div>
+
+                            {/* Historique complet des cycles */}
+                            {alertReminder?.alerts_history && alertReminder.alerts_history.length > 0 && (
+                              <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="full-history">
+                                  <AccordionTrigger className="text-sm font-semibold">
+                                    📋 Historique complet ({alertReminder.alerts_history.length} cycles)
+                                  </AccordionTrigger>
+                                  <AccordionContent className="space-y-3">
+                                    {alertReminder.alerts_history
+                                      .slice()
+                                      .reverse()
+                                      .slice((alertsHistoryPage - 1) * ALERTS_HISTORY_PER_PAGE, alertsHistoryPage * ALERTS_HISTORY_PER_PAGE)
+                                      .map((cycle: any, idx: number) => {
+                                        const cycleDate = new Date(cycle.cycle_date);
+                                        const alertCount = Object.keys(cycle.alerts || {}).length;
+                                        return (
+                                          <div key={idx} className="bg-card border border-border rounded-lg p-3 space-y-2">
+                                            <p className="text-sm font-medium">
+                                              Cycle du {cycleDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                            </p>
+                                            <div className="space-y-1">
+                                              {Object.entries(cycle.alerts || {}).map(([type, date]: [string, any]) => {
+                                                const alertDate = new Date(date);
+                                                const typeLabel = type === 'midpoint' ? '⏳ Mi-chemin' : type === 'one_week' ? '⚠️ J-7' : '🚨 J-1';
+                                                return (
+                                                  <div key={type} className="text-xs text-muted-foreground flex items-center gap-2">
+                                                    <Check className="h-3 w-3 text-green-600" />
+                                                    <span>{typeLabel} - {alertDate.toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                  </div>
+                                                );
+                                              })}
+                                              {alertCount === 0 && <p className="text-xs text-muted-foreground italic">Aucune alerte envoyée</p>}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+
+                                    {/* Pagination */}
+                                    {alertReminder.alerts_history.length > ALERTS_HISTORY_PER_PAGE && (
+                                      <div className="flex items-center justify-between pt-3 border-t border-border">
+                                        <p className="text-xs text-muted-foreground">
+                                          Page {alertsHistoryPage} sur {Math.ceil(alertReminder.alerts_history.length / ALERTS_HISTORY_PER_PAGE)}
+                                        </p>
+                                        <div className="flex gap-2">
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            disabled={alertsHistoryPage === 1}
+                                            onClick={() => setAlertsHistoryPage(p => p - 1)}
+                                          >
+                                            ← Précédent
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            disabled={alertsHistoryPage >= Math.ceil(alertReminder.alerts_history.length / ALERTS_HISTORY_PER_PAGE)}
+                                            onClick={() => setAlertsHistoryPage(p => p + 1)}
+                                          >
+                                            Suivant →
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              </Accordion>
+                            )}
+                          </TabsContent>
+                        </Tabs>
                 )}
               </TabsContent>
 

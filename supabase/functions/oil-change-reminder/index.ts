@@ -218,12 +218,21 @@ serve(async (req) => {
         const newNext = new Date(now);
         newNext.setMonth(newNext.getMonth() + (reminder.reminder_interval_months || 6));
 
+        // Archive current alerts to history before resetting
+        const currentCycle = {
+          cycle_date: nextDate.toISOString(),
+          alerts: alertsSent,
+          archived_at: now.toISOString(),
+        };
+        const updatedHistory = [...(reminder.alerts_history || []), currentCycle];
+
         await supabase
           .from("oil_change_reminders")
           .update({
             next_reminder_date: newNext.toISOString(),
             reminder_count: (reminder.reminder_count || 0) + 1,
             alerts_sent: {},
+            alerts_history: updatedHistory,
             updated_at: now.toISOString(),
           })
           .eq("id", reminder.id);
