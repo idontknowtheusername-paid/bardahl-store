@@ -308,6 +308,36 @@ export type Database = {
         }
         Relationships: []
       }
+      description_generation_schedule: {
+        Row: {
+          current_frequency: string | null
+          id: number
+          last_run: string | null
+          setup_date: string | null
+          switch_date: string | null
+          total_processed: number | null
+          total_runs: number | null
+        }
+        Insert: {
+          current_frequency?: string | null
+          id?: number
+          last_run?: string | null
+          setup_date?: string | null
+          switch_date?: string | null
+          total_processed?: number | null
+          total_runs?: number | null
+        }
+        Update: {
+          current_frequency?: string | null
+          id?: number
+          last_run?: string | null
+          setup_date?: string | null
+          switch_date?: string | null
+          total_processed?: number | null
+          total_runs?: number | null
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -1616,6 +1646,10 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
+      log_generation_run: {
+        Args: { processed_count: number }
+        Returns: undefined
+      }
       lookup_customer_email: { Args: { identifier: string }; Returns: string }
       owns_vehicle: { Args: { _vehicle_id: string }; Returns: boolean }
       search_products_fuzzy: {
@@ -1630,8 +1664,13 @@ export type Database = {
           title: string
         }[]
       }
+      should_switch_to_daily: { Args: never; Returns: boolean }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      update_schedule_frequency: {
+        Args: { new_frequency: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "editor" | "viewer" | "customer"
