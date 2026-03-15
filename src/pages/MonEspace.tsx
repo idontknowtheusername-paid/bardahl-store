@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight, Settings, Mail, KeyRound, Save, X } from 'lucide-react';
+import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight, Settings, Mail, KeyRound, Save, X, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
@@ -131,9 +131,12 @@ export default function MonEspace() {
         {/* Content with Tabs */}
         <div className="container py-5">
           <Tabs defaultValue="vehicules" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 mb-5">
+            <TabsList className="w-full grid grid-cols-3 mb-5">
               <TabsTrigger value="vehicules" className="gap-1.5 text-xs sm:text-sm">
-                <Car className="h-4 w-4 hidden sm:block" /> Mes véhicules
+                <Car className="h-4 w-4 hidden sm:block" /> Véhicules
+              </TabsTrigger>
+              <TabsTrigger value="historique" className="gap-1.5 text-xs sm:text-sm" onClick={() => navigate('/mon-espace/historique')}>
+                <History className="h-4 w-4 hidden sm:block" /> Historique
               </TabsTrigger>
               <TabsTrigger value="parametres" className="gap-1.5 text-xs sm:text-sm">
                 <Settings className="h-4 w-4 hidden sm:block" /> Paramètres

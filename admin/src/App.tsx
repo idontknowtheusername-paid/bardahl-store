@@ -26,6 +26,8 @@ import Users from '@/pages/Users';
 import Invoices from '@/pages/Invoices';
 import Reminders from '@/pages/Reminders';
 import Finances from '@/pages/Finances';
+import PaymentLinks from '@/pages/PaymentLinks';
+import Packs from '@/pages/Packs';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +71,8 @@ function App() {
                         <Route path="/invoices" element={<Invoices />} />
                         <Route path="/reminders" element={<Reminders />} />
                         <Route path="/finances" element={<Finances />} />
+                        <Route path="/payment-links" element={<PaymentLinks />} />
+                        <Route path="/packs" element={<Packs />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </AdminLayout>

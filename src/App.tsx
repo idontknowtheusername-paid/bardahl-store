@@ -42,6 +42,8 @@ import Entretien from "./pages/Entretien";
 import CustomerAuth from "./pages/CustomerAuth";
 import MonEspace from "./pages/MonEspace";
 import VehicleDetail from "./pages/VehicleDetail";
+import CustomerHistory from "./pages/CustomerHistory";
+import PaymentLink from "./pages/PaymentLink";
 import QRView from "./pages/QRView";
 import Maintenance from "./pages/Maintenance";
 import NotFound from "./pages/NotFound";
@@ -117,7 +119,9 @@ const App = () => {
                     <Route path="/entretien" element={<Entretien />} />
                     <Route path="/connexion" element={<CustomerAuth />} />
                     <Route path="/mon-espace" element={<MonEspace />} />
+                    <Route path="/mon-espace/historique" element={<CustomerHistory />} />
                     <Route path="/mon-espace/vehicule/:id" element={<VehicleDetail />} />
+                    <Route path="/paiement/:token" element={<PaymentLink />} />
                     <Route path="/qr/:token" element={<QRView />} />
                     <Route path="/marketing-plan" element={<MarketingPlan />} />
                     <Route path="*" element={<NotFound />} />

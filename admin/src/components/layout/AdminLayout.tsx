@@ -27,6 +27,8 @@ import {
   Moon,
   Sun,
   PiggyBank,
+  Link as LinkIcon,
+  Boxes,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -66,11 +68,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
     { href: '/products', label: t.nav.products, icon: Package },
     { href: '/orders', label: t.nav.orders, icon: ShoppingCart },
+    { href: '/payment-links', label: 'Liens paiement', icon: LinkIcon },
     { href: '/invoices', label: 'Factures', icon: Receipt },
     { href: '/customers', label: t.nav.customers, icon: UsersIcon },
     { href: '/reminders', label: 'Rappels vidange', icon: Bell },
     { href: '/users', label: t.nav.users, icon: UsersIcon },
     { href: '/promo-codes', label: t.nav.promoCodes, icon: Percent },
+    { href: '/packs', label: 'Packs', icon: Boxes },
     { href: '/blog', label: t.nav.blog, icon: FileText },
     { href: '/media', label: t.nav.media, icon: Image },
     // { href: '/newsletter', label: t.nav.newsletter, icon: Mail },

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, ExternalLink, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,35 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FilterResult {
   reference: string;
   brand: string;
-  type: string;
-  compatible: string[];
+  filter_type: string;
+  equivalent_references: string[];
 }
-
-// TODO: connect HIFI.COM API — currently using mock data
-const mockSearch = async (query: string): Promise<FilterResult[]> => {
-  await new Promise(r => setTimeout(r, 800));
-  if (!query.trim()) return [];
-  
-  const mockResults: FilterResult[] = [
-    {
-      reference: query.toUpperCase(),
-      brand: 'HIFI',
-      type: 'Filtre à huile',
-      compatible: ['MANN W 712/95', 'BOSCH F 026 407 157', 'MAHLE OC 593/4'],
-    },
-    {
-      reference: `HF-${query.toUpperCase().slice(0, 4)}`,
-      brand: 'HIFI',
-      type: 'Filtre à huile',
-      compatible: ['PURFLUX LS 923', 'FRAM PH 5796A'],
-    },
-  ];
-  return mockResults;
-};
 
 export function FilterEquivalenceModal() {
   const [open, setOpen] = useState(false);
@@ -51,9 +30,21 @@ export function FilterEquivalenceModal() {
     if (!query.trim()) return;
     setLoading(true);
     setSearched(true);
-    // TODO: connect HIFI.COM API
-    const data = await mockSearch(query);
-    setResults(data);
+
+    const { data, error } = await supabase
+      .from('filter_equivalences')
+      .select('reference, brand, filter_type, equivalent_references')
+      .or(`reference.ilike.%${query.trim()}%,brand.ilike.%${query.trim()}%`)
+      .limit(10);
+
+    if (!error && data) {
+      setResults(data.map(d => ({
+        ...d,
+        equivalent_references: (d.equivalent_references as any) || [],
+      })));
+    } else {
+      setResults([]);
+    }
     setLoading(false);
   };
 
@@ -115,12 +106,12 @@ export function FilterEquivalenceModal() {
                       <span className="text-xs text-muted-foreground ml-2">{result.brand}</span>
                     </div>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                      {result.type}
+                      {result.filter_type}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">Équivalences compatibles :</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {result.compatible.map((ref, j) => (
+                    {result.equivalent_references.map((ref, j) => (
                       <span key={j} className="text-xs bg-muted px-2 py-1 rounded font-medium">
                         {ref}
                       </span>
@@ -128,10 +119,6 @@ export function FilterEquivalenceModal() {
                   </div>
                 </div>
               ))}
-              <p className="text-[10px] text-muted-foreground text-center italic">
-                {/* TODO: connect HIFI.COM API */}
-                Source : données de démonstration. Intégration HIFI.COM en cours.
-              </p>
             </div>
           )}
         </div>
