@@ -42,6 +42,8 @@ import Entretien from "./pages/Entretien";
 import CustomerAuth from "./pages/CustomerAuth";
 import MonEspace from "./pages/MonEspace";
 import VehicleDetail from "./pages/VehicleDetail";
+import CustomerHistory from "./pages/CustomerHistory";
+import PaymentLink from "./pages/PaymentLink";
 import QRView from "./pages/QRView";
 import Maintenance from "./pages/Maintenance";
 import NotFound from "./pages/NotFound";
