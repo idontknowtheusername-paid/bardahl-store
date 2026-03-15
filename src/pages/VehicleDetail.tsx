@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check, History } from 'lucide-react';
+import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check, History, Settings } from 'lucide-react';
 import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
 import MaintenanceValidationBanner from '@/components/vehicle/MaintenanceValidationBanner';
@@ -91,6 +91,7 @@ export default function VehicleDetail() {
   const [alertInterval, setAlertInterval] = useState('6');
   const [savingAlerts, setSavingAlerts] = useState(false);
   const [alertsHistoryPage, setAlertsHistoryPage] = useState(1);
+  const [disablingAlerts, setDisablingAlerts] = useState(false);
   const ALERTS_HISTORY_PER_PAGE = 5;
 
   // Maintenance validation banner
@@ -785,15 +786,51 @@ export default function VehicleDetail() {
                         </div>
                       </>
                 ) : (
-                        <Tabs defaultValue="preferences" className="w-full">
-                          <TabsList className="w-full grid grid-cols-2 mb-4">
+                        <Tabs defaultValue="status" className="w-full">
+                          <TabsList className="w-full grid grid-cols-3 mb-4">
+                            <TabsTrigger value="status" className="gap-1.5 text-xs sm:text-sm">
+                              <Check className="h-4 w-4 hidden sm:block" /> Statut
+                            </TabsTrigger>
                             <TabsTrigger value="preferences" className="gap-1.5 text-xs sm:text-sm">
-                              <Bell className="h-4 w-4 hidden sm:block" /> Préférences
+                              <Settings className="h-4 w-4 hidden sm:block" /> Préférences
                             </TabsTrigger>
                             <TabsTrigger value="historique" className="gap-1.5 text-xs sm:text-sm">
                               <History className="h-4 w-4 hidden sm:block" /> Historique
                             </TabsTrigger>
                           </TabsList>
+
+                          {/* Statut Tab */}
+                          <TabsContent value="status" className="space-y-4">
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Check className="h-5 w-5 text-green-600" />
+                                <p className="font-semibold text-green-900">Alertes activées</p>
+                              </div>
+                              <div className="text-sm text-green-800 space-y-1">
+                                <p>📅 Intervalle: tous les <strong>{alertReminder.reminder_interval_months} mois</strong></p>
+                                <p>📧 Prochaine alerte: <strong>{new Date(alertReminder.next_reminder_date).toLocaleDateString('fr-FR')}</strong></p>
+                              </div>
+                            </div>
+
+                            <Button
+                              variant="destructive"
+                              className="w-full"
+                              disabled={disablingAlerts}
+                              onClick={async () => {
+                                setDisablingAlerts(true);
+                                const { error } = await supabase
+                                  .from('oil_change_reminders')
+                                  .update({ is_active: false })
+                                  .eq('id', alertReminder.id);
+                                setDisablingAlerts(false);
+                                if (error) { toast.error('Erreur: ' + error.message); return; }
+                                toast.success('Alertes désactivées');
+                                fetchData();
+                              }}
+                            >
+                              {disablingAlerts ? <Loader2 className="h-4 w-4 animate-spin" /> : '❌ Désactiver les alertes'}
+                            </Button>
+                          </TabsContent>
 
                           {/* Preferences Tab */}
                           <TabsContent value="preferences" className="space-y-4">

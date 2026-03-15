@@ -68,7 +68,6 @@ BEGIN
       customer_phone,
       vehicle_brand,
       vehicle_model,
-      vehicle_engine,
       next_reminder_date,
       reminder_interval_months,
       is_active,
@@ -82,9 +81,8 @@ BEGIN
       v_customer.phone,
       v_vehicle.brand,
       v_vehicle.model,
-      v_vehicle.engine,
       NEW.next_date,
-      3, -- Intervalle par défaut de 3 mois
+      6, -- Intervalle par défaut de 6 mois
       true,
       '{}',
       '{"midpoint": true, "one_week": true, "one_day": true}'
