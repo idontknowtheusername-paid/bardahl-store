@@ -141,7 +141,7 @@ export default function PaymentLinks() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button onClick={copyLink} variant="outline"><Copy className="h-4 w-4 mr-2" /> Copier</Button>
-                  <Button onClick={sendWhatsApp} className="bg-green-600 hover:bg-green-700 text-white"><Send className="h-4 w-4 mr-2" /> WhatsApp</Button>
+                  <Button onClick={sendWhatsApp} variant="default"><Send className="h-4 w-4 mr-2" /> WhatsApp</Button>
                 </div>
                 <div className="border-t pt-3">
                   <p className="text-sm font-semibold mb-1">Récapitulatif</p>
