@@ -4,21 +4,83 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Package } from 'lucide-react';
-import { useProducts } from '@/hooks/use-supabase-api';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PacksCarouselProps {
   className?: string;
 }
 
 export function PacksCarousel({ className = '' }: PacksCarouselProps) {
-  const { data: allProducts } = useProducts({ limit: 200 });
+  // Fetch packs from product_packs table
+  const { data: packs } = useQuery({
+    queryKey: ['product-packs-carousel'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('product_packs')
+        .select(`
+          id,
+          name,
+          slug,
+          description,
+          image_url,
+          discount_type,
+          discount_value,
+          is_active,
+          pack_items (
+            quantity,
+            product_id,
+            products (price, title)
+          )
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      return data || [];
+    },
+  });
 
-  const packs = useMemo(() => {
-    if (!allProducts) return [];
-    return allProducts.filter(p => p.style === 'packs-entretien' || p.category === 'packs-entretien');
-  }, [allProducts]);
+  // Transform packs to Product format for ProductCard
+  const transformedPacks = useMemo(() => {
+    if (!packs) return [];
 
-  if (packs.length === 0) return null;
+    return packs.map(pack => {
+      // Calculate pack price from items
+      const items = (pack.pack_items as any[]) || [];
+      const subtotal = items.reduce((sum, item) => {
+        const price = item.products?.price || 0;
+        return sum + (price * item.quantity);
+      }, 0);
+
+      // Apply discount
+      const discount = pack.discount_type === 'percentage'
+        ? subtotal * (pack.discount_value / 100)
+        : pack.discount_value;
+      const finalPrice = Math.max(0, subtotal - discount);
+
+      return {
+        id: pack.id,
+        slug: `/packs/${pack.slug}`,
+        name: pack.name,
+        price: finalPrice,
+        originalPrice: subtotal > finalPrice ? subtotal : undefined,
+        images: [pack.image_url || '/placeholder.svg'],
+        category: 'packs-entretien',
+        collection: '',
+        colors: [{ name: 'Standard', hex: '#1a1a1a' }],
+        sizes: [{ size: 'Standard', available: true }],
+        cupSizes: [],
+        description: pack.description || '',
+        composition: '',
+        care: '',
+        style: 'packs-entretien',
+        isNew: false,
+        isBestseller: false,
+        stock: { global: 1 },
+      };
+    });
+  }, [packs]);
+
+  if (!transformedPacks.length) return null;
 
   return (
     <section className={`py-10 md:py-16 bg-muted/30 ${className}`}>
@@ -37,9 +99,9 @@ export function PacksCarousel({ className = '' }: PacksCarouselProps) {
             <Link to="/categories/packs-entretien">Voir tous</Link>
           </Button>
         </div>
-        <Carousel opts={{ align: 'start', loop: packs.length > 3 }} className="w-full">
+        <Carousel opts={{ align: 'start', loop: transformedPacks.length > 3 }} className="w-full">
           <CarouselContent className="-ml-4 md:-ml-6">
-            {packs.map((product, index) => (
+            {transformedPacks.map((product, index) => (
               <CarouselItem key={product.id} className="pl-4 md:pl-6 basis-[45%] sm:basis-[40%] md:basis-1/3 lg:basis-1/4">
                 <ProductCard product={product} className="animate-slide-up"
                   style={{ animationDelay: `${index * 50}ms` } as React.CSSProperties} />

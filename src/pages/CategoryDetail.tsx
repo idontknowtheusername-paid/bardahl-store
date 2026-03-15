@@ -8,6 +8,8 @@ import { PacksCarousel } from '@/components/product/PacksCarousel';
 import { FilterEquivalenceModal } from '@/components/product/FilterEquivalenceModal';
 import { useProducts } from '@/hooks/use-supabase-api';
 import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const PRODUCT_TYPE_INFO: Record<string, { name: string; description: string; parentType?: string }> = {
   'huiles-moteur': { name: 'Huiles Moteur', description: 'Huiles moteur haute performance pour tous types de véhicules' },
@@ -37,9 +39,78 @@ export default function CategoryDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: allProducts, isLoading } = useProducts();
 
+  // Fetch packs from product_packs table if slug is packs-entretien
+  const { data: configurablePacks, isLoading: isLoadingPacks } = useQuery({
+    queryKey: ['product-packs', slug],
+    queryFn: async () => {
+      if (slug !== 'packs-entretien') return null;
+      const { data } = await supabase
+        .from('product_packs')
+        .select(`
+          id,
+          name,
+          slug,
+          description,
+          image_url,
+          discount_type,
+          discount_value,
+          is_active,
+          pack_items (
+            quantity,
+            product_id,
+            products (price, title)
+          )
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      return data || [];
+    },
+    enabled: slug === 'packs-entretien',
+  });
+
   const categoryInfo = slug ? PRODUCT_TYPE_INFO[slug] : null;
 
   const products = useMemo(() => {
+    // If packs-entretien, use configurable packs from product_packs table
+    if (slug === 'packs-entretien' && configurablePacks) {
+      return configurablePacks.map(pack => {
+        // Calculate pack price from items
+        const items = (pack.pack_items as any[]) || [];
+        const subtotal = items.reduce((sum, item) => {
+          const price = item.products?.price || 0;
+          return sum + (price * item.quantity);
+        }, 0);
+
+        // Apply discount
+        const discount = pack.discount_type === 'percentage'
+          ? subtotal * (pack.discount_value / 100)
+          : pack.discount_value;
+        const finalPrice = Math.max(0, subtotal - discount);
+
+        return {
+          id: pack.id,
+          slug: `/packs/${pack.slug}`,
+          name: pack.name,
+          price: finalPrice,
+          originalPrice: subtotal > finalPrice ? subtotal : undefined,
+          images: [pack.image_url || '/placeholder.svg'],
+          category: 'packs-entretien',
+          collection: '',
+          colors: [{ name: 'Standard', hex: '#1a1a1a' }],
+          sizes: [{ size: 'Standard', available: true }],
+          cupSizes: [],
+          description: pack.description || '',
+          composition: '',
+          care: '',
+          style: 'packs-entretien',
+          isNew: false,
+          isBestseller: false,
+          stock: { global: 1 },
+        };
+      });
+    }
+
+    // Otherwise, use regular products
     if (!allProducts || !slug) return [];
     const info = PRODUCT_TYPE_INFO[slug];
 
@@ -76,9 +147,9 @@ export default function CategoryDetail() {
     }
 
     return filtered;
-  }, [allProducts, slug]);
+  }, [allProducts, slug, configurablePacks]);
 
-  if (isLoading) {
+  if (isLoading || (slug === 'packs-entretien' && isLoadingPacks)) {
     return (
       <div className="py-8 md:py-12">
         <div className="container">
