@@ -68,6 +68,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/', label: t.nav.dashboard, icon: LayoutDashboard },
     { href: '/products', label: t.nav.products, icon: Package },
     { href: '/orders', label: t.nav.orders, icon: ShoppingCart },
+    { href: '/payment-links', label: 'Liens paiement', icon: LinkIcon },
     { href: '/invoices', label: 'Factures', icon: Receipt },
     { href: '/customers', label: t.nav.customers, icon: UsersIcon },
     { href: '/reminders', label: 'Rappels vidange', icon: Bell },
