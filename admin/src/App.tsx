@@ -26,6 +26,8 @@ import Users from '@/pages/Users';
 import Invoices from '@/pages/Invoices';
 import Reminders from '@/pages/Reminders';
 import Finances from '@/pages/Finances';
+import PaymentLinks from '@/pages/PaymentLinks';
+import Packs from '@/pages/Packs';
 
 const queryClient = new QueryClient({
   defaultOptions: {
