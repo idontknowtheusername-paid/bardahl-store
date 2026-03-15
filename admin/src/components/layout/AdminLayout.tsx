@@ -27,6 +27,8 @@ import {
   Moon,
   Sun,
   PiggyBank,
+  Link as LinkIcon,
+  Boxes,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
