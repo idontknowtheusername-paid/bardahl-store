@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Loader2, Package, Trash2, Search, Save } from 'lucide-react';
+import { Plus, Loader2, Package, Trash2, Search, Save, X } from 'lucide-react';
 
 interface PackItem {
   product_id: string;
@@ -28,6 +28,8 @@ export default function Packs() {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
   const [packItems, setPackItems] = useState<PackItem[]>([]);
@@ -61,6 +63,7 @@ export default function Packs() {
         name,
         slug: slug || name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         description,
+        image_url: imageUrl || null,
         discount_type: discountType,
         discount_value: discountValue,
         is_active: true,
@@ -123,8 +126,35 @@ export default function Packs() {
   };
 
   const resetForm = () => {
-    setEditId(null); setName(''); setSlug(''); setDescription('');
+    setEditId(null); setName(''); setSlug(''); setDescription(''); setImageUrl('');
     setDiscountType('percentage'); setDiscountValue(0); setPackItems([]);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `pack-${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('products')
+        .upload(fileName, file, { upsert: true });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(fileName);
+
+      setImageUrl(publicUrl);
+      toast.success('Image uploadée');
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   return (
@@ -143,6 +173,35 @@ export default function Packs() {
                 <div><Label>Slug</Label><Input value={slug} onChange={e => setSlug(e.target.value)} /></div>
               </div>
               <div><Label>Description</Label><Input value={description} onChange={e => setDescription(e.target.value)} /></div>
+
+              <div>
+                <Label>Image du pack</Label>
+                <div className="flex gap-3 items-start mt-1">
+                  {imageUrl && (
+                    <div className="relative">
+                      <img src={imageUrl} alt="Preview" className="w-20 h-20 object-cover rounded border" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => setImageUrl('')}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                    />
+                    {uploadingImage && <p className="text-xs text-muted-foreground mt-1">Upload en cours...</p>}
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <Label>Produits inclus</Label>
@@ -223,7 +282,66 @@ export default function Packs() {
                 <Badge variant="outline">{p.discount_type === 'percentage' ? `${p.discount_value}%` : formatPrice(p.discount_value)} de remise</Badge>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(p.id)}><Trash2 className="h-4 w-4" /></Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={async () => {
+                  // Load pack data for editing
+                  const { data: packData } = await supabase
+                    .from('product_packs')
+                    .select(`
+                      *,
+                      pack_items (
+                        id,
+                        product_id,
+                        quantity,
+                        item_type,
+                        products (id, title, price),
+                        pack_item_options (
+                          product_id,
+                          is_default,
+                          products (id, title, price)
+                        )
+                      )
+                    `)
+                    .eq('id', p.id)
+                    .single();
+
+                  if (packData) {
+                    setEditId(packData.id);
+                    setName(packData.name);
+                    setSlug(packData.slug);
+                    setDescription(packData.description || '');
+                    setImageUrl(packData.image_url || '');
+                    setDiscountType(packData.discount_type);
+                    setDiscountValue(packData.discount_value);
+
+                    // Transform pack_items to PackItem format
+                    const items: PackItem[] = (packData.pack_items as any[]).map(item => ({
+                      product_id: item.product_id,
+                      title: item.products.title,
+                      price: item.products.price,
+                      quantity: item.quantity,
+                      item_type: item.item_type,
+                      options: item.pack_item_options?.map((opt: any) => ({
+                        product_id: opt.product_id,
+                        title: opt.products.title,
+                        price: opt.products.price,
+                        is_default: opt.is_default,
+                      })),
+                    }));
+                    setPackItems(items);
+                    setOpen(true);
+                  }
+                }}
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(p.id)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </div>
