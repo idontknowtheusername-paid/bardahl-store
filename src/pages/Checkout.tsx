@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/context/CartContext';
+import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { paymentApi } from '@/lib/api-payment';
@@ -63,6 +64,7 @@ const availableCountries = [
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, clearCart } = useCart();
+  const { profile } = useCustomerAuth();
   const [currentStep, setCurrentStep] = useState<Step>('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
@@ -84,6 +86,19 @@ export default function Checkout() {
   const [acceptCGV, setAcceptCGV] = useState(false);
   const [subscribeToBlog, setSubscribeToBlog] = useState(true);
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+
+  // Pre-fill form if customer is authenticated
+  useEffect(() => {
+    if (profile) {
+      setShippingInfo(prev => ({
+        ...prev,
+        firstName: profile.full_name || prev.firstName,
+        email: profile.email || prev.email,
+        phone: profile.phone || prev.phone,
+        city: profile.city || prev.city,
+      }));
+    }
+  }, [profile]);
 
   // Get cities for selected country
   const citiesForCountry = countryCities[shippingInfo.country] || [];
@@ -270,6 +285,7 @@ export default function Checkout() {
           city: effectiveCity,
           address: shippingInfo.address,
           country: shippingInfo.country,
+          customer_profile_id: profile?.id, // Link to customer profile if authenticated
         },
         selectedShippingOption?.name || selectedShipping,
         'kkiapay',

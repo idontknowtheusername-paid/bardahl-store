@@ -15,7 +15,7 @@ serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   try {
-    const { items, shipping, shippingMethod, shippingCost: frontendShippingCost } = await req.json();
+    const { items, shipping, shippingMethod, shippingCost: frontendShippingCost, customer_profile_id } = await req.json();
 
     // Calculate subtotal from DB prices
     let subtotal = 0;
@@ -63,6 +63,7 @@ serve(async (req) => {
         customer_name: shipping.firstName,
         customer_email: shipping.email || null,
         customer_phone: shipping.phone,
+        customer_profile_id: customer_profile_id || null, // Link to customer profile
         shipping_address: {
           address: shipping.address,
           city: shipping.city,

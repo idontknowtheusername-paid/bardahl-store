@@ -16,6 +16,7 @@ export interface ShippingInfo {
   city: string;
   address?: string;
   country?: string;
+  customer_profile_id?: string; // Link to customers table
 }
 
 export interface CreateOrderResponse {
@@ -62,6 +63,7 @@ export const paymentApi = {
         shipping: shippingInfo,
         shippingMethod,
         shippingCost, // Pass explicit shipping cost from frontend
+        customer_profile_id: shippingInfo.customer_profile_id, // Pass customer profile ID
       },
     });
 

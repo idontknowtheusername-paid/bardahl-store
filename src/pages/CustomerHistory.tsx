@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ShoppingBag, Wrench, Loader2, Car, CheckCircle, Clock, Package } from 'lucide-react';
+import { ShoppingBag, Wrench, Loader2, Car, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
@@ -56,15 +56,47 @@ export default function CustomerHistory() {
     // Fetch orders by phone
     (async () => {
       setLoadingOrders(true);
-      const { data: ordersData } = await supabase
+
+      // Normalize phone number (remove spaces, +, etc.)
+      const normalizePhone = (phone: string) => phone.replace(/[\s\+\-\(\)]/g, '');
+      const profilePhone = normalizePhone(profile.phone);
+
+      console.log('🔍 Recherche commandes pour:', profile.phone, '(normalisé:', profilePhone + ')');
+
+      const { data: ordersData, error } = await supabase
         .from('orders')
-        .select('id, order_number, created_at, total, status, payment_status')
-        .eq('customer_phone', profile.phone)
+        .select('id, order_number, created_at, total, status, payment_status, customer_phone, customer_profile_id')
         .order('created_at', { ascending: false });
 
+      console.log('📦 Toutes les commandes:', ordersData?.length || 0);
+
       if (ordersData) {
+        // Log all customer phones for debugging
+        console.log('📞 Téléphones dans les commandes:', ordersData.map(o => o.customer_phone));
+
+        // Filter by customer_profile_id (priority) OR normalized phone (fallback)
+        const filtered = ordersData.filter(o => {
+          // Priority: match by customer_profile_id
+          if (o.customer_profile_id === profile.id) {
+            console.log(`✅ Match par profile_id: ${o.order_number}`);
+            return true;
+          }
+
+          // Fallback: match by phone
+          const orderPhone = normalizePhone(o.customer_phone || '');
+          const phoneMatch = orderPhone === profilePhone ||
+            orderPhone.endsWith(profilePhone) ||
+            profilePhone.endsWith(orderPhone);
+          if (phoneMatch) {
+            console.log(`✅ Match par téléphone: ${o.order_number} (${o.customer_phone})`);
+          }
+          return phoneMatch;
+        });
+
+        console.log('✅ Commandes filtrées:', filtered.length);
+
         const withItems = await Promise.all(
-          ordersData.map(async (o) => {
+          filtered.map(async (o) => {
             const { data: items } = await supabase
               .from('order_items')
               .select('product_title, quantity, unit_price')
@@ -124,7 +156,17 @@ export default function CustomerHistory() {
       <div className="min-h-[70vh] bg-muted/30">
         <section className="bg-secondary text-secondary-foreground py-6">
           <div className="container">
+            <button
+              onClick={() => navigate('/mon-espace')}
+              className="flex items-center gap-2 text-secondary-foreground/80 hover:text-white transition-colors mb-3 text-sm"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour à Mon espace
+            </button>
             <h1 className="text-xl font-extrabold text-white">📋 Mon Historique</h1>
+            <p className="text-secondary-foreground/70 text-sm mt-1">
+              Consultez vos commandes et entretiens
+            </p>
           </div>
         </section>
 

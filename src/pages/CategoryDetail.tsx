@@ -42,14 +42,40 @@ export default function CategoryDetail() {
   const products = useMemo(() => {
     if (!allProducts || !slug) return [];
     const info = PRODUCT_TYPE_INFO[slug];
+
+    let filtered = [];
     if (info?.parentType) {
       // Subcategory: match by subcategorySlug or style
-      return allProducts.filter(p => 
+      filtered = allProducts.filter(p => 
         p.subcategorySlug === slug || p.style === slug
       );
+    } else {
+      // Main category: match by product_type (style field holds product_type)
+      filtered = allProducts.filter(p => p.style === slug);
     }
-    // Main category: match by product_type (style field holds product_type)
-    return allProducts.filter(p => p.style === slug);
+
+    // Sort oils by capacity (5L first, then 4L, 2L, 1L, etc.)
+    if (slug === 'huiles-moteur') {
+      const sorted = filtered.sort((a, b) => {
+        const getCapacity = (product: any) => {
+          // Try capacity field first
+          let cap = product.capacity || '';
+          // If empty, extract from name (e.g., "Bardahl - XTS 5W30- 5L")
+          if (!cap && product.name) {
+            const nameMatch = product.name.match(/(\d+)L/i);
+            cap = nameMatch ? nameMatch[1] + 'L' : '';
+          }
+          const match = cap.match(/(\d+)/);
+          return match ? parseInt(match[1]) : 0;
+        };
+        const capA = getCapacity(a);
+        const capB = getCapacity(b);
+        return capB - capA; // Descending order (5L, 4L, 2L, 1L)
+      });
+      return sorted;
+    }
+
+    return filtered;
   }, [allProducts, slug]);
 
   if (isLoading) {
