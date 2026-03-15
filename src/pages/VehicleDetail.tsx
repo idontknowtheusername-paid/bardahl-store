@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { Car, ArrowLeft, Plus, Trash2, Wrench, Droplets, Calendar, Gauge, Fuel, MapPin, Loader2, ClipboardList, QrCode, Pencil, Bell, Check } from 'lucide-react';
 import BrandedQRCard from '@/components/vehicle/BrandedQRCard';
 import HealthDashboard from '@/components/vehicle/HealthDashboard';
+import MaintenanceValidationBanner from '@/components/vehicle/MaintenanceValidationBanner';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -90,6 +91,14 @@ export default function VehicleDetail() {
   const [alertInterval, setAlertInterval] = useState('6');
   const [savingAlerts, setSavingAlerts] = useState(false);
 
+  // Maintenance validation banner
+  const [showValidationBanner, setShowValidationBanner] = useState(false);
+  const [pendingMaintenance, setPendingMaintenance] = useState<{
+    type: string;
+    date: string;
+    intervalMonths: number;
+  } | null>(null);
+
   const vehicle = vehicles.find(v => v.id === id);
 
   const fetchData = useCallback(async () => {
@@ -122,6 +131,27 @@ export default function VehicleDetail() {
         setAlertReminder(match);
         setAlertPrefs((match as any).alert_preferences || { midpoint: true, one_week: true, one_day: true });
         setAlertInterval(String(match.reminder_interval_months || 6));
+
+        // Check if maintenance is overdue
+        const nextDate = new Date(match.next_reminder_date);
+        const today = new Date();
+        const isPast = nextDate < today;
+
+        if (isPast) {
+          // Check if there's a "Vidange moteur" record for this date
+          const vidangeRecord = (recs as unknown as MaintenanceRecord[])?.find(
+            r => r.maintenance_type === 'Vidange moteur' && r.next_date === match.next_reminder_date
+          );
+
+          if (vidangeRecord) {
+            setPendingMaintenance({
+              type: 'Vidange moteur',
+              date: match.next_reminder_date,
+              intervalMonths: match.reminder_interval_months || 6,
+            });
+            setShowValidationBanner(true);
+          }
+        }
       }
     }
 
@@ -325,7 +355,24 @@ export default function VehicleDetail() {
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
           ) : (
-            <Tabs defaultValue="entretien" className="w-full">
+              <>
+                {/* Validation Banner */}
+                {showValidationBanner && pendingMaintenance && (
+                  <div className="mb-5">
+                    <MaintenanceValidationBanner
+                      vehicleId={id!}
+                      maintenanceType={pendingMaintenance.type}
+                      scheduledDate={pendingMaintenance.date}
+                      intervalMonths={pendingMaintenance.intervalMonths}
+                      onValidated={() => {
+                        setShowValidationBanner(false);
+                        fetchData();
+                      }}
+                    />
+                  </div>
+                )}
+
+                <Tabs defaultValue="entretien" className="w-full">
               <TabsList className="w-full grid grid-cols-4 mb-5">
                 <TabsTrigger value="entretien" className="gap-1.5 text-xs sm:text-sm">
                   <ClipboardList className="h-4 w-4 hidden sm:block" /> Entretien
@@ -849,6 +896,7 @@ export default function VehicleDetail() {
                 </div>
               </TabsContent>
             </Tabs>
+              </>
           )}
         </div>
       </div>

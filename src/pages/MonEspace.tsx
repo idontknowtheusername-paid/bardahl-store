@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight, Settings, Mail, KeyRound, Save, X, History } from 'lucide-react';
+import { Car, Plus, Trash2, LogOut, User, Fuel, Gauge, Calendar, MapPin, Loader2, ChevronRight, Settings, Mail, KeyRound, Save, X, History, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
+import { usePendingMaintenanceCount } from '@/hooks/usePendingMaintenanceCount';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function MonEspace() {
   const { isAuthenticated, isLoading: authLoading, profile, vehicles, logout, addVehicle, deleteVehicle, refreshProfile } = useCustomerAuth();
+  const { count: pendingCount } = usePendingMaintenanceCount();
   const navigate = useNavigate();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -132,8 +135,16 @@ export default function MonEspace() {
         <div className="container py-5">
           <Tabs defaultValue="vehicules" className="w-full">
             <TabsList className="w-full grid grid-cols-3 mb-5">
-              <TabsTrigger value="vehicules" className="gap-1.5 text-xs sm:text-sm">
+              <TabsTrigger value="vehicules" className="gap-1.5 text-xs sm:text-sm relative">
                 <Car className="h-4 w-4 hidden sm:block" /> Véhicules
+                {pendingCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] font-bold"
+                  >
+                    {pendingCount}
+                  </Badge>
+                )}
               </TabsTrigger>
               <TabsTrigger value="historique" className="gap-1.5 text-xs sm:text-sm" onClick={() => navigate('/mon-espace/historique')}>
                 <History className="h-4 w-4 hidden sm:block" /> Historique
@@ -145,6 +156,23 @@ export default function MonEspace() {
 
             {/* TAB: Véhicules */}
             <TabsContent value="vehicules" className="space-y-4">
+              {/* Pending maintenance alert */}
+              {pendingCount > 0 && (
+                <div className="bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-950/20 border-l-4 border-orange-500 rounded-lg p-3 flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0">
+                    <Bell className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-sm text-orange-900 dark:text-orange-100 mb-0.5">
+                      {pendingCount} vidange{pendingCount > 1 ? 's' : ''} en attente
+                    </h3>
+                    <p className="text-xs text-orange-800 dark:text-orange-200">
+                      Cliquez sur votre véhicule pour valider.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold flex items-center gap-2">
                   <Car className="h-5 w-5 text-primary" /> Véhicules ({vehicles.length})

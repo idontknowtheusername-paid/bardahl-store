@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ArrowLeft, Car, Phone, Mail, MapPin, Calendar, Droplets, ClipboardList,
-  QrCode, ShoppingBag, MessageCircle, Pencil, Check, X, Loader2, Save, Shield, AlertTriangle
+  QrCode, ShoppingBag, MessageCircle, Pencil, Check, X, Loader2, Save, Shield, AlertTriangle, Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -118,12 +118,39 @@ export default function CustomerDetail() {
 
   // Fetch order stats
   const { data: orders } = useQuery({
-    queryKey: ['admin-customer-orders', customer?.phone],
+    queryKey: ['admin-customer-orders', customerId, customer?.phone],
     queryFn: async () => {
-      const { data } = await supabase.from('orders').select('id, order_number, total, status, created_at, customer_phone').eq('customer_phone', customer.phone);
-      return data || [];
+      if (!customer) return [];
+
+      // Normalize phone number (remove spaces, +, etc.)
+      const normalizePhone = (phone: string) => phone.replace(/[\s\+\-\(\)]/g, '');
+      const customerPhone = normalizePhone(customer.phone);
+
+      // Fetch all orders
+      const { data: allOrders } = await supabase
+        .from('orders')
+        .select('id, order_number, total, status, created_at, customer_phone, customer_profile_id')
+        .order('created_at', { ascending: false });
+
+      if (!allOrders) return [];
+
+      // Filter by customer_profile_id (priority) OR normalized phone (fallback)
+      const filtered = allOrders.filter(o => {
+        // Priority: match by customer_profile_id
+        if (o.customer_profile_id === customerId) {
+          return true;
+        }
+
+        // Fallback: match by phone
+        const orderPhone = normalizePhone(o.customer_phone || '');
+        return orderPhone === customerPhone ||
+          orderPhone.endsWith(customerPhone) ||
+          customerPhone.endsWith(orderPhone);
+      });
+
+      return filtered;
     },
-    enabled: !!customer?.phone,
+    enabled: !!customer?.phone && !!customerId,
   });
 
   // Auto-select first vehicle
@@ -192,14 +219,88 @@ export default function CustomerDetail() {
   // Validate maintenance
   const validateMaint = useMutation({
     mutationFn: async ({ id, validated }: { id: string; validated: boolean }) => {
-      await supabase.from('maintenance_records' as any).update({
-        admin_validated: validated,
-        admin_validated_at: validated ? new Date().toISOString() : null,
-        admin_validated_by: validated ? 'admin' : null,
-      }).eq('id', id);
+      if (validated) {
+        // Get the maintenance record to find the vehicle
+        const { data: record } = await supabase
+          .from('maintenance_records' as any)
+          .select('vehicle_id, maintenance_type')
+          .eq('id', id)
+          .single();
+
+        if (!record) return;
+
+        // Get the vehicle to find customer and alert config
+        const { data: vehicle } = await supabase
+          .from('customer_vehicles' as any)
+          .select('customer_id, brand, model')
+          .eq('id', record.vehicle_id)
+          .single();
+
+        let intervalMonths = 3; // Default
+
+        if (vehicle) {
+          // Try to get user's configured interval from oil_change_reminders
+          const { data: reminder } = await supabase
+            .from('oil_change_reminders' as any)
+            .select('reminder_interval_months')
+            .eq('vehicle_brand', vehicle.brand)
+            .eq('vehicle_model', vehicle.model)
+            .eq('is_active', true)
+            .maybeSingle();
+
+          if (reminder?.reminder_interval_months) {
+            intervalMonths = reminder.reminder_interval_months;
+          }
+        }
+
+        // When validating, update dates like user validation
+        const today = new Date();
+        const nextDate = new Date(today);
+        nextDate.setMonth(nextDate.getMonth() + intervalMonths);
+
+        await supabase.from('maintenance_records' as any).update({
+          admin_validated: true,
+          admin_validated_at: new Date().toISOString(),
+          admin_validated_by: 'admin',
+          last_date: today.toISOString(),
+          next_date: nextDate.toISOString(),
+        }).eq('id', id);
+      } else {
+      // When unvalidating, just remove validation flags
+        await supabase.from('maintenance_records' as any).update({
+          admin_validated: false,
+          admin_validated_at: null,
+          admin_validated_by: null,
+        }).eq('id', id);
+      }
     },
     onSuccess: () => {
       toast.success('Statut mis à jour');
+      queryClient.invalidateQueries({ queryKey: ['admin-maint-records'] });
+    },
+  });
+
+  // Postpone maintenance by 7 days
+  const postponeMaint = useMutation({
+    mutationFn: async (id: string) => {
+      // Get current record
+      const { data: record } = await supabase
+        .from('maintenance_records' as any)
+        .select('next_date')
+        .eq('id', id)
+        .single();
+
+      if (record?.next_date) {
+        const newDate = new Date(record.next_date);
+        newDate.setDate(newDate.getDate() + 7);
+
+        await supabase.from('maintenance_records' as any).update({
+          next_date: newDate.toISOString(),
+        }).eq('id', id);
+      }
+    },
+    onSuccess: () => {
+      toast.success('Entretien reporté de 7 jours');
       queryClient.invalidateQueries({ queryKey: ['admin-maint-records'] });
     },
   });
@@ -482,15 +583,39 @@ export default function CustomerDetail() {
                                 )}
                               </div>
                               <div className="flex gap-1 shrink-0">
-                                <Button
-                                  size="sm"
-                                  variant={r.admin_validated ? 'secondary' : 'default'}
-                                  className="gap-1 text-xs h-7"
-                                  onClick={() => validateMaint.mutate({ id: r.id, validated: !r.admin_validated })}
-                                >
-                                  {r.admin_validated ? <X className="h-3 w-3" /> : <Check className="h-3 w-3" />}
-                                  {r.admin_validated ? 'Annuler' : 'Valider'}
-                                </Button>
+                                  {!r.admin_validated && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        className="gap-1 text-xs h-7"
+                                        onClick={() => validateMaint.mutate({ id: r.id, validated: true })}
+                                      >
+                                        <Check className="h-3 w-3" />
+                                        Valider
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="gap-1 text-xs h-7"
+                                        onClick={() => postponeMaint.mutate(r.id)}
+                                      >
+                                        <Clock className="h-3 w-3" />
+                                        +7j
+                                      </Button>
+                                    </>
+                                  )}
+                                  {r.admin_validated && (
+                                    <Button
+                                      size="sm"
+                                      variant="secondary"
+                                      className="gap-1 text-xs h-7"
+                                      onClick={() => validateMaint.mutate({ id: r.id, validated: false })}
+                                    >
+                                      <X className="h-3 w-3" />
+                                      Annuler
+                                    </Button>
+                                  )}
                                 <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => startEditMaint(r)}>
                                   <Pencil className="h-3.5 w-3.5" />
                                 </Button>

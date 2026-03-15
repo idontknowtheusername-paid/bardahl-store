@@ -21,6 +21,7 @@ import CategoryDetail from "./pages/CategoryDetail";
 import Selections from "./pages/Selections";
 import SelectionDetail from "./pages/SelectionDetail";
 import ProductDetail from "./pages/ProductDetail";
+import PackDetail from "./pages/PackDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import CheckoutCallback from "./pages/CheckoutCallback";
@@ -100,6 +101,7 @@ const App = () => {
                     <Route path="/selections" element={<Selections />} />
                     <Route path="/selections/:slug" element={<SelectionDetail />} />
                     <Route path="/produits/:slug" element={<ProductDetail />} />
+                          <Route path="/packs/:slug" element={<PackDetail />} />
                     <Route path="/panier" element={<Cart />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/checkout/callback" element={<CheckoutCallback />} />

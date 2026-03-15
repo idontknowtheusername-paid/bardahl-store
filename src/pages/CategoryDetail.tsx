@@ -89,7 +89,7 @@ export default function CategoryDetail() {
 
         return {
           id: pack.id,
-          slug: `/packs/${pack.slug}`,
+          slug: `packs/${pack.slug}`, // Use /packs/:slug for pack detail page
           name: pack.name,
           price: finalPrice,
           originalPrice: subtotal > finalPrice ? subtotal : undefined,

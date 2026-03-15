@@ -41,9 +41,12 @@ export default function Customers() {
       const { data: vehicleRows } = await supabase
         .from('customer_vehicles' as any).select('id, customer_id').in('customer_id', customerIds);
 
-      const phones = customerRows.map((c: any) => c.phone);
-      const { data: orderRows } = await supabase
-        .from('orders').select('customer_phone, total, created_at').in('customer_phone', phones);
+      // Fetch all orders
+      const { data: allOrders } = await supabase
+        .from('orders').select('customer_phone, customer_profile_id, total, created_at');
+
+      // Normalize phone helper
+      const normalizePhone = (phone: string) => phone.replace(/[\s\+\-\(\)]/g, '');
 
       // For CSV export with lubrication data, fetch plans
       const { data: lubPlans } = await supabase
@@ -51,7 +54,20 @@ export default function Customers() {
 
       return customerRows.map((c: any): CustomerData & { _vehicles: any[]; _lubPlans: any[] } => {
         const custVehicles = (vehicleRows as any[] || []).filter((v: any) => v.customer_id === c.id);
-        const custOrders = (orderRows || []).filter((o: any) => o.customer_phone === c.phone);
+
+        // Filter orders by customer_profile_id (priority) OR normalized phone (fallback)
+        const customerPhone = normalizePhone(c.phone);
+        const custOrders = (allOrders || []).filter((o: any) => {
+          // Priority: match by customer_profile_id
+          if (o.customer_profile_id === c.id) return true;
+
+          // Fallback: match by phone
+          const orderPhone = normalizePhone(o.customer_phone || '');
+          return orderPhone === customerPhone ||
+            orderPhone.endsWith(customerPhone) ||
+            customerPhone.endsWith(orderPhone);
+        });
+
         return {
           id: c.id,
           full_name: c.full_name,

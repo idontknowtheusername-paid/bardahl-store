@@ -36,9 +36,12 @@ export function ProductCard({ product, className, style, compact = false }: Prod
     setTimeout(() => setIsAdding(false), 300);
   };
 
+  // Determine the correct link path - if slug starts with "packs/", use it as-is, otherwise prepend "/produits/"
+  const linkPath = product.slug.startsWith('packs/') ? `/${product.slug}` : `/produits/${product.slug}`;
+
   return (
     <div className={cn("group block bg-card rounded-lg overflow-hidden hover-lift h-full flex flex-col", className)} style={style}>
-      <Link to={`/produits/${product.slug}`} className="flex-shrink-0">
+      <Link to={linkPath} className="flex-shrink-0">
         <div className={cn("relative overflow-hidden bg-muted", compact ? "aspect-[4/3]" : "aspect-square")}>
           <img src={product.images[0]} alt={product.name}
             className={cn("w-full h-full object-contain transition-transform duration-500 group-hover:scale-105", compact ? "p-1" : "p-2")} loading="lazy" />
@@ -57,7 +60,7 @@ export function ProductCard({ product, className, style, compact = false }: Prod
       </Link>
       <div className={cn("flex-1 flex flex-col justify-between", compact ? "p-2" : "p-4")}>
         <div>
-          <Link to={`/produits/${product.slug}`}>
+          <Link to={linkPath}>
             <h3 className={cn("font-medium line-clamp-2 group-hover:text-primary transition-colors", compact ? "text-xs" : "text-sm md:text-base")}>{product.name}</h3>
           </Link>
           {product.composition && (
