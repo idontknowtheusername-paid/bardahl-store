@@ -71,6 +71,8 @@ function App() {
                         <Route path="/invoices" element={<Invoices />} />
                         <Route path="/reminders" element={<Reminders />} />
                         <Route path="/finances" element={<Finances />} />
+                        <Route path="/payment-links" element={<PaymentLinks />} />
+                        <Route path="/packs" element={<Packs />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </AdminLayout>

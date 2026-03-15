@@ -70,30 +70,25 @@ export default function PaymentLink() {
 
   const handlePay = () => {
     if (!data) return;
-    // Build cart items from payment link data and redirect to checkout
     clearCart();
     data.items.forEach(item => {
-      addItem({
-        product: {
-          id: item.product_id,
-          slug: item.product_id,
-          name: item.title,
-          price: item.price,
-          images: [],
-          category: '',
-          collection: '',
-          colors: [],
-          sizes: [{ size: 'unique', available: true }],
-          description: '',
-          composition: '',
-          care: '',
-          style: '',
-          stock: { unique: 99 },
-        },
-        quantity: item.quantity,
-        size: 'unique',
-        color: '',
-      });
+      const product: any = {
+        id: item.product_id,
+        slug: item.product_id,
+        name: item.title,
+        price: item.price,
+        images: [],
+        category: '',
+        collection: '',
+        colors: [],
+        sizes: [{ size: 'unique', available: true }],
+        description: '',
+        composition: '',
+        care: '',
+        style: '',
+        stock: { unique: 99 },
+      };
+      addItem(product, 'unique', '', item.quantity);
     });
     navigate('/checkout');
   };

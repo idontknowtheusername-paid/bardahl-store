@@ -74,6 +74,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/reminders', label: 'Rappels vidange', icon: Bell },
     { href: '/users', label: t.nav.users, icon: UsersIcon },
     { href: '/promo-codes', label: t.nav.promoCodes, icon: Percent },
+    { href: '/packs', label: 'Packs', icon: Boxes },
     { href: '/blog', label: t.nav.blog, icon: FileText },
     { href: '/media', label: t.nav.media, icon: Image },
     // { href: '/newsletter', label: t.nav.newsletter, icon: Mail },
