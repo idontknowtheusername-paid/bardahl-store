@@ -57,22 +57,22 @@ function generateInvoiceHTML(order: Order): string {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1a1a1a; background: #fff; }
         .invoice { max-width: 800px; margin: 0 auto; padding: 40px; }
-        .header { background: #0a0a0a; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .brand { color: #FFD000; font-size: 32px; font-weight: 900; letter-spacing: 3px; }
-        .brand-sub { color: #999; font-size: 11px; margin-top: 4px; }
-        .invoice-badge { background: #FFD000; color: #0a0a0a; padding: 8px 20px; border-radius: 4px; font-weight: 700; font-size: 14px; }
+        .header { background: #ffffff; padding: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4A7BA7; }
+        .brand { color: #4A7BA7; font-size: 32px; font-weight: 900; letter-spacing: 3px; }
+        .brand-sub { color: #666; font-size: 11px; margin-top: 4px; }
+        .invoice-badge { background: #4A7BA7; color: #ffffff; padding: 8px 20px; border-radius: 4px; font-weight: 700; font-size: 14px; }
         .meta { display: flex; justify-content: space-between; margin: 30px 0; }
         .meta-block h3 { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .meta-block p { font-size: 14px; color: #1a1a1a; line-height: 1.6; }
-        .divider { height: 2px; background: linear-gradient(to right, #FFD000, #0a0a0a); margin: 20px 0; }
+        .divider { height: 2px; background: linear-gradient(to right, #4A7BA7, #0a0a0a); margin: 20px 0; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        thead { background: #0a0a0a; color: #FFD000; }
+        thead { background: #0a0a0a; color: #4A7BA7; }
         thead th { padding: 12px 8px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
         thead th:last-child, thead th:nth-child(3), thead th:nth-child(2) { text-align: right; }
         thead th:nth-child(2) { text-align: center; }
         .totals { margin-left: auto; width: 280px; margin-top: 20px; }
         .totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #eee; }
-        .totals-total { display: flex; justify-content: space-between; padding: 12px 0; font-size: 18px; font-weight: 700; border-top: 2px solid #FFD000; margin-top: 8px; }
+        .totals-total { display: flex; justify-content: space-between; padding: 12px 0; font-size: 18px; font-weight: 700; border-top: 2px solid #4A7BA7; margin-top: 8px; }
         .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #999; font-size: 11px; }
         .paid-stamp { display: inline-block; border: 3px solid #16a34a; color: #16a34a; padding: 6px 20px; border-radius: 4px; font-weight: 700; font-size: 18px; transform: rotate(-5deg); margin-top: 20px; }
       </style>
@@ -81,7 +81,7 @@ function generateInvoiceHTML(order: Order): string {
     <div class="invoice">
       <div class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
-          <img src="${window.location.origin}/logo-autopassion.png" alt="AutoPassion" style="height: 70px; width: auto; object-fit: contain;" />
+          <img src="https://autopassionbj.com/logo-autopassion.png" alt="AutoPassion" style="height: 70px; width: auto; object-fit: contain;" />
           <div>
             <div class="brand">AUTOPASSION</div>
             <div class="brand-sub">Lubrifiants & Solutions Automobile - Bénin</div>
@@ -93,7 +93,7 @@ function generateInvoiceHTML(order: Order): string {
       <div class="meta">
         <div class="meta-block">
           <h3>Facture N°</h3>
-          <p style="font-size:18px; font-weight:700; color:#FFD000;">${invoiceNumber}</p>
+          <p style="font-size:18px; font-weight:700; color:#4A7BA7;">${invoiceNumber}</p>
           <p style="margin-top:4px;">Commande : ${order.order_number}</p>
           <p>Date : ${date}</p>
         </div>
@@ -131,7 +131,7 @@ function generateInvoiceHTML(order: Order): string {
       ${order.payment_status === 'paid' ? '<div style="text-align:right; margin-top:20px;"><div class="paid-stamp">PAYÉ</div></div>' : ''}
 
       <div class="footer">
-        <p>AUTOPASSION BJ - Lubrifiants & Solutions Automobile</p>
+        <p>AUTOPASSION BJ - Huile a moteur & Solutions Automobile</p>
         <p style="margin-top:4px;">Merci pour votre confiance. Pour toute question, contactez-nous.</p>
         <p style="margin-top:8px; color:#ccc;">Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
       </div>
@@ -268,7 +268,7 @@ export default function Invoices() {
                 <Button size="sm" onClick={() => handleDownload(previewOrder)}>
                   <Download className="w-4 h-4 mr-2" />Imprimer/PDF
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setPreviewOrder(null)}>Fermer</Button>
+                <Button size="sm" variant="ghost" onClick={() => setPreviewOrder(null)}>Fermer</Button>
               </div>
             </div>
             <div

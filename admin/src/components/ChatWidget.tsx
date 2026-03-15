@@ -52,6 +52,7 @@ export function ChatWidget() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showPill, setShowPill] = useState(false); // Masqué par défaut
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -112,12 +113,37 @@ export function ChatWidget() {
   const quickActions = ['📊 Résumé des KPIs du jour', '📦 Commandes à traiter en priorité', '⚠️ Produits en stock faible'];
 
   if (!isOpen) {
+    if (!showPill) {
+      return (
+        <button
+          onClick={() => setShowPill(true)}
+          className="fixed bottom-6 right-6 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center z-50 group"
+          title="Afficher l'assistant"
+        >
+          <Bot className="h-5 w-5 group-hover:scale-110 transition-transform" />
+        </button>
+      );
+    }
+
     return (
-      <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2.5 pl-3 pr-4 z-50 group" title="Assistant Admin AutoPassion">
-        <span className="h-8 w-8 rounded-full bg-primary-foreground/15 flex items-center justify-center"><Bot className="h-4 w-4 group-hover:scale-110 transition-transform" /></span>
-        <span className="text-sm font-medium">Assistant AutoPassion</span>
-        {messages.length > 1 && <span className="bg-primary-foreground text-primary text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">{messages.length - 1}</span>}
-      </button>
+      <div className="fixed bottom-6 right-6 flex items-center gap-2 z-50">
+        <button
+          onClick={() => setShowPill(false)}
+          className="h-10 w-10 rounded-full bg-muted border border-border text-foreground shadow-lg hover:bg-muted/80 transition-all flex items-center justify-center"
+          title="Masquer l'assistant"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center gap-2.5 pl-3 pr-4 group"
+          title="Assistant Admin AutoPassion"
+        >
+          <span className="h-8 w-8 rounded-full bg-primary-foreground/15 flex items-center justify-center"><Bot className="h-4 w-4 group-hover:scale-110 transition-transform" /></span>
+          <span className="text-sm font-medium">Assistant AutoPassion</span>
+          {messages.length > 1 && <span className="bg-primary-foreground text-primary text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">{messages.length - 1}</span>}
+        </button>
+      </div>
     );
   }
 
@@ -141,6 +167,7 @@ export function ChatWidget() {
           <div><h3 className="font-medium text-sm">Assistant AutoPassion</h3><span className="text-xs opacity-80">Gestion & Conseils</span></div>
         </div>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20" onClick={() => setShowPill(!showPill)} title={showPill ? "Masquer la pillule" : "Afficher la pillule"}>{showPill ? <X className="h-4 w-4" /> : <Bot className="h-4 w-4" />}</Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20" onClick={() => setShowHistory(!showHistory)} title="Historique"><History className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20" onClick={clearChat} title="Nouvelle conversation"><Trash2 className="h-4 w-4" /></Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20" onClick={() => setIsFullscreen(!isFullscreen)} title={isFullscreen ? "Réduire" : "Plein écran"}>
